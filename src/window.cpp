@@ -2,8 +2,8 @@
 
 // Screen dimensions
 // TODO: Take this from config file?
-constexpr unsigned int screen_width {640};
-constexpr unsigned int screen_height {480};
+constexpr unsigned int screen_width {432};
+constexpr unsigned int screen_height {304};
 
 constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO; // | SDL_INIT_AUDIO
 constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
@@ -55,12 +55,17 @@ Window::~Window() {
 
 void Window::render() const {
   // Fill the background white
-  // SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
-  // SDL_RenderClear(renderer_.get());
+  SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
+  SDL_RenderClear(renderer_.get());
 
   // Render image on screen
   if (sprite_sheet_ != nullptr) {
-    SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), nullptr, nullptr);
+    // Render the whole sprite sheet
+    // SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), nullptr, nullptr);
+    // Only render the mountain sprite "x":2,"y":200,"w":432,"h":64
+    constexpr SDL_FRect mountain_src(2, 200, 432, 64);
+    constexpr SDL_FRect mountain_dst(0, 188, 432, 64);
+    SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), &mountain_src, &mountain_dst);
   }
 
   //Update screen
@@ -80,6 +85,7 @@ void Window::load_sprite_sheet(const std::string& sprite_sheet_filename) {
   }
   // Generate the texture and save it
   sprite_sheet_.reset(SDL_CreateTextureFromSurface(renderer_.get(), sprites_surface));
+  SDL_Log("Sprite sheet size: %dx%d", sprite_sheet_.get()->w, sprite_sheet_.get()->h);
   // Release the temporary surface object
   SDL_DestroySurface(sprites_surface);
 }
