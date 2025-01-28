@@ -1,7 +1,8 @@
 
 add_executable(${PROJECT_NAME}
         window.cpp
-        window.hpp)
+        window.hpp
+        sprites.hpp)
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
 )

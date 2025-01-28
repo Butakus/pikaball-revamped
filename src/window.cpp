@@ -1,4 +1,5 @@
 #include "window.hpp"
+#include "sprites.hpp"
 
 // Screen dimensions
 // TODO: Take this from config file?
@@ -63,9 +64,9 @@ void Window::render() const {
     // Render the whole sprite sheet
     // SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), nullptr, nullptr);
     // Only render the mountain sprite "x":2,"y":200,"w":432,"h":64
-    constexpr SDL_FRect mountain_src(2, 200, 432, 64);
+    // constexpr SDL_FRect mountain_src(2, 200, 432, 64); // Source is obtained from sprites.hpp
     constexpr SDL_FRect mountain_dst(0, 188, 432, 64);
-    SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), &mountain_src, &mountain_dst);
+    SDL_RenderTexture(renderer_.get(), sprite_sheet_.get(), &sprite::objects_mountain, &mountain_dst);
   }
 
   //Update screen
