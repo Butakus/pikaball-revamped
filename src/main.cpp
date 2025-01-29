@@ -14,11 +14,8 @@ Window::SDL_Surface_ptr load_image() {
 }
 
 int main() {
-    SDL_Log("Hello from SDL");
-
     // Create a new window and load the sprite sheet textures
-    Window window;
-    window.load_sprite_sheet(image_path);
+    const Window window;
 
     SDL_Log("Running stuff!");
     bool quit {false};
