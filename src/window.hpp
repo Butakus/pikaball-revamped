@@ -18,7 +18,7 @@ public:
   ~Window();
 
   /** Render the next frame */
-  void render() const;
+  void render();
 
   /** Get a non-owning pointer to the renderer */
   [[nodiscard]] inline SDL_Renderer* get_renderer() const { return renderer_.get(); }
@@ -29,6 +29,11 @@ private:
   SDL_Surface* window_surface_;
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
+
+  // Frame rate management
+  Uint64 last_render_time_ {0};
+  Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
+  Uint64 target_time_per_frame_ {1000 / target_fps_}; // Possible speeds are 20 / 25 / 30 fps
 
   /** Load a new sprite sheet from disk and create a texture */
   void load_sprite_sheet();
