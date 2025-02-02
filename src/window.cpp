@@ -83,13 +83,14 @@ void Window::render() {
 
     // Render the static background
     SDL_RenderTexture(renderer_.get(), background_texture_.get(), nullptr, nullptr);
-    // Waves
+    // Waves and clouds
     render_waves();
+    render_clouds();
   }
 
   //Update screen
   SDL_RenderPresent(renderer_.get());
-  SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
+  // SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
   last_render_time_ = current_time;
 }
 
@@ -124,61 +125,68 @@ void Window::generate_background() {
   SDL_RenderClear(renderer_.get());
 
   // Build the sky
-  SDL_FRect dst = {
+  SDL_FRect f_dst;
+  SDL_Rect dst = {
     // Preset width and height of sky texture
     .w = 16,
     .h = 16,
   };
-  for (size_t i = 0; i < screen_width / 16; i++) {
-    for (size_t j = 0; j < 12; j++) {
+  for (int i = 0; i < screen_width / 16; i++) {
+    for (int j = 0; j < 12; j++) {
       // Set position and render texture
       dst.x = i * 16;
       dst.y = j * 16;
+      SDL_RectToFRect(&dst, &f_dst);
       SDL_RenderTexture(
-        renderer_.get(), sprite_sheet_.get(), &sprite::objects_sky_blue, &dst);
+        renderer_.get(), sprite_sheet_.get(), &sprite::objects_sky_blue, &f_dst);
     }
   }
   // Render the mountain sprite
-  constexpr SDL_FRect mountain_dst(0, 188, 432, 64);
   dst.x = 0;
   dst.y = 188;
   dst.w = 432;
   dst.h = 64;
+  SDL_RectToFRect(&dst, &f_dst);
   SDL_RenderTexture(
-    renderer_.get(), sprite_sheet_.get(), &sprite::objects_mountain, &dst);
+    renderer_.get(), sprite_sheet_.get(), &sprite::objects_mountain, &f_dst);
 
   // Render the red ground
   dst.y = 248;
   dst.w = 16;
   dst.h = 16;
-  for (size_t i = 0; i < screen_width / 16; i++) {
+  for (int i = 0; i < screen_width / 16; i++) {
     dst.x = i * 16;
+    SDL_RectToFRect(&dst, &f_dst);
     SDL_RenderTexture(
-      renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_red, &dst);
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_red, &f_dst);
   }
 
   // Render the ground line (the field delimiters)
   dst.x = 0;
   dst.y = 264;
+  SDL_RectToFRect(&dst, &f_dst);
   SDL_RenderTexture(
-    renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line_leftmost, &dst);
-  for (size_t i = 1; i < screen_width / 16 - 1; i++) {
+    renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line_leftmost, &f_dst);
+  for (int i = 1; i < screen_width / 16 - 1; i++) {
     dst.x = i * 16;
+    SDL_RectToFRect(&dst, &f_dst);
     SDL_RenderTexture(
-      renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line, &dst);
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line, &f_dst);
   }
   dst.x = screen_width - 16;
   dst.y = 264;
+  SDL_RectToFRect(&dst, &f_dst);
   SDL_RenderTexture(
-    renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line_rightmost, &dst);
+    renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_line_rightmost, &f_dst);
 
   // Render the yellow ground
-  for (size_t i = 0; i < screen_width / 16; i++) {
-    for (size_t j = 0; j < 2; j++) {
+  for (int i = 0; i < screen_width / 16; i++) {
+    for (int j = 0; j < 2; j++) {
       dst.x = i * 16;
       dst.y = 280 + j * 16;
+      SDL_RectToFRect(&dst, &f_dst);
       SDL_RenderTexture(
-        renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_yellow, &dst);
+        renderer_.get(), sprite_sheet_.get(), &sprite::objects_ground_yellow, &f_dst);
     }
   }
 
@@ -187,12 +195,14 @@ void Window::generate_background() {
   dst.y = 176;
   dst.w = 8;
   dst.h = 8;
+  SDL_RectToFRect(&dst, &f_dst);
   SDL_RenderTexture(
-    renderer_.get(), sprite_sheet_.get(), &sprite::objects_net_pillar_top, &dst);
-  for (size_t j = 0; j < 12; j++) {
+    renderer_.get(), sprite_sheet_.get(), &sprite::objects_net_pillar_top, &f_dst);
+  for (int j = 0; j < 12; j++) {
     dst.y = 184 + j * 8;
+    SDL_RectToFRect(&dst, &f_dst);
     SDL_RenderTexture(
-      renderer_.get(), sprite_sheet_.get(), &sprite::objects_net_pillar, &dst);
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_net_pillar, &f_dst);
   }
 
   // Set the render target back to the main window
@@ -201,16 +211,27 @@ void Window::generate_background() {
 
 void Window::render_waves() {
   wave_.update();
-  SDL_FRect dst = {
+  SDL_FRect f_dst;
+  SDL_Rect dst = {
     .x = 0,
     .w = 16,
     .h = 32,
   };
   for (const auto& w : wave_.get_coords()) {
     dst.y = w;
+    SDL_RectToFRect(&dst, &f_dst);
     SDL_RenderTexture(
-      renderer_.get(), sprite_sheet_.get(), &sprite::objects_wave, &dst);
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_wave, &f_dst);
     dst.x += dst.w;
   }
 }
 
+void Window::render_clouds() {
+  clouds_.update();
+  SDL_FRect f_dst;
+  for (const auto& cloud : clouds_.get_clouds()) {
+    SDL_RectToFRect(&cloud, &f_dst);
+    SDL_RenderTexture(
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_cloud, &f_dst);
+  }
+}

@@ -1,7 +1,7 @@
 #include "wave.hpp"
 #include "random.hpp"
 
-const std::array<int, NUM_WAVES>& Wave::get_coords() const {
+const std::array<int, Wave::num_waves>& Wave::get_coords() const {
    return wave_coords_;
 }
 

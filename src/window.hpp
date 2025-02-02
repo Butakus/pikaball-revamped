@@ -1,10 +1,12 @@
 #ifndef PIKA_WINDOW_HPP
 #define PIKA_WINDOW_HPP
 
-#include <memory>
+
 #include "SDL3/SDL.h"
+#include <memory>
 
 #include "wave.hpp"
+#include "cloud.hpp"
 
 /** TODO: Docs
  *
@@ -34,6 +36,7 @@ private:
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   Wave wave_;
+  CloudSet clouds_;
 
   // Frame rate management
   Uint64 last_render_time_ {0};
@@ -47,6 +50,8 @@ private:
   void generate_background();
   /** Update and render the waves */
   void render_waves();
+  /** Update and render the clouds */
+  void render_clouds();
 };
 
 #endif //PIKA_WINDOW_HPP
