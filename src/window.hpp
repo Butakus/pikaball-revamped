@@ -4,6 +4,8 @@
 #include <memory>
 #include "SDL3/SDL.h"
 
+#include "wave.hpp"
+
 /** TODO: Docs
  *
  */
@@ -27,19 +29,24 @@ private:
   SDL_Window_ptr window_;
   SDL_Renderer_ptr renderer_;
   SDL_Surface* window_surface_;
+
+  // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
+  Wave wave_;
 
   // Frame rate management
   Uint64 last_render_time_ {0};
   Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
-  Uint64 target_time_per_frame_ {1000 / target_fps_}; // Possible speeds are 20 / 25 / 30 fps
+  Uint64 target_time_per_frame_ {1000 / target_fps_};
 
   /** Load a new sprite sheet from disk and create a texture */
   void load_sprite_sheet();
 
   /** Build the static background texture from the sprite sheet */
   void generate_background();
+  /** Update and render the waves */
+  void render_waves();
 };
 
 #endif //PIKA_WINDOW_HPP

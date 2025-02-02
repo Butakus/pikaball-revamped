@@ -83,6 +83,8 @@ void Window::render() {
 
     // Render the static background
     SDL_RenderTexture(renderer_.get(), background_texture_.get(), nullptr, nullptr);
+    // Waves
+    render_waves();
   }
 
   //Update screen
@@ -196,3 +198,19 @@ void Window::generate_background() {
   // Set the render target back to the main window
   SDL_SetRenderTarget(renderer_.get(), nullptr);
 }
+
+void Window::render_waves() {
+  wave_.update();
+  SDL_FRect dst = {
+    .x = 0,
+    .w = 16,
+    .h = 32,
+  };
+  for (const auto& w : wave_.get_coords()) {
+    dst.y = w;
+    SDL_RenderTexture(
+      renderer_.get(), sprite_sheet_.get(), &sprite::objects_wave, &dst);
+    dst.x += dst.w;
+  }
+}
+
