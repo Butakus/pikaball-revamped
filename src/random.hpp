@@ -4,6 +4,7 @@
 
 #include <random>
 
+namespace pika {
 /**
  * Return a random integer in the range [0, 32767]
  *
@@ -17,5 +18,7 @@ inline uint16_t rand_int() {
    static std::uniform_int_distribution<uint16_t> dist(0, 32767);
    return dist(gen);
 }
+
+} // namespace pika
 
 #endif // PIKA_RANDOM_HPP

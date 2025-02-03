@@ -1,6 +1,7 @@
 #include "random.hpp"
 #include "cloud.hpp"
 
+namespace pika {
 Cloud::Cloud() :
   x_ {-68 + rand_int() % (432 + 68)},
   y_ {rand_int() % 152},
@@ -43,3 +44,6 @@ void CloudSet::update() {
     cloud.update();
   }
 }
+
+} // namespace pika
+

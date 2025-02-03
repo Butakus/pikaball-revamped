@@ -8,6 +8,8 @@
 #include "wave.hpp"
 #include "cloud.hpp"
 
+namespace pika {
+
 /** TODO: Docs
  *
  */
@@ -53,5 +55,7 @@ private:
   /** Update and render the clouds */
   void render_clouds();
 };
+
+} // namespace pika
 
 #endif //PIKA_WINDOW_HPP

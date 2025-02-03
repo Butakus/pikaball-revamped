@@ -4,6 +4,7 @@
 
 #include <SDL3/SDL_rect.h>
 
+namespace pika {
 class Cloud {
 public:
   Cloud();
@@ -28,8 +29,8 @@ private:
 };
 
 class CloudSet {
-/// The number of clouds to draw on the screen
-constexpr static unsigned int num_clouds {10};
+  /// The number of clouds to draw on the screen
+  constexpr static unsigned int num_clouds {10};
 public:
   CloudSet() = default;
   void update();
@@ -38,5 +39,7 @@ public:
 private:
   std::array<Cloud, num_clouds> clouds_;
 };
+
+} // namespace pika
 
 #endif // PIKA_CLOUD_HPP

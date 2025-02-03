@@ -4,7 +4,7 @@
 #include "SDL3/SDL_rect.h"
 /** Pixel locations and sizes of the sprites from the sprite sheet */
 
-namespace sprite {
+namespace pika::sprite {
 constexpr SDL_FRect ball_ball_0 {
   .x = 88,
   .y = 158,
@@ -503,6 +503,6 @@ constexpr SDL_FRect sitting_pikachu {
   .h = 104
 };
 
-} // end namespace sprite
+} // end namespace pika::sprite
 
 #endif //PIKA_SPRITES_HPP

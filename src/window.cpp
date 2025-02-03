@@ -1,6 +1,7 @@
 #include "window.hpp"
 #include "sprites.hpp"
 
+namespace pika {
 // Screen dimensions
 // TODO: Take this from config file?
 constexpr unsigned int screen_width {432};
@@ -235,3 +236,5 @@ void Window::render_clouds() {
       renderer_.get(), sprite_sheet_.get(), &sprite::objects_cloud, &f_dst);
   }
 }
+
+} // namespace pika

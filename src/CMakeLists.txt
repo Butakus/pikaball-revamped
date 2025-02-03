@@ -2,9 +2,8 @@
 add_executable(${PROJECT_NAME}
         window.cpp
         wave.cpp
-        random.hpp
         cloud.cpp
-        cloud.hpp
+        game.cpp
 )
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp

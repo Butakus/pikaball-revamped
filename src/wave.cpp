@@ -1,6 +1,7 @@
 #include "wave.hpp"
 #include "random.hpp"
 
+namespace pika {
 const std::array<int, Wave::num_waves>& Wave::get_coords() const {
    return wave_coords_;
 }
@@ -19,3 +20,5 @@ void Wave::update() {
       wave_position = 314 - vertical_position_ + (rand_int() % 3);
    }
 }
+
+} // namespace pika
