@@ -2,6 +2,7 @@
 #include "wave.hpp"
 
 namespace pika {
+
 const std::array<int, Wave::num_waves>& Wave::get_coords() const {
    return wave_coords_;
 }

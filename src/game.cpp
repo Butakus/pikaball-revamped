@@ -3,6 +3,11 @@
 
 namespace pika {
 
+Game::Game() {
+   volley_view_ = std::make_unique<VolleyView>(window_.get_sprite_sheet());
+}
+
+
 void Game::run() {
   SDL_Log("Running stuff!");
   running_ = true;
@@ -12,7 +17,15 @@ void Game::run() {
     handle_input();
 
     // TODO: Update game state (logic)
-
+    switch (state_) {
+    case GameState::Round:
+      window_.set_view(volley_view_.get());
+      break;
+    default:
+      // TODO
+      window_.set_view(nullptr);
+      break;
+    }
     // Update surface content
     window_.render();
   }

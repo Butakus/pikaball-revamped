@@ -2,6 +2,7 @@
 #include "cloud.hpp"
 
 namespace pika {
+
 Cloud::Cloud() :
   x_ {-68 + rand_int() % (432 + 68)},
   y_ {rand_int() % 152},
@@ -29,7 +30,6 @@ void Cloud::update() {
   }
   resize_factor_seq_ = (resize_factor_seq_ + 1) % 11;
 }
-
 
 std::array<SDL_Rect, CloudSet::num_clouds> CloudSet::get_clouds() const {
   std::array<SDL_Rect, num_clouds> cloud_rects {};

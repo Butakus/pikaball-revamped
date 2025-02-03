@@ -1,11 +1,13 @@
 #ifndef PIKA_GAME_HPP
 #define PIKA_GAME_HPP
 
-#include "window.hpp"
 #include "pikaball/input.hpp"
+#include "view/volley_view.hpp"
+#include "window.hpp"
 
 namespace pika {
 
+// TODO: Combine states inside each View (with its own FSM)
 enum class GameState {
   Intro,
   Menu,
@@ -19,7 +21,8 @@ enum class GameState {
 
 class Game {
 public:
-  Game() = default;
+  Game();
+  ~Game() = default;
 
   Game(Game const&) = delete;
   Game(Game &&) = delete;
@@ -33,6 +36,8 @@ public:
 
 private:
   Window window_;
+  // Views
+  std::unique_ptr<VolleyView> volley_view_ {nullptr};
 
   // Game state
   bool running_ {false};
