@@ -2,6 +2,7 @@
 #define PIKA_GAME_HPP
 
 #include "window.hpp"
+#include "input.hpp"
 
 namespace pika {
 
@@ -21,6 +22,15 @@ public:
 
 private:
   Window window_;
+  bool running_ {false};
+  PlayerInput player_input_1_ {};
+  PlayerInput player_input_2_ {};
+  MenuInput menu_input_ {};
+
+  /**
+  * Handle keyboard input and update input structs
+  */
+  void handle_input();
 };
 
 } // namespace pika
