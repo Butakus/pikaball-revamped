@@ -5,8 +5,8 @@
 #include "SDL3/SDL.h"
 #include <memory>
 
-#include "wave.hpp"
-#include "cloud.hpp"
+#include "view/wave.hpp"
+#include "view/cloud.hpp"
 
 namespace pika {
 

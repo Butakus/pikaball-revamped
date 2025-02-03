@@ -1,5 +1,5 @@
+#include "pikaball/random.hpp"
 #include "wave.hpp"
-#include "random.hpp"
 
 namespace pika {
 const std::array<int, Wave::num_waves>& Wave::get_coords() const {

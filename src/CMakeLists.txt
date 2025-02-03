@@ -1,12 +1,14 @@
 
-add_executable(${PROJECT_NAME}
-        window.cpp
-        wave.cpp
-        cloud.cpp
-        game.cpp
-)
+add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
+    window.cpp
+    game.cpp
+    view/wave.cpp
+    view/cloud.cpp
+)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
     vendor  # Link to vendored SDL (and other libs if any)

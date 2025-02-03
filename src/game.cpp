@@ -7,15 +7,12 @@ void Game::run() {
   SDL_Log("Running stuff!");
   running_ = true;
 
-  // Event data
-  SDL_Event event;
-  SDL_zero(event);  // Actually not required?
-
   while (running_) {
     // Get current input state from keyboard
     handle_input();
 
     // TODO: Update game state (logic)
+
     // Update surface content
     window_.render();
   }

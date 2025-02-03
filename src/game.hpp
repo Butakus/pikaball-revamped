@@ -2,9 +2,20 @@
 #define PIKA_GAME_HPP
 
 #include "window.hpp"
-#include "input.hpp"
+#include "pikaball/input.hpp"
 
 namespace pika {
+
+enum class GameState {
+  Intro,
+  Menu,
+  AfterMenuSelection,
+  BeforeNewGame,
+  StartNewGame,
+  Round,
+  AfterRoundEnd,
+  BeforeNextRound
+};
 
 class Game {
 public:
@@ -22,7 +33,12 @@ public:
 
 private:
   Window window_;
+
+  // Game state
   bool running_ {false};
+  GameState state_ {GameState::Round};
+
+  // Inputs
   PlayerInput player_input_1_ {};
   PlayerInput player_input_2_ {};
   MenuInput menu_input_ {};

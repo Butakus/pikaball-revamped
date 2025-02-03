@@ -1,5 +1,5 @@
 #include "window.hpp"
-#include "sprites.hpp"
+#include "pikaball/sprites.hpp"
 
 namespace pika {
 // Screen dimensions
