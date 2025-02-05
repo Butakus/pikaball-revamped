@@ -4,7 +4,8 @@
 namespace pika {
 
 Game::Game() {
-   volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
+  volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
+  intro_view_ = std::make_unique<view::IntroView>(window_.get_sprite_sheet());
 }
 
 
@@ -12,12 +13,23 @@ void Game::run() {
   SDL_Log("Running stuff!");
   running_ = true;
 
+  // Initialize state and window
+  state_ = GameState::Intro;
+  intro_view_->start();
+  window_.set_view(intro_view_.get());
+
   while (running_) {
     // Get current input state from keyboard
     handle_input();
 
     // TODO: Update game state (logic)
     switch (state_) {
+    case GameState::Intro:
+      intro_view_->set_input(menu_input_);
+      if (intro_view_->is_finished()) {
+        state_ = GameState::Round;
+      }
+      break;
     case GameState::Round:
       window_.set_view(volley_view_.get());  // TODO: This is only needed at the state transition
       // Send the current input state to the view

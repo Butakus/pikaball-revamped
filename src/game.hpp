@@ -3,6 +3,7 @@
 
 #include "pikaball/input.hpp"
 #include "view/volley_view.hpp"
+#include "view/intro_view.hpp"
 #include "window.hpp"
 
 namespace pika {
@@ -38,10 +39,11 @@ private:
   Window window_;
   // Views
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
+  std::unique_ptr<view::IntroView> intro_view_ {nullptr};
 
   // Game state
   bool running_ {false};
-  GameState state_ {GameState::Round};
+  GameState state_ {GameState::Intro};
 
   // Inputs
   PlayerInput player_input_1_ {};

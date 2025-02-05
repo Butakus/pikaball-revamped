@@ -90,14 +90,14 @@ constexpr SDL_FRect messages_fight {
   .h = 160
 };
 
-constexpr SDL_FRect messages_ja_game_start {
+constexpr SDL_FRect messages_game_start {
   .x = 304,
   .y = 64,
   .w = 96,
   .h = 24
 };
 
-constexpr SDL_FRect messages_ja_mark {
+constexpr SDL_FRect messages_sachisoft {
   .x = 386,
   .y = 611,
   .w = 88,

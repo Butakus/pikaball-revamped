@@ -7,6 +7,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     view/wave.cpp
     view/cloud.cpp
     view/volley_view.cpp
+    view/intro_view.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/include
