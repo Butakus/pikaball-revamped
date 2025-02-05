@@ -1,7 +1,7 @@
 #include "pikaball/random.hpp"
 #include "wave.hpp"
 
-namespace pika {
+namespace pika::view {
 
 const std::array<int, Wave::num_waves>& Wave::get_coords() const {
    return wave_coords_;
@@ -22,4 +22,4 @@ void Wave::update() {
    }
 }
 
-} // namespace pika
+} // namespace pika::view

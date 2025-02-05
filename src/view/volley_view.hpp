@@ -6,7 +6,7 @@
 #include "wave.hpp"
 #include "pikaball/input.hpp"
 
-namespace pika {
+namespace pika::view {
 
 class VolleyView final : public View {
 public:
@@ -49,6 +49,6 @@ private:
   void render_clouds(SDL_Renderer* renderer);
 };
 
-} // namespace pika
+} // namespace pika::view
 
 #endif // PIKA_VOLLEY_VIEW_HPP

@@ -4,7 +4,7 @@
 
 #include <SDL3/SDL_rect.h>
 
-namespace pika {
+namespace pika::view {
 class Cloud {
 public:
   Cloud();
@@ -40,6 +40,6 @@ private:
   std::array<Cloud, num_clouds> clouds_;
 };
 
-} // namespace pika
+} // namespace pika::view
 
 #endif // PIKA_CLOUD_HPP

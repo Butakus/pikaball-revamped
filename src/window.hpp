@@ -6,8 +6,6 @@
 #include <memory>
 
 #include "view/view.hpp"
-#include "view/cloud.hpp"
-#include "view/wave.hpp"
 
 namespace pika {
 
@@ -30,7 +28,7 @@ public:
    * Change the active view that will render the content
    * @param view non-owning pointer to the active view
    */
-  void set_view(View* view);
+  void set_view(view::View* view);
 
   /** Get a non-owning pointer to the renderer */
   [[nodiscard]] inline SDL_Renderer* get_renderer() const { return renderer_.get(); }
@@ -44,7 +42,7 @@ private:
   SDL_Surface* window_surface_;
 
   // Current game view (intro, menu, volley, etc.)
-  View* view_ {nullptr};
+  view::View* view_ {nullptr};
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};

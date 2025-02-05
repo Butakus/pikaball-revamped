@@ -2,7 +2,7 @@
 #define PIKA_WAVE_HPP
 #include <array>
 
-namespace pika {
+namespace pika::view {
 /**
  * Class representing the wave physics.
  * Does not handle textures, but only the time and the position on the y axis of the wave.
@@ -25,6 +25,6 @@ private:
   int vertical_velocity_ {2};
 };
 
-} // namespace pika
+} // namespace pika::view
 
 #endif // PIKA_WAVE_HPP

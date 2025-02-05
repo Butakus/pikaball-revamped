@@ -37,7 +37,7 @@ public:
 private:
   Window window_;
   // Views
-  std::unique_ptr<VolleyView> volley_view_ {nullptr};
+  std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
 
   // Game state
   bool running_ {false};

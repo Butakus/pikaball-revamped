@@ -4,7 +4,7 @@
 #include <memory>
 #include <SDL3/SDL_render.h>
 
-namespace pika {
+namespace pika::view {
 
 class View {
 public:
@@ -24,6 +24,6 @@ protected:
   SDL_Texture* sprite_sheet_ {nullptr};
 };
 
-} // namespace pika
+} // namespace pika::view
 
 #endif // PIKA_VIEW_HPP

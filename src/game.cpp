@@ -4,7 +4,7 @@
 namespace pika {
 
 Game::Game() {
-   volley_view_ = std::make_unique<VolleyView>(window_.get_sprite_sheet());
+   volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
 }
 
 
@@ -19,7 +19,9 @@ void Game::run() {
     // TODO: Update game state (logic)
     switch (state_) {
     case GameState::Round:
-      window_.set_view(volley_view_.get());
+      window_.set_view(volley_view_.get());  // TODO: This is only needed at the state transition
+      // Send the current input state to the view
+      volley_view_->set_input(player_input_1_, player_input_2_);
       break;
     default:
       // TODO

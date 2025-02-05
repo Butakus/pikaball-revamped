@@ -77,7 +77,7 @@ void Window::render() {
   last_render_time_ = current_time;
 }
 
-void Window::set_view(View *view) {
+void Window::set_view(view::View *view) {
   view_ = view;
 }
 

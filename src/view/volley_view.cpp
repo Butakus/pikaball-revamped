@@ -6,7 +6,7 @@
 #include "pikaball/common.hpp"
 #include "pikaball/sprites.hpp"
 
-namespace pika {
+namespace pika::view {
 
 VolleyView::VolleyView(SDL_Texture* sprite_sheet) : View(sprite_sheet) {}
 
@@ -140,7 +140,7 @@ void VolleyView::preload_background(SDL_Renderer *renderer) {
 }
 
 void VolleyView::render_waves(SDL_Renderer* renderer) {
-  if (sprite_sheet_ == nullptr || renderer == nullptr) {
+  if (sprite_sheet_ == nullptr) {
     return;
   }
   wave_.update();
@@ -160,7 +160,7 @@ void VolleyView::render_waves(SDL_Renderer* renderer) {
 }
 
 void VolleyView::render_clouds(SDL_Renderer* renderer) {
-  if (sprite_sheet_ == nullptr || renderer == nullptr) {
+  if (sprite_sheet_ == nullptr) {
     return;
   }
   clouds_.update();
@@ -173,4 +173,4 @@ void VolleyView::render_clouds(SDL_Renderer* renderer) {
 }
 
 
-} // pika namespace
+} // pika::view namespace
