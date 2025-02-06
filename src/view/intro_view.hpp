@@ -10,9 +10,11 @@ namespace pika::view {
 
 class IntroView final : public View{
 
+public:
 // Total number of frames to render the intro
 constexpr static unsigned int max_frames = 165;
 
+private:
 // Fixed sprite positions
 constexpr static SDL_FRect sachi_dst {
   .x = screen_h_width - sprite::messages_sachisoft.w - 15,
@@ -36,31 +38,6 @@ public:
    * @param renderer the Window's renderer to draw objects
    */
   void render(SDL_Renderer* renderer) override;
-
-  /**
-   * Set the current menu input. This is used to skip the intro.
-   * @param input MenuInput (only the power-hit commands are used)
-   */
-  void set_input(const MenuInput& input);
-
-  /**
-   * Start the intro state. Reset the frame counter
-   */
-  void start();
-
-  /**
-   * @return True if the frame counter reached the end
-   */
-  [[nodiscard]] inline bool is_finished() const { return is_finished_; }
-  
-private:
-  MenuInput input_ {};
-  unsigned int frame_counter_ {0};
-  bool is_finished_ {false};
-
-  // Objects
-  SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
-
 };
 
 } // namespace pika::view

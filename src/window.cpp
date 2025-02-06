@@ -39,7 +39,7 @@ Window::Window() :
     SDL_LOGICAL_PRESENTATION_STRETCH
   )) {
     SDL_Log("Unable to set a fixed logical scale for the renderer! SDL Error: %s\n", SDL_GetError());
-    // Throw??
+    // TODO: Throw?? We actually need this for the physics engine
   }
 
   // Load sprites and build the static background
@@ -57,11 +57,7 @@ Window::~Window() {
   SDL_Quit();
 }
 
-void Window::render() {
-  const Uint64 current_time = SDL_GetTicks();
-  if (current_time - last_render_time_ < target_time_per_frame_) {
-    return;
-  }
+void Window::render() const {
   // Fill the background white
   SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
   SDL_RenderClear(renderer_.get());
@@ -74,7 +70,6 @@ void Window::render() {
   //Update screen
   SDL_RenderPresent(renderer_.get());
   // SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
-  last_render_time_ = current_time;
 }
 
 void Window::set_view(view::View *view) {

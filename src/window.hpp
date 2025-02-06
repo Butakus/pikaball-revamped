@@ -1,7 +1,6 @@
 #ifndef PIKA_WINDOW_HPP
 #define PIKA_WINDOW_HPP
 
-
 #include "SDL3/SDL.h"
 #include <memory>
 
@@ -22,7 +21,7 @@ public:
   ~Window();
 
   /** Render the next frame */
-  void render();
+  void render() const;
 
   /**
    * Change the active view that will render the content
@@ -46,11 +45,6 @@ private:
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};
-
-  // Frame rate management
-  Uint64 last_render_time_ {0};
-  Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
-  Uint64 target_time_per_frame_ {1000 / target_fps_};
 
   /** Load a new sprite sheet from disk and create a texture */
   void load_sprite_sheet();

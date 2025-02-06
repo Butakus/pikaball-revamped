@@ -4,8 +4,9 @@
 namespace pika {
 
 Game::Game() {
-  volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
   intro_view_ = std::make_unique<view::IntroView>(window_.get_sprite_sheet());
+  menu_view_ = std::make_unique<view::MenuView>(window_.get_sprite_sheet());
+  volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
 }
 
 
@@ -15,18 +16,31 @@ void Game::run() {
 
   // Initialize state and window
   state_ = GameState::Intro;
-  intro_view_->start();
   window_.set_view(intro_view_.get());
+  frame_counter_ = 0;
 
   while (running_) {
+    const Uint64 current_time = SDL_GetTicks();
+    if (current_time - last_render_time_ < target_time_per_frame_) {
+      // TODO: Do this better. Dynamic sleep at the end of the loop?
+      continue;
+    }
     // Get current input state from keyboard
     handle_input();
 
     // TODO: Update game state (logic)
     switch (state_) {
     case GameState::Intro:
-      intro_view_->set_input(menu_input_);
-      if (intro_view_->is_finished()) {
+      if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
+        state_ = GameState::Menu;
+        frame_counter_ = 0;
+        window_.set_view(menu_view_.get());
+        continue;  // TODO: Skip render?
+      }
+      break;
+    case GameState::Menu:
+      menu_view_->set_input(menu_input_);
+      if (menu_view_->is_finished()) {
         state_ = GameState::Round;
       }
       break;
@@ -42,6 +56,8 @@ void Game::run() {
     }
     // Update surface content
     window_.render();
+    last_render_time_ = current_time;
+    frame_counter_++;
   }
 }
 
