@@ -20,17 +20,26 @@ void Game::step() {
       state_ = GameState::Menu;
       frame_counter_ = 0;
       window_.set_view(menu_view_.get());
-      return;  // TODO: Skip render?
+      // TODO: Skip render? Not rendering will freeze the window for 1 frame...
+      // return;
     }
     break;
   case GameState::Menu:
-    menu_view_->set_input(menu_input_);
-    if (menu_view_->is_finished()) {
-      state_ = GameState::Round;
+    // At the first frames, just render the animation.
+    if (frame_counter_ < view::MenuView::start_frames && menu_input_.enter) {
+      // The animation can be skipped pressing enter
+      frame_counter_ = view::MenuView::start_frames;
+    } else {
+      menu_view_->update(menu_input_);
+      if (menu_input_.enter) {
+        const view::MenuPlayerSelection player_sel = menu_view_->get_selection();
+        SDL_Log("Game mode: %d", player_sel);
+        frame_counter_ = 0;
+        window_.set_view(volley_view_.get());
+      }
     }
     break;
   case GameState::Round:
-    window_.set_view(volley_view_.get());  // TODO: This is only needed at the state transition
     // Send the current input state to the view
     volley_view_->set_input(player_input_1_, player_input_2_);
     break;

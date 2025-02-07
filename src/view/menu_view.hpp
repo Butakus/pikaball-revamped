@@ -7,8 +7,16 @@
 
 namespace pika::view {
 
+enum class MenuPlayerSelection {
+  SINGLE_PLAYER,
+  MULTI_PLAYER,
+};
+
 class MenuView final : public View {
 public:
+  // Number of frames at the start to block the input
+  constexpr static unsigned int start_frames = 71;
+
   explicit MenuView(SDL_Texture* sprite_sheet);
   ~MenuView() override = default;
 
@@ -19,26 +27,25 @@ public:
   void render(SDL_Renderer* renderer) override;
 
   /**
-   * Set the current menu input. Used to select the number of players and start the game.
+   * Update the menu state based on the current menu input.
+   * Used to select the number of players and start the game.
    * @param input MenuInput
    */
-  void set_input(const MenuInput& input);
+  void update(const MenuInput& input);
 
   /**
-   * Start the menu state. Reset the frame counter
+   * Start the menu state. Reset the player selection
    */
   void start();
 
   /**
-   * @return True if user starts a game
-   * TODO: Implement game type selection (1/2 players)
+   * Get the selected game mode (1 / 2 players)
+   * @return The MenuPlayerSelection value.
    */
-  [[nodiscard]] inline bool is_finished() const { return is_finished_; }
+  [[nodiscard]] MenuPlayerSelection get_selection() const { return selection_; }
 
 private:
-  MenuInput input_ {};
-  unsigned int frame_counter_ {0};
-  bool is_finished_ {false};
+  MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
 };
 
 } // namespace pika::view
