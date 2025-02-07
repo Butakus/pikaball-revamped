@@ -32,7 +32,13 @@ public:
   Game &operator=(Game &&) = delete;
 
   /**
-   * Main loop. Handle input, control game state, and updates views.
+   * Game loop iteration. Handle input, control game state, and updates views.
+   */
+  void step();
+
+  /**
+   * Run the game continuously at the selected frame rate.
+   * This method does not return until the window is closed.
    */
   void run();
 
@@ -44,9 +50,9 @@ private:
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
 
   // Frame rate management
-  Uint64 last_render_time_ {0};
   Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
-  Uint64 target_time_per_frame_ {1000 / target_fps_};
+  // Time in nanoseconds per frame.
+  Uint64 target_time_per_frame_ {SDL_NS_PER_SECOND / target_fps_};
 
   // Game state
   bool running_ {false};

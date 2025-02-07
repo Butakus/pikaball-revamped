@@ -10,6 +10,40 @@ Game::Game() {
 }
 
 
+void Game::step() {
+  // Get current input state from keyboard
+  handle_input();
+
+  switch (state_) {
+  case GameState::Intro:
+    if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
+      state_ = GameState::Menu;
+      frame_counter_ = 0;
+      window_.set_view(menu_view_.get());
+      return;  // TODO: Skip render?
+    }
+    break;
+  case GameState::Menu:
+    menu_view_->set_input(menu_input_);
+    if (menu_view_->is_finished()) {
+      state_ = GameState::Round;
+    }
+    break;
+  case GameState::Round:
+    window_.set_view(volley_view_.get());  // TODO: This is only needed at the state transition
+    // Send the current input state to the view
+    volley_view_->set_input(player_input_1_, player_input_2_);
+    break;
+  default:
+    // TODO
+    window_.set_view(nullptr);
+    break;
+  }
+  // Update surface content
+  window_.render();
+  frame_counter_++;
+}
+
 void Game::run() {
   SDL_Log("Running stuff!");
   running_ = true;
@@ -20,44 +54,12 @@ void Game::run() {
   frame_counter_ = 0;
 
   while (running_) {
-    const Uint64 current_time = SDL_GetTicks();
-    if (current_time - last_render_time_ < target_time_per_frame_) {
-      // TODO: Do this better. Dynamic sleep at the end of the loop?
-      continue;
-    }
-    // Get current input state from keyboard
-    handle_input();
+    const Uint64 start_time = SDL_GetTicksNS();
+    step();
+    const Uint64 end_time = SDL_GetTicksNS();
 
-    // TODO: Update game state (logic)
-    switch (state_) {
-    case GameState::Intro:
-      if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
-        state_ = GameState::Menu;
-        frame_counter_ = 0;
-        window_.set_view(menu_view_.get());
-        continue;  // TODO: Skip render?
-      }
-      break;
-    case GameState::Menu:
-      menu_view_->set_input(menu_input_);
-      if (menu_view_->is_finished()) {
-        state_ = GameState::Round;
-      }
-      break;
-    case GameState::Round:
-      window_.set_view(volley_view_.get());  // TODO: This is only needed at the state transition
-      // Send the current input state to the view
-      volley_view_->set_input(player_input_1_, player_input_2_);
-      break;
-    default:
-      // TODO
-      window_.set_view(nullptr);
-      break;
-    }
-    // Update surface content
-    window_.render();
-    last_render_time_ = current_time;
-    frame_counter_++;
+    const Uint64 sleep_time = target_time_per_frame_ - (end_time - start_time);
+    SDL_DelayPrecise(sleep_time);
   }
 }
 
