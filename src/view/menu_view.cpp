@@ -3,6 +3,7 @@
 #include <SDL3/SDL_log.h>
 #include <pikaball/common.hpp>
 #include <pikaball/sprites.hpp>
+#include <array>
 
 namespace pika::view {
 
@@ -17,14 +18,16 @@ GameState MenuView::update() {
 
   // Fill the background white or black
   if (selection_ == MenuPlayerSelection::SINGLE_PLAYER) {
-    SDL_SetRenderDrawColor(renderer_, 0xFF, 0xFF, 0xFF, 0xFF);
-  } else {
     SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
+  }
+  else {
+    SDL_SetRenderDrawColor(renderer_, 0xFF, 0xFF, 0xFF, 0xFF);
   }
   SDL_RenderClear(renderer_);
 
   // TODO: Render the background and messages
   render_background();
+  render_fight_msg();
 
   SDL_RenderPresent(renderer_);
 
@@ -42,7 +45,8 @@ GameState MenuView::update() {
   // Process input to update the game mode selection
   if (selection_ == MenuPlayerSelection::SINGLE_PLAYER && input_.down) {
     selection_ = MenuPlayerSelection::MULTI_PLAYER;
-  } else if (selection_ == MenuPlayerSelection::MULTI_PLAYER && input_.up) {
+  }
+  else if (selection_ == MenuPlayerSelection::MULTI_PLAYER && input_.up) {
     selection_ = MenuPlayerSelection::SINGLE_PLAYER;
   }
 
@@ -58,6 +62,8 @@ void MenuView::start() {
   frame_counter_ = 0;
   input_ = {};
   selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+  background_offset_ = 0;
+  background_alpha_ = 0.0;
   if (!background_texture_) {
     preload_background();
   }
@@ -79,11 +85,42 @@ void MenuView::render_background() {
     .h = screen_height,
   };
 
-  // TODO: Handle background alpha based on frame counter
+  // Handle background alpha based on frame counter
+  if (frame_counter_ >= start_frames) {
+    background_alpha_ = 1.0;
+  }
+  else if (frame_counter_ > 30) {
+    background_alpha_ = std::min(1.0f, background_alpha_ + 0.04f);
+  }
+  SDL_SetTextureAlphaModFloat(background_texture_.get(), background_alpha_);
+
   SDL_RectToFRect(&src_rect, &f_src);
   SDL_RenderTexture(
     renderer_, background_texture_.get(), &f_src, nullptr);
 }
+
+void MenuView::render_fight_msg() const {
+  static constexpr std::array fight_msg_sizes = {20, 22, 25, 27, 30, 27, 25, 22, 20};
+  constexpr auto sprite_width = static_cast<int>(sprite::messages_fight.w);
+  constexpr auto sprite_height = static_cast<int>(sprite::messages_fight.h);
+
+  // The sprite grows for the first 30 frames, then it resizes based on the
+  const int size = (frame_counter_ < 30) ? static_cast<int>(frame_counter_)
+                                         : fight_msg_sizes[(frame_counter_ + 1) % 9];
+  const int h_width = size * sprite_width / 30 / 2;
+  const int h_height = size * sprite_height / 30 / 2;
+  SDL_FRect f_dst;
+  const SDL_Rect dst_rect {
+    .x = 100 - h_width,
+    .y = 70 - h_height,
+    .w = h_width * 2,
+    .h = h_height * 2,
+  };
+  SDL_RectToFRect(&dst_rect, &f_dst);
+  SDL_RenderTexture(
+    renderer_, sprite_sheet_, &sprite::messages_fight, &f_dst);
+}
+
 
 void MenuView::preload_background() {
   if (sprite_sheet_ == nullptr || renderer_ == nullptr) {

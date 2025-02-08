@@ -49,11 +49,14 @@ private:
   MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
   SDL_Texture_ptr background_texture_{nullptr, SDL_DestroyTexture};
   int background_offset_ {0};
+  float background_alpha_ {0.0};
 
-  /**
-   * Render the background: Sitting pikachu moving diagonally.
-   */
+  /** Render the background: Sitting pikachu moving diagonally. */
   void render_background();
+
+  /** Render the "fight!" / "MLP powah!" sprite */
+  void render_fight_msg() const;
+
   /**
    * Preload the sitting pikachu background.
    * Build a new texture stitching / tiling the sprite

@@ -5,6 +5,7 @@
 /** Pixel locations and sizes of the sprites from the sprite sheet */
 
 namespace pika::sprite {
+
 constexpr SDL_FRect ball_ball_0 {
   .x = 88,
   .y = 158,
