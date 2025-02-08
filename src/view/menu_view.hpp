@@ -47,6 +47,18 @@ public:
 private:
   MenuInput input_ {};
   MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
+  SDL_Texture_ptr background_texture_{nullptr, SDL_DestroyTexture};
+  int background_offset_ {0};
+
+  /**
+   * Render the background: Sitting pikachu moving diagonally.
+   */
+  void render_background();
+  /**
+   * Preload the sitting pikachu background.
+   * Build a new texture stitching / tiling the sprite
+   */
+  void preload_background();
 };
 
 } // namespace pika::view

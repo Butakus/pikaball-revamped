@@ -69,7 +69,7 @@ void VolleyView::preload_background() {
   SDL_SetRenderTarget(renderer_, background_texture_.get());
 
   // Fill the background white
-  SDL_SetRenderDrawColor(renderer_, 0xFF, 0xFF, 0xFF, 0xFF );
+  SDL_SetRenderDrawColor(renderer_, 0xFF, 0xFF, 0xFF, 0xFF);
   SDL_RenderClear(renderer_);
 
   // Build the sky
