@@ -2,24 +2,13 @@
 #define PIKA_GAME_HPP
 
 #include "pikaball/input.hpp"
+#include "pikaball/game_state.hpp"
 #include "view/intro_view.hpp"
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
 #include "window.hpp"
 
 namespace pika {
-
-// TODO: Combine states inside each View (with its own FSM)
-enum class GameState {
-  Intro,
-  Menu,
-  AfterMenuSelection,
-  BeforeNewGame,
-  StartNewGame,
-  Round,
-  AfterRoundEnd,
-  BeforeNextRound
-};
 
 class Game {
 public:
@@ -57,7 +46,6 @@ private:
   // Game state
   bool running_ {false};
   GameState state_ {GameState::Intro};
-  unsigned int frame_counter_ {0};
 
   // Inputs
   PlayerInput player_input_1_ {};

@@ -8,7 +8,7 @@
 
 namespace pika::view {
 
-class IntroView final : public View{
+class IntroView final : public View {
 
 public:
 // Total number of frames to render the intro
@@ -30,14 +30,29 @@ constexpr static SDL_FRect mlp_dst {
 };
 
 public:
-  explicit IntroView(SDL_Texture* sprite_sheet);
+  explicit IntroView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   ~IntroView() override = default;
 
   /**
-   *  Update the state and render the new frame.
-   * @param renderer the Window's renderer to draw objects
+   * Update the state and render the new frame.s
+   * @return The next game state.
    */
-  void render(SDL_Renderer* renderer) override;
+  GameState update() override;
+
+  /**
+   * Start the view. Set the frame counter to zero.
+   */
+  void start() override;
+
+  /**
+   * Update the menu input to be used in the update() call.
+   * Only the enter field is used (to skip the intro).
+   * @param input MenuInput
+   */
+  void set_input(const MenuInput& input);
+
+private:
+  MenuInput input_ {};
 };
 
 } // namespace pika::view

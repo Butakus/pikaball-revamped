@@ -17,26 +17,26 @@ public:
   // Number of frames at the start to block the input
   constexpr static unsigned int start_frames = 71;
 
-  explicit MenuView(SDL_Texture* sprite_sheet);
+  explicit MenuView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   ~MenuView() override = default;
 
   /**
-   *  Update the state and render the new frame.
-   * @param renderer the Window's renderer to draw objects
+   * Update the state and render the new frame.
+   * @return The next game state.
    */
-  void render(SDL_Renderer* renderer) override;
+  GameState update() override;
 
   /**
-   * Update the menu state based on the current menu input.
-   * Used to select the number of players and start the game.
+   * Update the menu input to be used in the update() call.
    * @param input MenuInput
    */
-  void update(const MenuInput& input);
+  void set_input(const MenuInput& input);
 
   /**
-   * Start the menu state. Reset the player selection
+   * Start the view
+   * Set the frame counter to zero and the player selection to 1P.
    */
-  void start();
+  void start() override;
 
   /**
    * Get the selected game mode (1 / 2 players)
@@ -45,6 +45,7 @@ public:
   [[nodiscard]] MenuPlayerSelection get_selection() const { return selection_; }
 
 private:
+  MenuInput input_ {};
   MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
 };
 

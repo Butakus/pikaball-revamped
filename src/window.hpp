@@ -4,8 +4,6 @@
 #include "SDL3/SDL.h"
 #include <memory>
 
-#include "view/view.hpp"
-
 namespace pika {
 
 /** TODO: Docs
@@ -20,28 +18,21 @@ public:
   Window();
   ~Window();
 
-  /** Render the next frame */
+  /** Render the next frame
+   * DEPRECATED: It will just render a white background.
+   */
   void render() const;
 
-  /**
-   * Change the active view that will render the content
-   * @param view non-owning pointer to the active view
-   */
-  void set_view(view::View* view);
-
   /** Get a non-owning pointer to the renderer */
-  [[nodiscard]] inline SDL_Renderer* get_renderer() const { return renderer_.get(); }
+  [[nodiscard]] SDL_Renderer* get_renderer() const { return renderer_.get(); }
 
   /** Get a non-owning pointer to the sprite sheet texture */
-  [[nodiscard]] inline SDL_Texture* get_sprite_sheet() const { return sprite_sheet_.get(); }
+  [[nodiscard]] SDL_Texture* get_sprite_sheet() const { return sprite_sheet_.get(); }
 
 private:
   SDL_Window_ptr window_;
   SDL_Renderer_ptr renderer_;
   SDL_Surface* window_surface_;
-
-  // Current game view (intro, menu, volley, etc.)
-  view::View* view_ {nullptr};
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};

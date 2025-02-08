@@ -10,14 +10,19 @@ namespace pika::view {
 
 class VolleyView final : public View {
 public:
-  explicit VolleyView(SDL_Texture* sprite_sheet);
+  explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   ~VolleyView() override = default;
 
   /**
-   *  Update the state and render the new frame.
-   * @param renderer the Window's renderer to draw objects
+   * Update the state and render the new frame.
+   * @return The next game state.
    */
-  void render(SDL_Renderer* renderer) override;
+  GameState update() override;
+
+  /**
+   * Start the view and reset the game state to start the first round.
+   */
+  void start() override;
 
   /**
    * Set the current player input
@@ -28,11 +33,9 @@ public:
 
   /**
    * Precompute the static background texture from the sprite sheet.
-   * If this is not called at initialization, it will be computed at first
-   * render()
-   * @param renderer Window's renderer to generate the new texture.
+   * If this is not called at initialization, it will be computed at first update()
    */
-  void preload_background(SDL_Renderer* renderer);
+  void preload_background();
 
 private:
   PlayerInput input_1_ {};
@@ -44,9 +47,9 @@ private:
   CloudSet clouds_;
 
   /** Update and render the waves */
-  void render_waves(SDL_Renderer* renderer);
+  void render_waves();
   /** Update and render the clouds */
-  void render_clouds(SDL_Renderer* renderer);
+  void render_clouds();
 };
 
 } // namespace pika::view

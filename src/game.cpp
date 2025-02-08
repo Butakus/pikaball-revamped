@@ -4,9 +4,12 @@
 namespace pika {
 
 Game::Game() {
-  intro_view_ = std::make_unique<view::IntroView>(window_.get_sprite_sheet());
-  menu_view_ = std::make_unique<view::MenuView>(window_.get_sprite_sheet());
-  volley_view_ = std::make_unique<view::VolleyView>(window_.get_sprite_sheet());
+  intro_view_ = std::make_unique<view::IntroView>(
+    window_.get_renderer(), window_.get_sprite_sheet());
+  menu_view_ = std::make_unique<view::MenuView>(
+    window_.get_renderer(), window_.get_sprite_sheet());
+  volley_view_ = std::make_unique<view::VolleyView>(
+    window_.get_renderer(), window_.get_sprite_sheet());
 }
 
 
@@ -16,42 +19,29 @@ void Game::step() {
 
   switch (state_) {
   case GameState::Intro:
-    if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
-      state_ = GameState::Menu;
-      frame_counter_ = 0;
-      window_.set_view(menu_view_.get());
-      // TODO: Skip render? Not rendering will freeze the window for 1 frame...
-      // return;
+    intro_view_->set_input(menu_input_);
+    state_ = intro_view_->update();
+    // Check transition
+    if (state_ == GameState::Menu) {
+      menu_view_->start();
     }
     break;
   case GameState::Menu:
-    // At the first frames, just render the animation.
-    if (frame_counter_ < view::MenuView::start_frames && menu_input_.enter) {
-      // The animation can be skipped pressing enter
-      frame_counter_ = view::MenuView::start_frames;
-    } else {
-      menu_view_->update(menu_input_);
-      if (menu_input_.enter) {
-        const view::MenuPlayerSelection player_sel = menu_view_->get_selection();
-        SDL_Log("Game mode: %d", player_sel);
-        state_ = GameState::Round;
-        frame_counter_ = 0;
-        window_.set_view(volley_view_.get());
-      }
+    menu_view_->set_input(menu_input_);
+    state_ = menu_view_->update();
+    if (state_ == GameState::Round) {
+      const view::MenuPlayerSelection selection = menu_view_->get_selection();
+      SDL_Log("Player selection: %d", selection);
+      volley_view_->start();
     }
     break;
   case GameState::Round:
     // Send the current input state to the view
     volley_view_->set_input(player_input_1_, player_input_2_);
-    break;
-  default:
+    state_ = volley_view_->update();
     // TODO
-    window_.set_view(nullptr);
     break;
   }
-  // Update surface content
-  window_.render();
-  frame_counter_++;
 }
 
 void Game::run() {
@@ -60,8 +50,7 @@ void Game::run() {
 
   // Initialize state and window
   state_ = GameState::Intro;
-  window_.set_view(intro_view_.get());
-  frame_counter_ = 0;
+  intro_view_->start();
 
   while (running_) {
     const Uint64 start_time = SDL_GetTicksNS();

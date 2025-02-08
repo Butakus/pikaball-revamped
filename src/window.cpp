@@ -62,18 +62,9 @@ void Window::render() const {
   SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
   SDL_RenderClear(renderer_.get());
 
-  // Render the active view
-  if (view_ != nullptr) {
-    view_->render(renderer_.get());
-  }
-
-  //Update screen
+  // Update screen
   SDL_RenderPresent(renderer_.get());
   // SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
-}
-
-void Window::set_view(view::View *view) {
-  view_ = view;
 }
 
 void Window::load_sprite_sheet() {
