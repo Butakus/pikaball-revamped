@@ -34,6 +34,7 @@ void Game::step() {
       if (menu_input_.enter) {
         const view::MenuPlayerSelection player_sel = menu_view_->get_selection();
         SDL_Log("Game mode: %d", player_sel);
+        state_ = GameState::Round;
         frame_counter_ = 0;
         window_.set_view(volley_view_.get());
       }
@@ -73,14 +74,34 @@ void Game::run() {
 }
 
 void Game::handle_input() {
-  // Event data
-  SDL_Event event;
-  SDL_zero(event);  // Actually not required?
+  // Enter / power-hit keys are handled by events to avoid repetitions
+  player_input_1_.power_hit = false;
+  player_input_2_.power_hit = false;
+  menu_input_.enter = false;
 
-  // PollEvent checks new events to process. Not thread safe.
+  // Event data
+  SDL_Event event {};
+
+  // Check and process all new events. Not thread safe.
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_EVENT_QUIT) {
       running_ = false;
+      break;
+    }
+    if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
+      switch (event.key.scancode) {
+        case SDL_SCANCODE_Z:
+          player_input_1_.power_hit = true;
+          menu_input_.enter = true;
+          break;
+        case SDL_SCANCODE_RETURN:
+        case SDL_SCANCODE_KP_ENTER:
+          player_input_2_.power_hit = true;
+          menu_input_.enter = true;
+          break;
+        default:
+          break;
+      }
     }
   }
 
@@ -90,17 +111,13 @@ void Game::handle_input() {
   player_input_1_.right = keys[SDL_SCANCODE_G];
   player_input_1_.up = keys[SDL_SCANCODE_R];
   player_input_1_.down = keys[SDL_SCANCODE_F];
-  player_input_1_.power_hit = keys[SDL_SCANCODE_Z];
   player_input_2_.left = keys[SDL_SCANCODE_LEFT];
   player_input_2_.right = keys[SDL_SCANCODE_RIGHT];
   player_input_2_.up = keys[SDL_SCANCODE_UP];
   player_input_2_.down = keys[SDL_SCANCODE_DOWN];
-  player_input_2_.power_hit = keys[SDL_SCANCODE_RETURN] | keys[SDL_SCANCODE_KP_ENTER];
 
   menu_input_.up = keys[SDL_SCANCODE_UP] | keys[SDL_SCANCODE_R];
   menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];
-  menu_input_.enter =
-    keys[SDL_SCANCODE_RETURN] | keys[SDL_SCANCODE_KP_ENTER] | keys[SDL_SCANCODE_Z];
 }
 
 } // namespace pika
