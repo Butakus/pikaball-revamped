@@ -12,6 +12,11 @@ enum class MenuPlayerSelection {
   MULTI_PLAYER,
 };
 
+enum class MenuState {
+  Menu,
+  FadeOut
+};
+
 class MenuView final : public View {
 public:
   // Number of frames at the start to block the input
@@ -45,6 +50,7 @@ public:
   [[nodiscard]] MenuPlayerSelection get_selection() const { return selection_; }
 
 private:
+  MenuState state_ {MenuState::Menu};
   MenuInput input_ {};
   MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
   // Background with the repeating sitting pikachus
@@ -52,9 +58,12 @@ private:
   // Copyright message. Needs its own texture to apply an independent alpha.
   SDL_Texture_ptr copyright_texture_{nullptr, SDL_DestroyTexture};
   int background_offset_ {0};
-  float background_alpha_ {0.0};
+  float pika_background_alpha_ {0.0};
   float copyright_alpha_ {0.0};
   unsigned int selection_size_ {2};
+
+  /** Render the whole View */
+  void render();
 
   /** Render the background: Sitting pikachu moving diagonally. */
   void render_background();

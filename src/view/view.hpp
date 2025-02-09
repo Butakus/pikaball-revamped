@@ -9,10 +9,7 @@ namespace pika::view {
 
 class View {
 public:
-  explicit View(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
-    renderer_(renderer),
-    sprite_sheet_(sprite_sheet)
-  {}
+  explicit View(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   virtual ~View() = default;
 
   View(View const&) = delete;
@@ -31,6 +28,22 @@ public:
    */
   virtual void start() = 0;
 
+  void render_fade_in_out() const;
+
+  /**
+   * Reduce the current alpha value for the black cover and render it.
+   * The black_fade_alpha_ attribute will be updated (within the limits
+   * [0.0, 1.0]
+   * @param alpha_decrement the alpha decrement for the black cover
+   */
+  void fade_in(float alpha_decrement);
+  /**
+   * Increase the current alpha value for the black cover and render it.
+   * The black_fade_alpha_ attribute will be updated (within the limits [0.0, 1.0]
+   * @param alpha_increment the alpha increment for the black cover
+   */
+  void fade_out(float alpha_increment);
+
 protected:
   // Convenient type alias to hold owning textures
   using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
@@ -41,6 +54,11 @@ protected:
 
   // Frame counter to control inner state and transitions. Should be incremented after each update
   unsigned int frame_counter_ {0};
+
+  // Full-black cover texture to do fade-in/fade-out effects
+  SDL_Texture_ptr black_texture_ {nullptr, SDL_DestroyTexture};
+  // The alpha channel is default initialized to one because tha fade-in effect usually goes first
+  float black_fade_alpha_ {1.0f};
 };
 
 } // namespace pika::view

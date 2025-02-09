@@ -15,59 +15,55 @@ GameState MenuView::update() {
     return GameState::Menu;
   }
 
-  // Fill the background white or black
-  if (selection_ == MenuPlayerSelection::SINGLE_PLAYER) {
-    SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
-  }
-  else {
-    SDL_SetRenderDrawColor(renderer_, 0xFF, 0xFF, 0xFF, 0xFF);
-  }
-  SDL_RenderClear(renderer_);
-
-  // TODO: Render the background and messages
-  render_background();
-  render_fight_msg();
-  render_copyright_msg();
-  render_title_msgs();
-  render_player_selection_msg();
-
-  SDL_RenderPresent(renderer_);
+  render();
 
   frame_counter_++;
-  if (frame_counter_ < start_frames && input_.enter) {
-    // The animation is skipped by pressing enter
-    frame_counter_ = start_frames;
-    return GameState::Menu;
-  }
-  // On the first frames, just render the animation (skip input processing).
-  if (frame_counter_ <= start_frames) {
-    return GameState::Menu;
-  }
+  switch (state_) {
+  case MenuState::Menu:
+    if (frame_counter_ < start_frames && input_.enter) {
+      // The animation is skipped by pressing enter
+      frame_counter_ = start_frames;
+      return GameState::Menu;
+    }
+    // On the first frames, just render the animation (skip input processing).
+    if (frame_counter_ <= start_frames) {
+      return GameState::Menu;
+    }
 
-  // Process input to update the game mode selection
-  if (selection_ == MenuPlayerSelection::SINGLE_PLAYER && input_.down) {
-    selection_ = MenuPlayerSelection::MULTI_PLAYER;
-    selection_size_ = 2;
-  }
-  else if (selection_ == MenuPlayerSelection::MULTI_PLAYER && input_.up) {
-    selection_ = MenuPlayerSelection::SINGLE_PLAYER;
-    selection_size_ = 2;
-  }
+    // Process input to update the game mode selection
+    if (selection_ == MenuPlayerSelection::SINGLE_PLAYER && input_.down) {
+      selection_ = MenuPlayerSelection::MULTI_PLAYER;
+      selection_size_ = 2;
+    }
+    else if (selection_ == MenuPlayerSelection::MULTI_PLAYER && input_.up) {
+      selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+      selection_size_ = 2;
+    }
 
-  // Process input to check if the game must start
-  if (input_.enter) {
-    return GameState::Round;
+    // Process input to check if the game must start
+    if (input_.enter) {
+      state_ = MenuState::FadeOut;
+    }
+    break;
+  case MenuState::FadeOut:
+    // After fading out completely, change game state to start the game
+    if (black_fade_alpha_ >= 1.0) {
+      return GameState::Round;
+    }
+    break;
   }
 
   return GameState::Menu;
 }
 
 void MenuView::start() {
+  state_ = MenuState::Menu;
   frame_counter_ = 0;
+  black_fade_alpha_ = 0.0;
   input_ = {};
   selection_ = MenuPlayerSelection::SINGLE_PLAYER;
   background_offset_ = 0;
-  background_alpha_ = 0.0;
+  pika_background_alpha_ = 0.0;
   copyright_alpha_ = 0.0;
   selection_size_ = 2;
   if (!background_texture_ || !copyright_texture_) {
@@ -78,6 +74,25 @@ void MenuView::start() {
 void MenuView::set_input(const MenuInput& input) {
   input_ = input;
 }
+
+void MenuView::render() {
+  // Fill the background black
+  SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
+  SDL_RenderClear(renderer_);
+
+  // Render the background and messages
+  render_background();
+  render_fight_msg();
+  render_copyright_msg();
+  render_title_msgs();
+  render_player_selection_msg();
+
+  if (state_ == MenuState::FadeOut) {
+    fade_out(1.0f / 30);
+  }
+  SDL_RenderPresent(renderer_);
+}
+
 
 void MenuView::render_background() {
   constexpr auto sprite_width = static_cast<int>(sprite::sitting_pikachu.w);
@@ -93,12 +108,12 @@ void MenuView::render_background() {
 
   // Handle background alpha based on frame counter
   if (frame_counter_ >= start_frames) {
-    background_alpha_ = 1.0;
+    pika_background_alpha_ = 1.0;
   }
   else if (frame_counter_ > 30) {
-    background_alpha_ = std::min(1.0f, background_alpha_ + 0.04f);
+    pika_background_alpha_ = std::min(1.0f, pika_background_alpha_ + 0.04f);
   }
-  SDL_SetTextureAlphaModFloat(background_texture_.get(), background_alpha_);
+  SDL_SetTextureAlphaModFloat(background_texture_.get(), pika_background_alpha_);
 
   SDL_RectToFRect(&src_rect, &f_src);
   SDL_RenderTexture(
