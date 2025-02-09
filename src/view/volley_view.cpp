@@ -1,7 +1,3 @@
-//
-// Created by butakus on 3/02/25.
-//
-
 #include "volley_view.hpp"
 #include "pikaball/common.hpp"
 #include "pikaball/sprites.hpp"

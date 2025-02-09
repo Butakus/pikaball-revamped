@@ -47,15 +47,26 @@ public:
 private:
   MenuInput input_ {};
   MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
+  // Background with the repeating sitting pikachus
   SDL_Texture_ptr background_texture_{nullptr, SDL_DestroyTexture};
+  // Copyright message. Needs its own texture to apply an independent alpha.
+  SDL_Texture_ptr copyright_texture_{nullptr, SDL_DestroyTexture};
   int background_offset_ {0};
   float background_alpha_ {0.0};
+  float copyright_alpha_ {0.0};
+  unsigned int selection_size_ {2};
 
   /** Render the background: Sitting pikachu moving diagonally. */
   void render_background();
 
   /** Render the "fight!" / "MLP powah!" sprite */
   void render_fight_msg() const;
+  /** Render the copyright message at the bottom */
+  void render_copyright_msg();
+  /** Render the title sprites (Pikachu Volleyball / Tournament) */
+  void render_title_msgs() const;
+  /** Render 1P/2P selection messages */
+  void render_player_selection_msg();
 
   /**
    * Preload the sitting pikachu background.
