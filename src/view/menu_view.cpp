@@ -251,6 +251,8 @@ void MenuView::preload_background() {
     num_cols * sprite_width,
     num_rows * sprite_height
   ));
+  // Set the texture scaling mode to nearest interpolation
+  SDL_SetTextureScaleMode(background_texture_.get(), SDL_SCALEMODE_NEAREST);
 
   // Focus the renderer on the target texture
   SDL_SetRenderTarget(renderer_, background_texture_.get());
@@ -285,9 +287,13 @@ void MenuView::preload_background() {
     sprite::messages_copyright.w,
     sprite::messages_copyright.h
   ));
-  SDL_SetRenderTarget(renderer_, copyright_texture_.get());
+  // Set the texture scaling mode to nearest interpolation
+  SDL_SetTextureScaleMode(copyright_texture_.get(), SDL_SCALEMODE_NEAREST);
+
   // Copy the texture from the sheet
+  SDL_SetRenderTarget(renderer_, copyright_texture_.get());
   SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::messages_copyright, nullptr);
+
 
   // Set the render target back to the main window
   SDL_SetRenderTarget(renderer_, nullptr);

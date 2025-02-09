@@ -61,6 +61,9 @@ void VolleyView::preload_background() {
     screen_width,
     screen_height
   ));
+  // Set the texture scaling mode to nearest interpolation
+  SDL_SetTextureScaleMode(background_texture_.get(), SDL_SCALEMODE_NEAREST);
+
   // Focus the renderer on the target texture
   SDL_SetRenderTarget(renderer_, background_texture_.get());
 
