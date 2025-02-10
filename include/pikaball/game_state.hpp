@@ -7,7 +7,7 @@ namespace pika {
 enum class GameState {
   Intro,
   Menu,
-  Round,
+  VolleyGame,
 };
 
 // Game states in the JS game version (including transitions)

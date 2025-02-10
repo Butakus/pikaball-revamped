@@ -48,7 +48,7 @@ GameState MenuView::update() {
   case MenuState::FadeOut:
     // After fading out completely, change game state to start the game
     if (black_fade_alpha_ >= 1.0) {
-      return GameState::Round;
+      return GameState::VolleyGame;
     }
     break;
   }

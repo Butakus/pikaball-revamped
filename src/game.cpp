@@ -29,15 +29,15 @@ void Game::step() {
   case GameState::Menu:
     menu_view_->set_input(menu_input_);
     state_ = menu_view_->update();
-    if (state_ == GameState::Round) {
+    if (state_ == GameState::VolleyGame) {
       const view::MenuPlayerSelection selection = menu_view_->get_selection();
       SDL_Log("Player selection: %d", selection);
       volley_view_->start();
     }
     break;
-  case GameState::Round:
+  case GameState::VolleyGame:
     // Send the current input state to the view
-    volley_view_->set_input(player_input_1_, player_input_2_);
+    volley_view_->set_input(player_input_left_, player_input_right_);
     state_ = volley_view_->update();
     // TODO
     break;
@@ -64,8 +64,8 @@ void Game::run() {
 
 void Game::handle_input() {
   // Enter / power-hit keys are handled by events to avoid repetitions
-  player_input_1_.power_hit = false;
-  player_input_2_.power_hit = false;
+  player_input_left_.power_hit = false;
+  player_input_right_.power_hit = false;
   menu_input_.enter = false;
 
   // Event data
@@ -80,12 +80,12 @@ void Game::handle_input() {
     if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
       switch (event.key.scancode) {
         case SDL_SCANCODE_Z:
-          player_input_1_.power_hit = true;
+          player_input_left_.power_hit = true;
           menu_input_.enter = true;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_KP_ENTER:
-          player_input_2_.power_hit = true;
+          player_input_right_.power_hit = true;
           menu_input_.enter = true;
           break;
         default:
@@ -96,14 +96,14 @@ void Game::handle_input() {
 
   // Forget about events and just grab a snapshot of the current keyboard state
   const bool* keys = SDL_GetKeyboardState(nullptr);
-  player_input_1_.left = keys[SDL_SCANCODE_D];
-  player_input_1_.right = keys[SDL_SCANCODE_G];
-  player_input_1_.up = keys[SDL_SCANCODE_R];
-  player_input_1_.down = keys[SDL_SCANCODE_F];
-  player_input_2_.left = keys[SDL_SCANCODE_LEFT];
-  player_input_2_.right = keys[SDL_SCANCODE_RIGHT];
-  player_input_2_.up = keys[SDL_SCANCODE_UP];
-  player_input_2_.down = keys[SDL_SCANCODE_DOWN];
+  player_input_left_.left = keys[SDL_SCANCODE_D];
+  player_input_left_.right = keys[SDL_SCANCODE_G];
+  player_input_left_.up = keys[SDL_SCANCODE_R];
+  player_input_left_.down = keys[SDL_SCANCODE_F];
+  player_input_right_.left = keys[SDL_SCANCODE_LEFT];
+  player_input_right_.right = keys[SDL_SCANCODE_RIGHT];
+  player_input_right_.up = keys[SDL_SCANCODE_UP];
+  player_input_right_.down = keys[SDL_SCANCODE_DOWN];
 
   menu_input_.up = keys[SDL_SCANCODE_UP] | keys[SDL_SCANCODE_R];
   menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];

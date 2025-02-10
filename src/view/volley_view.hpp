@@ -8,6 +8,14 @@
 
 namespace pika::view {
 
+enum class VolleyGameState {
+  NewGame,
+  StartRound,
+  PlayRound,
+  EndRound,
+  GameEnd
+};
+
 class VolleyView final : public View {
 public:
   explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
@@ -26,10 +34,10 @@ public:
 
   /**
    * Set the current player input
-   * @param input_1 Input for player 1 (left)
-   * @param input_2 Input for player 2 (right)
+   * @param input_left Input for player 1 (left)
+   * @param input_right Input for player 2 (right)
    */
-  void set_input(const PlayerInput& input_1, const PlayerInput& input_2);
+  void set_input(const PlayerInput& input_left, const PlayerInput& input_right);
 
   /**
    * Precompute the static background texture from the sprite sheet.
@@ -38,13 +46,16 @@ public:
   void preload_background();
 
 private:
-  PlayerInput input_1_ {};
-  PlayerInput input_2_ {};
+  PlayerInput input_left_ {};
+  PlayerInput input_right_ {};
 
   // Objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   Wave wave_;
   CloudSet clouds_;
+
+  /** Render the whole View */
+  void render();
 
   /** Update and render the waves */
   void render_waves();

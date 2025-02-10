@@ -48,8 +48,8 @@ private:
   GameState state_ {GameState::Intro};
 
   // Inputs
-  PlayerInput player_input_1_ {};
-  PlayerInput player_input_2_ {};
+  PlayerInput player_input_left_ {};
+  PlayerInput player_input_right_ {};
   MenuInput menu_input_ {};
 
   /**

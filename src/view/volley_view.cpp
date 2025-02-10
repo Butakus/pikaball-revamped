@@ -10,11 +10,36 @@ VolleyView::VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
 
 GameState VolleyView::update() {
   if (renderer_ == nullptr) {
-    return GameState::Round;
+    return GameState::VolleyGame;
   }
 
+  render();
+
+  frame_counter_++;
   // TODO: Game logic
 
+  return GameState::VolleyGame;
+}
+
+void VolleyView::start() {
+  frame_counter_ = 0;
+  input_left_ = {};
+  input_right_ = {};
+  if (!background_texture_) {
+    preload_background();
+  }
+
+  // TODO: Other initialization / reset
+}
+
+
+void VolleyView::set_input(const PlayerInput &input_left,
+                           const PlayerInput &input_right) {
+  input_left_ = input_left;
+  input_right_ = input_right;
+}
+
+void VolleyView::render() {
   // Load the background texture if not already initialized
   if (!background_texture_) {
     preload_background();
@@ -27,26 +52,6 @@ GameState VolleyView::update() {
   render_clouds();
 
   SDL_RenderPresent(renderer_);
-  frame_counter_++;
-  return GameState::Round;
-}
-
-void VolleyView::start() {
-  frame_counter_ = 0;
-  input_1_ = {};
-  input_2_ = {};
-  if (!background_texture_) {
-    preload_background();
-  }
-
-  // TODO: Other initialization / reset
-}
-
-
-void VolleyView::set_input(const PlayerInput &input_1,
-                           const PlayerInput &input_2) {
-  input_1_ = input_1;
-  input_2_ = input_2;
 }
 
 void VolleyView::preload_background() {
