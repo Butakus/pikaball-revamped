@@ -12,6 +12,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     view/menu_view.cpp
     physics/ball.cpp
     physics/player.cpp
+    physics/physics.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/include

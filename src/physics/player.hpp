@@ -3,6 +3,8 @@
 
 #include "physics_common.hpp"
 
+#include <pikaball/input.hpp>
+
 namespace pika {
 
 enum class PlayerState {
@@ -35,9 +37,23 @@ public:
   Player& operator=(Player&&) = delete;
 
   /**
+   * Initialize the ball for a new game (reset state)
+   */
+  void initialize_game();
+
+  /**
    * Initialize the ball for a new round (reset state)
    */
-  void initialize();
+  void initialize_round();
+
+  /**
+   * Update player state according to user input.
+   * FUN_00401fc0
+   * @param input The player's input
+   */
+  void update(const PlayerInput& input);
+
+  void end_game() { game_ended_ = true; }
 
   // Getters
   [[nodiscard]] const auto& x() const { return x_; }
@@ -46,15 +62,15 @@ public:
   [[nodiscard]] const auto& anim_frame_number() const { return anim_frame_number_; }
   [[nodiscard]] const auto& is_computer() const { return is_computer_; }
 
+  // Flag to remember if the ball was already touched
+  bool collision_with_ball {false};  // 0xBC
+
 private:
   // Player coordinates
   unsigned int x_ {36};               // 0xA8, initialized to 36 (left) or 396 (right)
   unsigned int y_ {player_ground_y};  // 0xAC
   // y velocity is positive when going down (gravity)
   int velocity_y_ {0};                // 0xB0
-  // Flag to remember if the ball was already touched
-  bool collision_with_ball_ {false};  // 0xBC
-
   PlayerState state_ {PlayerState::Normal};  // 0xC0 (the state is an integer in the OG game).
   // Current animation frame number
   unsigned int anim_frame_number_ {0};  // 0xC4

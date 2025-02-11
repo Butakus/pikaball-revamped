@@ -2,12 +2,19 @@
 #define PIKA_BALL_HPP
 
 #include <array>
+
+#include <pikaball/input.hpp>
 #include "physics_common.hpp"
+#include "player.hpp"
 
 namespace pika {
 
 class Ball {
 public:
+  Ball() = default;
+  ~Ball() = default;
+  Ball(const Ball&) = default;
+  Ball& operator=(const Ball&) = default;
 
   // Delete move operations
   Ball(Ball&&) = delete;
@@ -25,6 +32,31 @@ public:
    * @return true if the ball is touching the ground
    */
   bool update();
+
+  /**
+   * Calculate the x coordinate of the landing point.
+   * This function simulates the future ball assuming no players until reaching
+   * the ground. FUN_004031b0
+   */
+  void calculate_landing_point();
+
+  /**
+   * Check if there is a collision between the ball and a player
+   * FUN_00403070
+   * @param player a reference to one of the players
+   * @return true if the ball is touching the given player
+   */
+  [[nodiscard]] bool collision_with_player(const Player& player) const;
+
+  /**
+   * Process the collision between the ball and a player.
+   * The player may be on the ground or jumping and power-hitting.
+   * This function only sets velocity and expected landing point of the ball.
+   * FUN_004030a0 / processCollisionBetweenBallAndPlayer
+   * @param player The player that is in contact with the ball.
+   * @param input The input for the given player.
+   */
+  void process_player_hit(const Player& player, const PlayerInput& input);
 
   // Getters
   [[nodiscard]] const auto& x() const { return x_; }
@@ -57,6 +89,15 @@ private:
   // Previous ball coordinates for trailing effect for power hit
   std::array<unsigned int, 2> trailing_x_ {0};  // 0x58, 0x5C
   std::array<unsigned int, 2> trailing_y_ {0};  // 0x60, 0x64
+
+
+  /**
+   * Part of the update() function (FUN_00402dc0) that only
+   * checks collisions and updates the ball state (no rotation or trailing).
+   * This code has been isolated to be reused in calculate_landing_point()
+   * @return true if the ball is touching the ground
+   */
+  bool update_position();
 };
 
 } // namespace pika
