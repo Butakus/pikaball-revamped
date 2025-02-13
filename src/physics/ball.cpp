@@ -1,4 +1,4 @@
-#include "ball.hpp"
+#include <pikaball/physics/ball.hpp>
 #include <cmath>
 #include <pikaball/random.hpp>
 

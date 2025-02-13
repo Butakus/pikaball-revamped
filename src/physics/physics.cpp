@@ -1,4 +1,4 @@
-#include "physics.hpp"
+#include <pikaball/physics/physics.hpp>
 
 namespace pika {
 

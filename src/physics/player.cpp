@@ -1,6 +1,6 @@
 #include <algorithm>
-#include "player.hpp"
-#include "pikaball/random.hpp"
+#include <pikaball/physics/player.hpp>
+#include <pikaball/random.hpp>
 
 namespace pika {
 Player::Player(const FieldSide &field_side, const bool is_computer) {
