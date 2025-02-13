@@ -4,7 +4,10 @@
 #include "view.hpp"
 #include "cloud.hpp"
 #include "wave.hpp"
+#include "ball_view.hpp"
+#include "player_view.hpp"
 #include "pikaball/input.hpp"
+#include "pikaball/physics/physics.hpp"
 
 namespace pika::view {
 
@@ -18,7 +21,7 @@ enum class VolleyGameState {
 
 class VolleyView final : public View {
 public:
-  explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
+  explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics);
   ~VolleyView() override = default;
 
   /**
@@ -46,13 +49,19 @@ public:
   void preload_background();
 
 private:
+  // Non-owning pointer to physics object to update the state of ball and players
+  Physics* physics_;
+
   PlayerInput input_left_ {};
   PlayerInput input_right_ {};
 
-  // Objects
+  // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   Wave wave_;
   CloudSet clouds_;
+  BallView ball_view_;
+  PlayerView player_view_left_;
+  PlayerView player_view_right_;
 
   /** Render the whole View */
   void render();

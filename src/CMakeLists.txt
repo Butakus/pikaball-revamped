@@ -1,5 +1,6 @@
 
 # Build the physics library
+set(PHYSICS_LIB_NAME "${PROJECT_NAME}_physics")
 add_subdirectory(physics)
 
 add_executable(${PROJECT_NAME})

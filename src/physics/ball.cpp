@@ -32,6 +32,8 @@ bool Ball::update() {
   trailing_y_[1] = trailing_y_[0];
   trailing_x_[0] = x_;
   trailing_y_[0] = y_;
+  // Update ball radius effect (it will decrease with every update call
+  decrease_punch_effect_radius();
 
   int next_fine_rotation = static_cast<int>(fine_rotation_) + velocity_x_ / 2;
   // If next_fine_rotation === 50, it skips next if statement finely.
@@ -201,5 +203,15 @@ void Ball::calculate_landing_point() {
   }
   expected_landing_x_ = ball_clone.x_;
 }
+
+void Ball::decrease_punch_effect_radius() {
+  if (punch_effect_radius_ > 2) {
+    punch_effect_radius_ -= 2;
+  }
+  else {
+    punch_effect_radius_ = 0;
+  }
+}
+
 
 } // pika

@@ -51,4 +51,9 @@ void Physics::collision_ball_player(Player& player, const PlayerInput& input) {
   }
 }
 
+const Player& Physics::player(const FieldSide& side) const {
+  return (side == FieldSide::Left) ? player_left_ : player_right_;
+}
+
+
 } // namespace pika

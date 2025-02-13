@@ -1,12 +1,14 @@
 #ifndef PIKA_GAME_HPP
 #define PIKA_GAME_HPP
 
-#include "pikaball/input.hpp"
 #include "pikaball/game_state.hpp"
+#include "pikaball/input.hpp"
 #include "view/intro_view.hpp"
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
 #include "window.hpp"
+
+#include <pikaball/physics/physics.hpp>
 
 namespace pika {
 
@@ -33,6 +35,10 @@ public:
 
 private:
   Window window_;
+
+  // Main (and only) physics object to update the state of ball and players
+  Physics::Ptr physics_ {nullptr};
+
   // Views
   std::unique_ptr<view::IntroView> intro_view_ {nullptr};
   std::unique_ptr<view::MenuView> menu_view_ {nullptr};

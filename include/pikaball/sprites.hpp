@@ -2,6 +2,8 @@
 #define PIKA_SPRITES_HPP
 
 #include "SDL3/SDL_rect.h"
+#include <array>
+
 /** Pixel locations and sizes of the sprites from the sprite sheet */
 
 namespace pika::sprite {
@@ -39,6 +41,15 @@ constexpr SDL_FRect ball_ball_4 {
   .y = 158,
   .w = 40,
   .h = 40
+};
+
+// Ball animation
+constexpr std::array ball_animation_ {
+  ball_ball_0,
+  ball_ball_1,
+  ball_ball_2,
+  ball_ball_3,
+  ball_ball_4,
 };
 
 constexpr SDL_FRect ball_ball_hyper {

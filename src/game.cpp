@@ -4,12 +4,16 @@
 namespace pika {
 
 Game::Game() {
+  physics_ = std::make_unique<Physics>(),
   intro_view_ = std::make_unique<view::IntroView>(
     window_.get_renderer(), window_.get_sprite_sheet());
   menu_view_ = std::make_unique<view::MenuView>(
     window_.get_renderer(), window_.get_sprite_sheet());
   volley_view_ = std::make_unique<view::VolleyView>(
-    window_.get_renderer(), window_.get_sprite_sheet());
+    window_.get_renderer(),
+    window_.get_sprite_sheet(),
+    physics_.get()
+  );
 }
 
 

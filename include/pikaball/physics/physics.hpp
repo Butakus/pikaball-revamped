@@ -1,14 +1,19 @@
 #ifndef PIKA_PHYSICS_HPP
 #define PIKA_PHYSICS_HPP
 
-#include "player.hpp"
 #include "ball.hpp"
 #include "pikaball/input.hpp"
+#include "player.hpp"
+
+#include <memory>
 
 namespace pika {
 
 class Physics {
 public:
+  // Utility typedef
+  using Ptr = std::unique_ptr<Physics>;
+
   Physics();
   Physics(bool is_computer_left, bool is_computer_right);
   ~Physics() = default;
@@ -30,10 +35,12 @@ public:
    */
   bool update(const PlayerInput& input_left, const PlayerInput& input_right);
 
+  [[nodiscard]] const Ball& ball() const { return ball_; }
+  [[nodiscard]] const Player& player(const FieldSide& side) const;
 private:
   Player player_left_;
   Player player_right_;
-  Ball ball_;
+  Ball ball_ {};
 
   /**
    * Check and process collisions between the ball and a player

@@ -64,6 +64,14 @@ public:
   [[nodiscard]] const auto& velocity_x() const { return velocity_x_; }
   [[nodiscard]] const auto& velocity_y() const { return velocity_y_; }
   [[nodiscard]] const auto& rotation() const { return rotation_; }
+  [[nodiscard]] const auto& punch_effect_radius() const { return punch_effect_radius_; }
+  [[nodiscard]] const auto& punch_effect_x() const { return punch_effect_x_; }
+  [[nodiscard]] const auto& punch_effect_y() const { return punch_effect_y_; }
+  [[nodiscard]] const auto& power_hit() const { return power_hit_; }
+  [[nodiscard]] const auto& trailing_x() const { return trailing_x_; }
+  [[nodiscard]] const auto& trailing_y() const { return trailing_y_; }
+
+  void decrease_punch_effect_radius();
 
 private:
   // Ball coordinates and velocities
@@ -87,8 +95,8 @@ private:
   unsigned int expected_landing_x_ {0};   // 0x40
 
   // Previous ball coordinates for trailing effect for power hit
-  std::array<unsigned int, 2> trailing_x_ {0};  // 0x58, 0x5C
-  std::array<unsigned int, 2> trailing_y_ {0};  // 0x60, 0x64
+  std::array<int, 2> trailing_x_ {0};  // 0x58, 0x5C
+  std::array<int, 2> trailing_y_ {0};  // 0x60, 0x64
 
 
   /**

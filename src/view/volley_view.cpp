@@ -4,8 +4,12 @@
 
 namespace pika::view {
 
-VolleyView::VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
-  View(renderer, sprite_sheet)
+VolleyView::VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics) :
+  View(renderer, sprite_sheet),
+  physics_(physics),
+  ball_view_(renderer, sprite_sheet),
+  player_view_left_(renderer, sprite_sheet),
+  player_view_right_(renderer, sprite_sheet)
 {}
 
 GameState VolleyView::update() {
@@ -17,6 +21,7 @@ GameState VolleyView::update() {
 
   frame_counter_++;
   // TODO: Game logic
+  physics_->update(input_left_, input_right_);
 
   return GameState::VolleyGame;
 }
@@ -50,6 +55,11 @@ void VolleyView::render() {
   // Waves and clouds
   render_waves();
   render_clouds();
+
+  // Render ball and players
+  ball_view_.draw_ball(physics_->ball());
+  player_view_left_.draw_player(physics_->player(FieldSide::Left));
+  player_view_right_.draw_player(physics_->player(FieldSide::Right));
 
   SDL_RenderPresent(renderer_);
 }
