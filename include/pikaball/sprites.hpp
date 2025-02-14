@@ -75,7 +75,7 @@ constexpr SDL_FRect ball_trail {
 
 constexpr std::array ball_trail_animation {
   ball_hyper,
-  ball_punch,
+  ball_trail,
 };
 
 constexpr SDL_FRect msg_game_end {

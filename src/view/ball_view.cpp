@@ -17,8 +17,8 @@ void BallView::draw_ball(const Ball &ball) const {
 
   // First, draw the shadow
   const SDL_FRect shadow_dst {
-    .x = static_cast<float>(x),
-    .y = 273,
+    .x = static_cast<float>(ball.x()) - sprite::objects_shadow.w / 2,
+    .y = 273 - sprite::objects_shadow.h / 2,
     .w = sprite::objects_shadow.w,
     .h = sprite::objects_shadow.h,
   };
@@ -56,8 +56,8 @@ void BallView::draw_ball(const Ball &ball) const {
     // The ball was hit hard. Draw a trailing effect (ball_hyper and ball_trail)
     for (size_t i = 0; i < 2; i++) {
       const SDL_FRect hyper_dst {
-        .x = static_cast<float>(ball.trailing_x()[i]),
-        .y = static_cast<float>(ball.trailing_y()[i]),
+        .x = static_cast<float>(ball.trailing_x()[i]) - sprite::ball_hyper.w / 2,
+        .y = static_cast<float>(ball.trailing_y()[i]) - sprite::ball_hyper.h / 2,
         .w = ball_width,
         .h = ball_height,
       };

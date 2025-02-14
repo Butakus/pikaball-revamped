@@ -59,6 +59,8 @@ public:
   [[nodiscard]] const auto& x() const { return x_; }
   [[nodiscard]] const auto& y() const { return y_; }
   [[nodiscard]] const auto& state() const { return state_; }
+  [[nodiscard]] const auto& side() const { return field_side_; }
+  [[nodiscard]] const auto& diving_direction() const { return diving_direction_; }
   [[nodiscard]] const auto& anim_frame_number() const { return anim_frame_number_; }
   [[nodiscard]] const auto& is_computer() const { return is_computer_; }
 

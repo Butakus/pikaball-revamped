@@ -3,8 +3,8 @@
 namespace pika {
 
 Physics::Physics() :
-  player_left_(FieldSide::Left, true),
-  player_right_(FieldSide::Right, true)
+  player_left_(FieldSide::Left, false),
+  player_right_(FieldSide::Right, false)
 {}
 
 Physics::Physics(const bool is_computer_left, const bool is_computer_right) :

@@ -30,8 +30,8 @@ bool Ball::update() {
   // But it is proper to process here.
   trailing_x_[1] = trailing_x_[0];
   trailing_y_[1] = trailing_y_[0];
-  trailing_x_[0] = x_;
-  trailing_y_[0] = y_;
+  trailing_x_[0] = static_cast<int>(x_);
+  trailing_y_[0] = static_cast<int>(y_);
   // Update ball radius effect (it will decrease with every update call
   decrease_punch_effect_radius();
 
