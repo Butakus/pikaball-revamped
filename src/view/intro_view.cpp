@@ -17,9 +17,9 @@ GameState IntroView::update() {
 
   // Render intro sprites
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_sachisoft, &sachi_dst);
+    renderer_, sprite_sheet_, &sprite::msg_sachisoft, &sachi_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_init_mark_mlp, &mlp_dst);
+    renderer_, sprite_sheet_, &sprite::msg_init_mark_mlp, &mlp_dst);
 
   // Apply fade-in and fade-out effects
   if (frame_counter_ <= 25) {

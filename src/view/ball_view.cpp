@@ -10,15 +10,15 @@ BallView::BallView(SDL_Renderer *renderer, SDL_Texture *sprite_sheet) :
 {}
 
 void BallView::draw_ball(const Ball &ball) const {
-  constexpr int ball_width = static_cast<int>(sprite::ball_ball_hyper.w);
-  constexpr int ball_height = static_cast<int>(sprite::ball_ball_hyper.h);
+  constexpr int ball_width = static_cast<int>(sprite::ball_hyper.w);
+  constexpr int ball_height = static_cast<int>(sprite::ball_hyper.h);
   const int x = static_cast<int>(ball.x()) - ball_width / 2;
   const int y = static_cast<int>(ball.y()) - ball_height / 2;
 
   // Get the current animation frame
-  SDL_FRect src_rect = sprite::ball_ball_hyper;
+  SDL_FRect src_rect = sprite::ball_hyper;
   if (ball.rotation() < 5) {
-    src_rect = sprite::ball_animation_[ball.rotation()];
+    src_rect = sprite::ball_animation[ball.rotation()];
   }
 
   // Draw Ball
@@ -45,7 +45,7 @@ void BallView::draw_ball(const Ball &ball) const {
       .h = 2 * punch_h_size
     };
     SDL_RectToFRect(&punch_dst, &f_dst);
-    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_ball_punch, &f_dst);
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_punch, &f_dst);
   }
   if (ball.power_hit()) {
     // The bal was hit hard. Draw a trailing effect
@@ -65,11 +65,11 @@ void BallView::draw_ball(const Ball &ball) const {
       .w = ball_width,
       .h = ball_height,
     };
-    // Draw trailing effect (ball_ball_hyper and ball_ball_trail)
+    // Draw trailing effect (ball_hyper and ball_trail)
     SDL_RectToFRect(&hyper_dst, &f_dst);
-    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_ball_hyper, &f_dst);
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_hyper, &f_dst);
     SDL_RectToFRect(&trail_dst, &f_dst);
-    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_ball_trail, &f_dst);
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::ball_trail, &f_dst);
   }
 }
 

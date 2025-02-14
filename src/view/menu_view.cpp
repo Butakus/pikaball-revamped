@@ -122,8 +122,8 @@ void MenuView::render_background() {
 
 void MenuView::render_fight_msg() const {
   static constexpr std::array fight_msg_sizes = {20, 22, 25, 27, 30, 27, 25, 22, 20};
-  constexpr auto sprite_width = static_cast<int>(sprite::messages_fight.w);
-  constexpr auto sprite_height = static_cast<int>(sprite::messages_fight.h);
+  constexpr auto sprite_width = static_cast<int>(sprite::msg_fight.w);
+  constexpr auto sprite_height = static_cast<int>(sprite::msg_fight.h);
 
   // The sprite grows for the first 30 frames, then it resizes based on the
   const int size = (frame_counter_ < 30) ? static_cast<int>(frame_counter_)
@@ -139,7 +139,7 @@ void MenuView::render_fight_msg() const {
   };
   SDL_RectToFRect(&dst_rect, &f_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_fight, &f_dst);
+    renderer_, sprite_sheet_, &sprite::msg_fight, &f_dst);
 }
 
 void MenuView::render_copyright_msg() {
@@ -153,10 +153,10 @@ void MenuView::render_copyright_msg() {
   SDL_SetTextureAlphaModFloat(copyright_texture_.get(), copyright_alpha_);
 
   constexpr SDL_FRect dst_rect {
-    .x = screen_h_width - sprite::messages_copyright.w / 2,
+    .x = screen_h_width - sprite::msg_copyright.w / 2,
     .y = 264,
-    .w = sprite::messages_copyright.w,
-    .h = sprite::messages_copyright.h,
+    .w = sprite::msg_copyright.w,
+    .h = sprite::msg_copyright.h,
   };
   SDL_RenderTexture(
     renderer_, copyright_texture_.get(), nullptr, &dst_rect);
@@ -166,8 +166,8 @@ void MenuView::render_title_msgs() const {
   if (frame_counter_ < 30) {
     return;
   }
-  constexpr auto sprite_width = static_cast<int>(sprite::messages_pikachu_volleyball.w);
-  constexpr auto sprite_height = static_cast<int>(sprite::messages_pikachu_volleyball.h);
+  constexpr auto sprite_width = static_cast<int>(sprite::msg_pikachu_volleyball.w);
+  constexpr auto sprite_height = static_cast<int>(sprite::msg_pikachu_volleyball.h);
 
   SDL_FRect f_title_dst;
   SDL_Rect title_dst {
@@ -188,18 +188,18 @@ void MenuView::render_title_msgs() const {
   }
   SDL_RectToFRect(&title_dst, &f_title_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_pikachu_volleyball, &f_title_dst);
+    renderer_, sprite_sheet_, &sprite::msg_pikachu_volleyball, &f_title_dst);
 
   // Pikachu tournament message
   constexpr SDL_FRect tournament_dst {
     .x = 170,
     .y = 40,
-    .w = sprite::messages_pokemon_tournament.w,
-    .h = sprite::messages_pokemon_tournament.h,
+    .w = sprite::msg_pokemon_tournament.w,
+    .h = sprite::msg_pokemon_tournament.h,
   };
   if (frame_counter_ > start_frames) {
     SDL_RenderTexture(
-      renderer_, sprite_sheet_, &sprite::messages_pokemon_tournament, &tournament_dst);
+      renderer_, sprite_sheet_, &sprite::msg_pokemon_tournament, &tournament_dst);
   }
 }
 
@@ -207,8 +207,8 @@ void MenuView::render_player_selection_msg() {
   if (frame_counter_ < start_frames) {
     return;
   }
-  constexpr auto sprite_width = static_cast<int>(sprite::messages_player_1.w);
-  constexpr auto sprite_height = static_cast<int>(sprite::messages_player_1.h);
+  constexpr auto sprite_width = static_cast<int>(sprite::msg_player_1.w);
+  constexpr auto sprite_height = static_cast<int>(sprite::msg_player_1.h);
 
   if (selection_size_ < 10) {
     selection_size_++;
@@ -239,10 +239,10 @@ void MenuView::render_player_selection_msg() {
 
   SDL_RectToFRect(&p1_dst, &f_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_player_1, &f_dst);
+    renderer_, sprite_sheet_, &sprite::msg_player_1, &f_dst);
   SDL_RectToFRect(&p2_dst, &f_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::messages_player_2, &f_dst);
+    renderer_, sprite_sheet_, &sprite::msg_player_2, &f_dst);
 
 }
 
@@ -299,15 +299,15 @@ void MenuView::preload_background() {
     renderer_,
     SDL_PIXELFORMAT_ARGB8888,
     SDL_TEXTUREACCESS_TARGET,
-    sprite::messages_copyright.w,
-    sprite::messages_copyright.h
+    sprite::msg_copyright.w,
+    sprite::msg_copyright.h
   ));
   // Set the texture scaling mode to nearest interpolation
   SDL_SetTextureScaleMode(copyright_texture_.get(), SDL_SCALEMODE_NEAREST);
 
   // Copy the texture from the sheet
   SDL_SetRenderTarget(renderer_, copyright_texture_.get());
-  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::messages_copyright, nullptr);
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_copyright, nullptr);
 
 
   // Set the render target back to the main window

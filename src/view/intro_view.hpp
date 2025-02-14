@@ -17,16 +17,16 @@ constexpr static unsigned int max_frames = 165;
 private:
 // Fixed sprite positions
 constexpr static SDL_FRect sachi_dst {
-  .x = screen_h_width - sprite::messages_sachisoft.w - 15,
-  .y = screen_h_height - sprite::messages_sachisoft.h / 2,
-  .w = sprite::messages_sachisoft.w,
-  .h = sprite::messages_sachisoft.h,
+  .x = screen_h_width - sprite::msg_sachisoft.w - 15,
+  .y = screen_h_height - sprite::msg_sachisoft.h / 2,
+  .w = sprite::msg_sachisoft.w,
+  .h = sprite::msg_sachisoft.h,
 };
 constexpr static SDL_FRect mlp_dst {
   .x = screen_h_width + 15,
-  .y = screen_h_height - sprite::messages_init_mark_mlp.h / 2,
-  .w = sprite::messages_init_mark_mlp.w,
-  .h = sprite::messages_init_mark_mlp.h,
+  .y = screen_h_height - sprite::msg_init_mark_mlp.h / 2,
+  .w = sprite::msg_init_mark_mlp.w,
+  .h = sprite::msg_init_mark_mlp.h,
 };
 
 public:
