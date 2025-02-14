@@ -15,6 +15,15 @@ void BallView::draw_ball(const Ball &ball) const {
   const int x = static_cast<int>(ball.x()) - ball_width / 2;
   const int y = static_cast<int>(ball.y()) - ball_height / 2;
 
+  // First, draw the shadow
+  const SDL_FRect shadow_dst {
+    .x = static_cast<float>(x),
+    .y = 273,
+    .w = sprite::objects_shadow.w,
+    .h = sprite::objects_shadow.h,
+  };
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::objects_shadow, &shadow_dst);
+
   // Get the current animation frame
   SDL_FRect src_rect = sprite::ball_hyper;
   if (ball.rotation() < 5) {
@@ -28,7 +37,6 @@ void BallView::draw_ball(const Ball &ball) const {
     .w = sprite::ball_hyper.w,
     .h = sprite::ball_hyper.h,
   };
-
   SDL_RenderTexture(renderer_, sprite_sheet_, &src_rect, &ball_dst);
 
   // For punch effect, refer to FUN_00402ee0
