@@ -98,10 +98,9 @@ void MenuView::render_background() {
   constexpr auto sprite_width = static_cast<int>(sprite::sitting_pikachu.w);
   background_offset_ = (background_offset_ + 2) % sprite_width;
 
-  SDL_FRect f_src;
-  const SDL_Rect src_rect {
-    .x = background_offset_,
-    .y = background_offset_,
+  const SDL_FRect src_rect {
+    .x = static_cast<float>(background_offset_),
+    .y = static_cast<float>(background_offset_),
     .w = screen_width,
     .h = screen_height,
   };
@@ -115,9 +114,8 @@ void MenuView::render_background() {
   }
   SDL_SetTextureAlphaModFloat(background_texture_.get(), pika_background_alpha_);
 
-  SDL_RectToFRect(&src_rect, &f_src);
   SDL_RenderTexture(
-    renderer_, background_texture_.get(), &f_src, nullptr);
+    renderer_, background_texture_.get(), &src_rect, nullptr);
 }
 
 void MenuView::render_fight_msg() const {
@@ -130,16 +128,14 @@ void MenuView::render_fight_msg() const {
                                          : fight_msg_sizes[(frame_counter_ + 1) % 9];
   const int h_width = size * sprite_width / 30 / 2;
   const int h_height = size * sprite_height / 30 / 2;
-  SDL_FRect f_dst;
-  const SDL_Rect dst_rect {
-    .x = 100 - h_width,
-    .y = 70 - h_height,
-    .w = h_width * 2,
-    .h = h_height * 2,
+  const SDL_FRect dst_rect {
+    .x = static_cast<float>(100 - h_width),
+    .y = static_cast<float>(70 - h_height),
+    .w = static_cast<float>(h_width * 2),
+    .h = static_cast<float>(h_height * 2),
   };
-  SDL_RectToFRect(&dst_rect, &f_dst);
   SDL_RenderTexture(
-    renderer_, sprite_sheet_, &sprite::msg_fight, &f_dst);
+    renderer_, sprite_sheet_, &sprite::msg_fight, &dst_rect);
 }
 
 void MenuView::render_copyright_msg() {
@@ -276,7 +272,7 @@ void MenuView::preload_background() {
   SDL_SetRenderDrawColor(renderer_, 0x00, 0xFF, 0x00, 0xFF);
   SDL_RenderClear(renderer_);
 
-  // Build the sky
+  // Build the sitting pikachu green background
   SDL_FRect f_dst;
   SDL_Rect dst = {
     // Preset width and height with pikachu sprite size

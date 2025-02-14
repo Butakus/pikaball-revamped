@@ -73,6 +73,11 @@ constexpr SDL_FRect ball_trail {
   .h = 40
 };
 
+constexpr std::array ball_trail_animation {
+  ball_hyper,
+  ball_punch,
+};
+
 constexpr SDL_FRect msg_game_end {
   .x = 124,
   .y = 64,
