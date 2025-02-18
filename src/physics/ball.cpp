@@ -49,7 +49,7 @@ bool Ball::update() {
     next_fine_rotation += -50;
   }
   fine_rotation_ = next_fine_rotation;
-  rotation_ = (fine_rotation_ / 10) | 0;
+  rotation_ = fine_rotation_ / 10;
 
   return update_position();
 }
@@ -85,14 +85,14 @@ bool Ball::update_position() {
     if (y_ <= net_top_bottom_y) {
       // The ball collides with the top of the net and bounces back up
       if (velocity_y_ > 0) {
-        velocity_y_ = -velocity_y_;
+        velocity_y_ = - velocity_y_;
       }
     }
     else {
       // The ball collides with the net and bounces back left/right
       if (x_ < ground_h_width) {
         // TODO: I think this conditional produces the glitch that makes the ball pierce the net!
-        velocity_x_ = -std::abs(velocity_x_);
+        velocity_x_ = - std::abs(velocity_x_);
       }
       else {
         velocity_x_ = std::abs(velocity_x_);
@@ -112,7 +112,7 @@ bool Ball::update_position() {
 
     // ball.sound.ballTouchesGround = true;
 
-    velocity_y_ = -velocity_y_;
+    velocity_y_ = - velocity_y_;
     punch_effect_x_ = x_;
     y_ = ball_ground_y;
     punch_effect_radius_ = ball_radius;
@@ -121,8 +121,8 @@ bool Ball::update_position() {
   }
   else {
     // Update position
-    y_ = next_y;
-    x_ = next_x;
+    y_ += velocity_y_;
+    x_ += velocity_x_;
     // Gravity effect
     velocity_y_++;
   }
