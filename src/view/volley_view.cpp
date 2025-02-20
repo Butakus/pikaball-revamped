@@ -21,18 +21,24 @@ GameState VolleyView::update() {
   render_background();
   // Same with the ball and players
   render_physics();
+  // And same with the scoreboard
+  render_score();
 
   switch (volley_game_state_) {
     case VolleyGameState::NewGame:
       render_game_start();
       // TODO: Maybe check transitions after rendering and updating
       if (frame_counter_ >= new_game_frames) {
-        volley_game_state_ = VolleyGameState::StartRound;
+        volley_game_state_ = VolleyGameState::PlayRound;
       }
     break;
     case VolleyGameState::StartRound:
     break;
     case VolleyGameState::PlayRound:
+      if (physics_->update(input_left_, input_right_)) {
+        const FieldSide winner_side = update_score();
+        physics_->init_round(winner_side);
+      }
     break;
     case VolleyGameState::EndRound:
     break;
@@ -43,11 +49,6 @@ GameState VolleyView::update() {
   SDL_RenderPresent(renderer_);
   frame_counter_++;
 
-  if (volley_game_state_ != VolleyGameState::NewGame) {
-    const bool ball_touching_ground = physics_->update(input_left_, input_right_);
-    // TODO
-    (void) ball_touching_ground;
-  }
   return GameState::VolleyGame;
 }
 
@@ -135,8 +136,8 @@ void VolleyView::render_game_start() {
   fade_in(1.0f / 17);
 
   // Estimate the message size and position for the current frame_counter
-  constexpr int w = static_cast<int>(sprite::msg_game_start.w);
-  constexpr int h = static_cast<int>(sprite::msg_game_start.h);
+  static constexpr int w = static_cast<int>(sprite::msg_game_start.w);
+  static constexpr int h = static_cast<int>(sprite::msg_game_start.h);
   const int half_width = static_cast<int>(w * frame_counter_ / 50);
   const int half_height = static_cast<int>(h * frame_counter_ / 50);
   const SDL_FRect dst = {
@@ -147,6 +148,78 @@ void VolleyView::render_game_start() {
   };
   // Draw the "game start" message
   SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_game_start, &dst);
+}
+
+void VolleyView::render_score() const {
+  if (sprite_sheet_ == nullptr) {
+    return;
+  }
+
+  // Set score sprite positions
+  static constexpr SDL_FRect dst_left_tens {
+    .x = 14,
+    .y = 10,
+    .w = sprite::number_0.w,
+    .h = sprite::number_0.h,
+  };
+  static constexpr SDL_FRect dst_left_units {
+    .x = 14 + sprite::number_0.w,
+    .y = 10,
+    .w = sprite::number_0.w,
+    .h = sprite::number_0.h,
+  };
+  static constexpr SDL_FRect dst_right_tens {
+    .x = screen_width - 2 * sprite::number_0.w - 14,
+    .y = 10,
+    .w = sprite::number_0.w,
+    .h = sprite::number_0.h,
+  };
+  static constexpr SDL_FRect dst_right_units {
+    .x = screen_width - sprite::number_0.w - 14,
+    .y = 10,
+    .w = sprite::number_0.w,
+    .h = sprite::number_0.h,
+  };
+
+  // Draw left score
+  const unsigned int units_left = score_left_ % 10;
+  SDL_RenderTexture(
+    renderer_, sprite_sheet_, &sprite::numbers[units_left], &dst_left_units);
+  if (score_left_ >= 10) {
+    const unsigned int tens_left = score_left_ / 10 % 10;
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::numbers[tens_left], &dst_left_tens);
+  }
+
+  // Draw right score
+  const unsigned int units_right = score_right_ % 10;
+  SDL_RenderTexture(
+    renderer_, sprite_sheet_, &sprite::numbers[units_right], &dst_right_units);
+  if (score_right_ >= 10) {
+    const unsigned int tens_right = score_right_ / 10 % 10;
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::numbers[tens_right], &dst_right_tens);
+  }
+
+}
+
+FieldSide VolleyView::update_score() {
+  if (physics_->ball().punch_effect_x() < ground_h_width) {
+    score_right_++;
+    next_serve_side_ = FieldSide::Right;
+    if (score_right_ >= win_score) {
+      physics_->end_game(FieldSide::Right);
+    }
+    return FieldSide::Right;
+  }
+  else {
+    score_left_++;
+    next_serve_side_ = FieldSide::Left;
+    if (score_left_ >= win_score) {
+      physics_->end_game(FieldSide::Left);
+    }
+    return FieldSide::Left;
+  }
 }
 
 void VolleyView::preload_background() {

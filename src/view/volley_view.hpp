@@ -23,6 +23,8 @@ class VolleyView final : public View {
 public:
   // Number of frames for the NewGame state
   constexpr static unsigned int new_game_frames = 71;
+  // TODO: This must come from the game settings
+  constexpr static unsigned int win_score = 5;
 
   explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics);
   ~VolleyView() override = default;
@@ -60,6 +62,10 @@ private:
 
   VolleyGameState volley_game_state_ {VolleyGameState::NewGame};
 
+  unsigned int score_left_ {0};
+  unsigned int score_right_ {0};
+  FieldSide next_serve_side_ {FieldSide::Left};
+
   // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   Wave wave_;
@@ -80,6 +86,13 @@ private:
 
   /** Render the game start message in the NewGame state */
   void render_game_start();
+  /** Render the players score */
+  void render_score() const;
+
+  /** Update the score based on the position of the ball punch effect
+   * @return The side that won the point
+   */
+  FieldSide update_score();
 };
 
 } // namespace pika::view
