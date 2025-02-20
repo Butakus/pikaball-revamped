@@ -21,6 +21,9 @@ enum class VolleyGameState {
 
 class VolleyView final : public View {
 public:
+  // Number of frames for the NewGame state
+  constexpr static unsigned int new_game_frames = 71;
+
   explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics);
   ~VolleyView() override = default;
 
@@ -55,6 +58,8 @@ private:
   PlayerInput input_left_ {};
   PlayerInput input_right_ {};
 
+  VolleyGameState volley_game_state_ {VolleyGameState::NewGame};
+
   // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   Wave wave_;
@@ -63,13 +68,18 @@ private:
   PlayerView player_view_left_;
   PlayerView player_view_right_;
 
-  /** Render the whole View */
-  void render();
-
+  /** Render the whole background */
+  void render_background();
   /** Update and render the waves */
   void render_waves();
   /** Update and render the clouds */
   void render_clouds();
+
+  /** Render the ball and players */
+  void render_physics() const;
+
+  /** Render the game start message in the NewGame state */
+  void render_game_start();
 };
 
 } // namespace pika::view

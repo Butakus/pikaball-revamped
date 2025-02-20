@@ -196,4 +196,10 @@ void Player::update(const PlayerInput& input) {
   }
 }
 
+void Player::end_game(const bool is_winner) {
+  game_ended_ = true;
+  is_winner_ = is_winner;
+}
+
+
 } // namespace pika

@@ -53,7 +53,7 @@ public:
    */
   void update(const PlayerInput& input);
 
-  void end_game() { game_ended_ = true; }
+  void end_game(bool is_winner);
 
   // Getters
   [[nodiscard]] const auto& x() const { return x_; }

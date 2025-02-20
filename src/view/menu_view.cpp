@@ -88,7 +88,7 @@ void MenuView::render() {
   render_player_selection_msg();
 
   if (state_ == MenuState::FadeOut) {
-    fade_out(1.0f / 30);
+    fade_out(1.0f / fade_out_frames);
   }
   SDL_RenderPresent(renderer_);
 }

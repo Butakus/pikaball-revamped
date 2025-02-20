@@ -17,12 +17,37 @@ GameState VolleyView::update() {
     return GameState::VolleyGame;
   }
 
-  render();
+  // Always render the background, clouds and waves
+  render_background();
+  // Same with the ball and players
+  render_physics();
 
+  switch (volley_game_state_) {
+    case VolleyGameState::NewGame:
+      render_game_start();
+      // TODO: Maybe check transitions after rendering and updating
+      if (frame_counter_ >= new_game_frames) {
+        volley_game_state_ = VolleyGameState::StartRound;
+      }
+    break;
+    case VolleyGameState::StartRound:
+    break;
+    case VolleyGameState::PlayRound:
+    break;
+    case VolleyGameState::EndRound:
+    break;
+    case VolleyGameState::GameEnd:
+    break;
+  }
+
+  SDL_RenderPresent(renderer_);
   frame_counter_++;
-  // TODO: Game logic
-  physics_->update(input_left_, input_right_);
 
+  if (volley_game_state_ != VolleyGameState::NewGame) {
+    const bool ball_touching_ground = physics_->update(input_left_, input_right_);
+    // TODO
+    (void) ball_touching_ground;
+  }
   return GameState::VolleyGame;
 }
 
@@ -34,7 +59,7 @@ void VolleyView::start() {
     preload_background();
   }
 
-  // TODO: Other initialization / reset
+  volley_game_state_ = VolleyGameState::NewGame;
 }
 
 
@@ -44,7 +69,7 @@ void VolleyView::set_input(const PlayerInput &input_left,
   input_right_ = input_right;
 }
 
-void VolleyView::render() {
+void VolleyView::render_background() {
   // Load the background texture if not already initialized
   if (!background_texture_) {
     preload_background();
@@ -55,13 +80,69 @@ void VolleyView::render() {
   // Waves and clouds
   render_waves();
   render_clouds();
+}
 
+void VolleyView::render_waves() {
+  if (sprite_sheet_ == nullptr) {
+    return;
+  }
+  wave_.update();
+  SDL_FRect f_dst;
+  SDL_Rect dst = {
+    .x = 0,
+    .w = 16,
+    .h = 32,
+  };
+  for (const auto& w : wave_.get_coords()) {
+    dst.y = w;
+    SDL_RectToFRect(&dst, &f_dst);
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::objects_wave, &f_dst);
+    dst.x += dst.w;
+  }
+}
+
+void VolleyView::render_clouds() {
+  if (sprite_sheet_ == nullptr) {
+    return;
+  }
+  clouds_.update();
+  SDL_FRect f_dst;
+  for (const auto& cloud : clouds_.get_clouds()) {
+    SDL_RectToFRect(&cloud, &f_dst);
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::objects_cloud, &f_dst);
+  }
+}
+
+void VolleyView::render_physics() const {
   // Render ball and players
-  ball_view_.draw_ball(physics_->ball());
   player_view_left_.draw_player(physics_->player(FieldSide::Left));
   player_view_right_.draw_player(physics_->player(FieldSide::Right));
+  ball_view_.draw_ball(physics_->ball());
+}
 
-  SDL_RenderPresent(renderer_);
+void VolleyView::render_game_start() {
+  if (sprite_sheet_ == nullptr) {
+    return;
+  }
+
+  // Apply a fade-in the first 17 frames
+  fade_in(1.0f / 17);
+
+  // Estimate the message size and position for the current frame_counter
+  constexpr int w = static_cast<int>(sprite::msg_game_start.w);
+  constexpr int h = static_cast<int>(sprite::msg_game_start.h);
+  const int half_width = static_cast<int>(w * frame_counter_ / 50);
+  const int half_height = static_cast<int>(h * frame_counter_ / 50);
+  const SDL_FRect dst = {
+    .x = static_cast<float>(216 - half_width),
+    .y = static_cast<float>(50 + 2 * half_height),
+    .w = static_cast<float>(2 * half_width),
+    .h = static_cast<float>(2 * half_height),
+  };
+  // Draw the "game start" message
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_game_start, &dst);
 }
 
 void VolleyView::preload_background() {
@@ -170,39 +251,5 @@ void VolleyView::preload_background() {
   // Set the render target back to the main window
   SDL_SetRenderTarget(renderer_, nullptr);
 }
-
-void VolleyView::render_waves() {
-  if (sprite_sheet_ == nullptr) {
-    return;
-  }
-  wave_.update();
-  SDL_FRect f_dst;
-  SDL_Rect dst = {
-    .x = 0,
-    .w = 16,
-    .h = 32,
-  };
-  for (const auto& w : wave_.get_coords()) {
-    dst.y = w;
-    SDL_RectToFRect(&dst, &f_dst);
-    SDL_RenderTexture(
-      renderer_, sprite_sheet_, &sprite::objects_wave, &f_dst);
-    dst.x += dst.w;
-  }
-}
-
-void VolleyView::render_clouds() {
-  if (sprite_sheet_ == nullptr) {
-    return;
-  }
-  clouds_.update();
-  SDL_FRect f_dst;
-  for (const auto& cloud : clouds_.get_clouds()) {
-    SDL_RectToFRect(&cloud, &f_dst);
-    SDL_RenderTexture(
-      renderer_, sprite_sheet_, &sprite::objects_cloud, &f_dst);
-  }
-}
-
 
 } // pika::view namespace

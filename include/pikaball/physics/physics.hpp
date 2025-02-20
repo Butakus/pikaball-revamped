@@ -25,6 +25,12 @@ public:
   Physics& operator=(Physics&&) = delete;
 
   /**
+   * Reset ball and players positions for the new round
+   * @param field_side The side to serve in this round
+   */
+  void init_round(const FieldSide& field_side);
+
+  /**
    * Update the world state based on the user input.
    * If any of the players is controlled by the computer, its input is ignored
    * and its commands are computed by function TODO: XXXX.
@@ -34,6 +40,12 @@ public:
    * @return True if the ball touches the ground after the update.
    */
   bool update(const PlayerInput& input_left, const PlayerInput& input_right);
+
+  /**
+   * Update the players' state to show the winner / loser animation
+   * @param field_side The side who won the game
+   */
+  void end_game(const FieldSide& field_side);
 
   [[nodiscard]] const Ball& ball() const { return ball_; }
   [[nodiscard]] const Player& player(const FieldSide& side) const;

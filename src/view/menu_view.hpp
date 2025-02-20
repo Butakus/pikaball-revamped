@@ -21,6 +21,8 @@ class MenuView final : public View {
 public:
   // Number of frames at the start to block the input
   constexpr static unsigned int start_frames = 71;
+  // Number of frames for the final fade out effect
+  constexpr static unsigned int fade_out_frames = 30;
 
   explicit MenuView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   ~MenuView() override = default;

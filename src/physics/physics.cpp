@@ -12,6 +12,13 @@ Physics::Physics(const bool is_computer_left, const bool is_computer_right) :
   player_right_(FieldSide::Right, is_computer_right)
 {}
 
+void Physics::init_round(const FieldSide &field_side) {
+  ball_.initialize(field_side);
+  player_left_.initialize_round();
+  player_right_.initialize_round();
+}
+
+
 bool Physics::update(const PlayerInput& input_left,
                      const PlayerInput& input_right) {
   // Update ball position and calculate estimated landing point
@@ -27,6 +34,11 @@ bool Physics::update(const PlayerInput& input_left,
   collision_ball_player(player_right_, input_right);
 
   return ball_touching_ground;
+}
+
+void Physics::end_game(const FieldSide& field_side) {
+  player_left_.end_game(field_side == FieldSide::Left);
+  player_right_.end_game(field_side == FieldSide::Right);
 }
 
 void Physics::update_player(Player &player, const PlayerInput &input) {
