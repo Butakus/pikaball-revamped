@@ -13,15 +13,6 @@ void PlayerView::draw_player(const Player &player) const {
   const int player_width = static_cast<int>(src_sprite.w);
   const int player_height = static_cast<int>(src_sprite.h);
 
-  // First, draw the shadow
-  const SDL_FRect shadow_dst {
-    .x = static_cast<float>(player.x()) - sprite::objects_shadow.w / 2,
-    .y = 273 - sprite::objects_shadow.h / 2,
-    .w = sprite::objects_shadow.w,
-    .h = sprite::objects_shadow.h,
-  };
-  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::objects_shadow, &shadow_dst);
-
   // Initially, only flip the sprite of the right side
   SDL_FlipMode flip = player.side() == FieldSide::Left ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
   // If the player is diving... Only flip it when diving to the left
@@ -49,5 +40,14 @@ void PlayerView::draw_player(const Player &player) const {
 
 }
 
+void PlayerView::draw_shadow(const Player &player) const {
+  const SDL_FRect shadow_dst {
+    .x = static_cast<float>(player.x()) - sprite::objects_shadow.w / 2,
+    .y = 273 - sprite::objects_shadow.h / 2,
+    .w = sprite::objects_shadow.w,
+    .h = sprite::objects_shadow.h,
+  };
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::objects_shadow, &shadow_dst);
+}
 
 } // namespace pika::view

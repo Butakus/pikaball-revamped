@@ -116,6 +116,10 @@ void VolleyView::render_clouds() {
 }
 
 void VolleyView::render_physics() const {
+  // First draw the shadows so they don't get on top of the players
+  ball_view_.draw_shadow(physics_->ball());
+  player_view_left_.draw_shadow(physics_->player(FieldSide::Left));
+  player_view_right_.draw_shadow(physics_->player(FieldSide::Right));
   // Render ball and players
   player_view_left_.draw_player(physics_->player(FieldSide::Left));
   player_view_right_.draw_player(physics_->player(FieldSide::Right));

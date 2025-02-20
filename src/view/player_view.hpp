@@ -13,7 +13,16 @@ class PlayerView {
 public:
   explicit PlayerView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
 
+  /**
+   * Draw the player
+   * @param player The Player object from the game Physics
+   */
   void draw_player(const Player& player) const;
+  /**
+   * Draw the shadow of the player
+   * @param player The Player object from the game Physics
+   */
+  void draw_shadow(const Player& player) const;
 private:
   SDL_Renderer* renderer_ {nullptr};
   SDL_Texture* sprite_sheet_ {nullptr};
