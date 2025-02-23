@@ -28,7 +28,7 @@ public:
   constexpr static unsigned int game_end_frames = 211;
   constexpr static unsigned int game_end_skip_frames = 70;
   // TODO: This must come from the game settings
-  constexpr static unsigned int win_score = 1;
+  constexpr static unsigned int win_score = 5;
 
   explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics);
   ~VolleyView() override = default;

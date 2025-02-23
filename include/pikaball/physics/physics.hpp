@@ -30,6 +30,14 @@ public:
    */
   void init_round(const FieldSide& field_side);
 
+
+  /**
+   * Reset ball and players positions for a new game
+   * @param is_computer_left True if the left player is controlled by the computer
+   * @param is_computer_right True if the right player is controlled by the computer
+   */
+  void restart(bool is_computer_left, bool is_computer_right);
+
   /**
    * Update the world state based on the user input.
    * If any of the players is controlled by the computer, its input is ignored

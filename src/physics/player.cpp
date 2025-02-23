@@ -5,12 +5,11 @@
 namespace pika {
 Player::Player(const FieldSide &field_side, const bool is_computer) {
   field_side_ = field_side;
-  is_computer_ = is_computer;
-
-  initialize_game();
+  initialize_game(is_computer);
 }
 
-void Player::initialize_game() {
+void Player::initialize_game(const bool is_computer) {
+  is_computer_ = is_computer;
   game_ended_ = false;
   is_winner_ = false;
   initialize_round();
@@ -185,7 +184,7 @@ void Player::update(const PlayerInput& input) {
     // FUN_004025e0
     // Process game end frames (winner / loser animations)
     // processGameEndFrameFor(player);
-    if (game_ended_ && anim_frame_number_ < 4) {
+    if (anim_frame_number_ < 4) {
       anim_frame_delay_++;
       if (anim_frame_delay_ > 4) {
         anim_frame_delay_ = 0;

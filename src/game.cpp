@@ -36,6 +36,7 @@ void Game::step() {
     if (state_ == GameState::VolleyGame) {
       const view::MenuPlayerSelection selection = menu_view_->get_selection();
       SDL_Log("Player selection: %d", selection);
+      physics_->restart(false, false);  // Is computer is always false for now
       volley_view_->start();
     }
     break;

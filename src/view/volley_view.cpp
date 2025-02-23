@@ -108,12 +108,17 @@ GameState VolleyView::update() {
 void VolleyView::start() {
   frame_counter_ = 0;
   black_fade_alpha_ = 1.0f;
-  input_left_ = {};
-  input_right_ = {};
+  slow_motion_ = false;
   if (!background_texture_) {
     preload_background();
   }
 
+  input_left_ = {};
+  input_right_ = {};
+  score_left_ = 0;
+  score_right_ = 0;
+  next_serve_side_ = FieldSide::Left;
+  physics_->restart(false, false);
   volley_game_state_ = VolleyGameState::NewGame;
 }
 

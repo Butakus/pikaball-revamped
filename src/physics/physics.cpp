@@ -18,6 +18,11 @@ void Physics::init_round(const FieldSide &field_side) {
   player_right_.initialize_round();
 }
 
+void Physics::restart(const bool is_computer_left, const bool is_computer_right) {
+  ball_.initialize(FieldSide::Left);
+  player_left_.initialize_game(is_computer_left);
+  player_right_.initialize_game(is_computer_right);
+}
 
 bool Physics::update(const PlayerInput& input_left,
                      const PlayerInput& input_right) {

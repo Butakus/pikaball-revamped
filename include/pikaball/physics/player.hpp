@@ -37,12 +37,13 @@ public:
   Player& operator=(Player&&) = delete;
 
   /**
-   * Initialize the ball for a new game (reset state)
+   * Initialize the player for a new game (reset state)
+   * @param is_computer True if the player will be controlled by the computer
    */
-  void initialize_game();
+  void initialize_game(bool is_computer);
 
   /**
-   * Initialize the ball for a new round (reset state)
+   * Initialize the player for a new round (reset state)
    */
   void initialize_round();
 
