@@ -23,8 +23,12 @@ class VolleyView final : public View {
 public:
   // Number of frames for the NewGame state
   constexpr static unsigned int new_game_frames = 71;
+  constexpr static unsigned int start_round_frames = 30;
+  constexpr static unsigned int end_round_frames = 11;
+  constexpr static unsigned int game_end_frames = 211;
+  constexpr static unsigned int game_end_skip_frames = 70;
   // TODO: This must come from the game settings
-  constexpr static unsigned int win_score = 5;
+  constexpr static unsigned int win_score = 1;
 
   explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics);
   ~VolleyView() override = default;
@@ -53,6 +57,15 @@ public:
    */
   void preload_background();
 
+  /**
+   * Check if the view needs the game to slow down the FPS.
+   *
+   * This is not elegant (the game object must check this everytime),
+   * but it is what it is right now.
+   * @return True if the game should run in slow motion.
+   */
+  bool slow_motion() const { return slow_motion_; }
+
 private:
   // Non-owning pointer to physics object to update the state of ball and players
   Physics* physics_;
@@ -65,6 +78,9 @@ private:
   unsigned int score_left_ {0};
   unsigned int score_right_ {0};
   FieldSide next_serve_side_ {FieldSide::Left};
+
+  // Slow Motion state. The Game object must manually check this to adjust the FPS
+  bool slow_motion_ {false};
 
   // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
@@ -86,10 +102,18 @@ private:
 
   /** Render the game start message in the NewGame state */
   void render_game_start();
+  /**
+   * Render the "Ready" message when starting a new round
+   * The message is toggled every 5 frames
+   */
+  void render_ready_msg() const;
+  /** Render the game start message in the NewGame state */
+  void render_game_end() const;
   /** Render the players score */
   void render_score() const;
 
-  /** Update the score based on the position of the ball punch effect
+  /** Update the score based on the position of the ball punch effect.
+   *
    * @return The side that won the point
    */
   FieldSide update_score();

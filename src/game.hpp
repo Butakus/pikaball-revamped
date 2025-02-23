@@ -46,7 +46,9 @@ private:
 
   // Frame rate management
   Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
-  // Time in nanoseconds per frame.
+  // Speed for slow motion effect (fixed to 5 FPS)
+  constexpr static Uint64 slow_motion_fps_ {5};
+  // Time in nanoseconds per frame. This variable will be changed when slow  motion is applied
   Uint64 target_time_per_frame_ {SDL_NS_PER_SECOND / target_fps_};
 
   // Game state

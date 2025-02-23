@@ -28,32 +28,86 @@ GameState VolleyView::update() {
     case VolleyGameState::NewGame:
       render_game_start();
       // TODO: Maybe check transitions after rendering and updating
+      frame_counter_++;
       if (frame_counter_ >= new_game_frames) {
         volley_game_state_ = VolleyGameState::PlayRound;
       }
     break;
     case VolleyGameState::StartRound:
+      // Apply fade in effect
+      fade_in(1.0f / 16);
+      frame_counter_++;
+      // Display blinking "Ready" message
+      render_ready_msg();
+      if (frame_counter_ >= start_round_frames) {
+        // Start the next round
+        black_fade_alpha_ = 0.0;
+        volley_game_state_ = VolleyGameState::PlayRound;
+      }
     break;
     case VolleyGameState::PlayRound:
+      // Update physics and check if the ball is touching the ground
       if (physics_->update(input_left_, input_right_)) {
-        const FieldSide winner_side = update_score();
-        physics_->init_round(winner_side);
+        // End of the round
+        next_serve_side_ = update_score();
+        if (score_left_ >= win_score || score_right_ >= win_score) {
+          // Game ended
+          physics_->end_game(next_serve_side_);
+          frame_counter_ = 0;
+          volley_game_state_ = VolleyGameState::GameEnd;
+        }
+        else {
+          // Apply end-of-round effects and start next round
+          frame_counter_ = 0;
+          black_fade_alpha_ = 0.0f;
+          volley_game_state_ = VolleyGameState::EndRound;
+        }
       }
     break;
     case VolleyGameState::EndRound:
+      // Apply and manage slow motion and fading effects
+      // Slow motion will be active for the first 6 frames after the point
+      slow_motion_ = frame_counter_ <= 6;
+      // After the slow motion, start the fade out effect
+      frame_counter_++;
+      if (frame_counter_ >= 6) {
+        fade_out(1.0f / 16);
+      }
+      // We keep updating the physics, but without checking the ball
+      physics_->update(input_left_, input_right_);
+      if (frame_counter_ >= end_round_frames) {
+        // Start the next round
+        frame_counter_ = 0;
+        black_fade_alpha_ = 1.0f;
+        physics_->init_round(next_serve_side_);
+        volley_game_state_ = VolleyGameState::StartRound;
+      }
     break;
     case VolleyGameState::GameEnd:
+      frame_counter_++;
+      // Draw the "Game end" message
+      render_game_end();
+      // Check if the user wants to skip the end frames
+      if (frame_counter_ > game_end_skip_frames &&
+          (input_left_.power_hit || input_right_.power_hit)) {
+        return GameState::Intro;
+      }
+      // End the game after the total animation frames
+      if (frame_counter_ > game_end_frames) {
+        return GameState::Intro;
+      }
+      physics_->update(input_left_, input_right_);
     break;
   }
 
   SDL_RenderPresent(renderer_);
-  frame_counter_++;
 
   return GameState::VolleyGame;
 }
 
 void VolleyView::start() {
   frame_counter_ = 0;
+  black_fade_alpha_ = 1.0f;
   input_left_ = {};
   input_right_ = {};
   if (!background_texture_) {
@@ -150,6 +204,48 @@ void VolleyView::render_game_start() {
   SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_game_start, &dst);
 }
 
+void VolleyView::render_ready_msg() const {
+  // Only show the message every 5 frames (5 yes / 5 no)
+  if (!sprite_sheet_ || frame_counter_ / 5 % 2 == 0) {
+    return;
+  }
+  constexpr static SDL_FRect dst {
+    .x = 176,
+    .y = 38,
+    .w = sprite::msg_ready.w,
+    .h = sprite::msg_ready.h,
+  };
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_ready, &dst);
+}
+
+void VolleyView::render_game_end() const {
+  if (sprite_sheet_ == nullptr) {
+    return;
+  }
+
+  SDL_FRect dst = {
+    .x = 216 - sprite::msg_game_end.w / 2,
+    .y = 50,
+    .w = sprite::msg_game_end.w,
+    .h = sprite::msg_game_end.h,
+  };
+  if (frame_counter_ < 50) {
+    // In the first frames, reduce the message size
+    // Estimate the message size and position for the current frame_counter
+    static constexpr int w = static_cast<int>(sprite::msg_game_end.w);
+    static constexpr int h = static_cast<int>(sprite::msg_game_end.h);
+    const int width_increment = 2 * static_cast<int>(w * (50 - frame_counter_) / 50);
+    const int height_increment = 2 * static_cast<int>(h * (50 - frame_counter_) / 50);
+    dst.x -= static_cast<float>(width_increment);
+    dst.y -= static_cast<float>(height_increment);
+    dst.w += static_cast<float>(2 * width_increment);
+    dst.h += static_cast<float>(2 * height_increment);
+  }
+  // Draw the "game start" message
+  SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_game_end, &dst);
+}
+
+
 void VolleyView::render_score() const {
   if (sprite_sheet_ == nullptr) {
     return;
@@ -206,20 +302,10 @@ void VolleyView::render_score() const {
 FieldSide VolleyView::update_score() {
   if (physics_->ball().punch_effect_x() < ground_h_width) {
     score_right_++;
-    next_serve_side_ = FieldSide::Right;
-    if (score_right_ >= win_score) {
-      physics_->end_game(FieldSide::Right);
-    }
     return FieldSide::Right;
   }
-  else {
-    score_left_++;
-    next_serve_side_ = FieldSide::Left;
-    if (score_left_ >= win_score) {
-      physics_->end_game(FieldSide::Left);
-    }
-    return FieldSide::Left;
-  }
+  score_left_++;
+  return FieldSide::Left;
 }
 
 void VolleyView::preload_background() {

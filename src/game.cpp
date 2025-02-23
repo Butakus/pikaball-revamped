@@ -43,7 +43,12 @@ void Game::step() {
     // Send the current input state to the view
     volley_view_->set_input(player_input_left_, player_input_right_);
     state_ = volley_view_->update();
-    // TODO
+    // Check if the view needs slow motion and change the FPS
+    const Uint64 fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
+    target_time_per_frame_ = SDL_NS_PER_SECOND / fps;
+    if (state_ == GameState::Intro) {
+      intro_view_->start();
+    }
     break;
   }
 }
