@@ -136,6 +136,15 @@ bool Ball::collision_with_player(const Player& player) const {
 }
 
 void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
+
+  // Base y velocity is always updated when the ball hits the player
+  const int abs_velocity_y = std::abs(velocity_y_);
+  velocity_y_ = - abs_velocity_y;
+
+  if (abs_velocity_y < 15) {
+    velocity_y_ = -15;
+  }
+
   if (player.state() == PlayerState::PowerHit) {
     // Player is jumping and power hitting
     const int input_direction_x = get_input_direction_x(input);
@@ -175,13 +184,6 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
     if (velocity_x_ == 0) {
       // If ball velocity x is 0, randomly choose one of -1, 0, 1.
       velocity_x_ = rand_int() % 3 - 1;
-    }
-
-    const int abs_velocity_y = std::abs(velocity_y_);
-    velocity_y_ = - abs_velocity_y;
-
-    if (abs_velocity_y < 15) {
-      velocity_y_ = -15;
     }
 
     power_hit_ = false;
