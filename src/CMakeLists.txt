@@ -3,6 +3,11 @@
 set(PHYSICS_LIB_NAME "${PROJECT_NAME}_physics")
 add_subdirectory(physics)
 
+# Build the controller base library
+set(CONTROLLER_BASE_LIB_NAME "${PROJECT_NAME}_controller")
+set(KEYBOARD_CONTROLLER_LIB_NAME "${PROJECT_NAME}_kb_controller")
+add_subdirectory(controller)
+
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
@@ -23,6 +28,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PRIVATE
     vendor  # Link to vendored SDL (and other libs if any)
     ${PHYSICS_LIB_NAME}
+    ${CONTROLLER_BASE_LIB_NAME}
+    ${KEYBOARD_CONTROLLER_LIB_NAME}
 )
 
 # Link assets to build directory

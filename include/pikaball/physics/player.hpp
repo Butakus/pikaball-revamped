@@ -18,9 +18,9 @@ enum class PlayerState {
 };
 
 /**
- * Class representing a Pikachu player
+ * Class representing a Pikachu player.
  *
- *  1 property address: 00411F28 -> +28 -> +10 -> +C -> ...
+ * Player 1 property address: 00411F28 -> +28 -> +10 -> +C -> ...
  * Player 2 property address: 00411F28 -> +28 -> +10 -> +10 -> ...
  * The "..." part is written on the line comment on the right side of each property.
  * e.g. address to player1.isPlayer: 00411F28 -> +28 -> +10 -> +C -> +A0
@@ -31,6 +31,9 @@ enum class PlayerState {
 class Player {
 public:
   Player(const FieldSide& field_side, bool is_computer);
+  ~Player() = default;
+  Player(const Player&) = default;
+  Player& operator=(const Player&) = default;
 
   // Delete move operations
   Player(Player&&) = delete;

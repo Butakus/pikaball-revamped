@@ -8,6 +8,7 @@
 #include "view/volley_view.hpp"
 #include "window.hpp"
 
+#include <pikaball/controller/player_controller.hpp>
 #include <pikaball/physics/physics.hpp>
 
 namespace pika {
@@ -49,16 +50,17 @@ private:
   // Speed for slow motion effect (fixed to 5 FPS)
   constexpr static unsigned int slow_motion_fps_ {5};
   // Time in nanoseconds per frame. This variable will be changed when slow  motion is applied
-  unsigned long target_time_per_frame_ {SDL_NS_PER_SECOND / target_fps_};
+  unsigned long target_time_per_frame_ {ns_per_second / target_fps_};
 
   // Game state
   bool running_ {false};
   GameState state_ {GameState::Intro};
 
   // Inputs
-  PlayerInput player_input_left_ {};
-  PlayerInput player_input_right_ {};
   MenuInput menu_input_ {};
+  // Player controllers
+  std::unique_ptr<PlayerController> controller_left_ {nullptr};
+  std::unique_ptr<PlayerController> controller_right_ {nullptr};
 
   /**
   * Handle keyboard input and update input structs

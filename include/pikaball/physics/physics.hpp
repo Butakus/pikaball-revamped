@@ -30,7 +30,6 @@ public:
    */
   void init_round(const FieldSide& field_side);
 
-
   /**
    * Reset ball and players positions for a new game
    * @param is_computer_left True if the left player is controlled by the computer
@@ -76,6 +75,27 @@ private:
    */
   static void update_player(Player& player, const PlayerInput& input);
 
+};
+
+/**
+ * A simple interface to the Physics object to be used by the controllers.
+ * This prevents the Controller from casting const away
+ * from the Physics object and doing nasty stuff
+ *
+ * The Object holds a const copy to the Ball and Player objects.
+ */
+class PhysicsView {
+public:
+  explicit PhysicsView(const Physics& physics) :
+    ball(physics.ball()),
+    player_left(physics.player(FieldSide::Left)),
+    player_right(physics.player(FieldSide::Right))
+  {}
+  ~PhysicsView() = default;
+
+  const Ball ball;
+  const Player player_left;
+  const Player player_right;
 };
 
 } // namespace pika
