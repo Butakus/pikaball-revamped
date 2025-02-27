@@ -28,8 +28,6 @@ Window::Window() :
   }
   window_.reset(temp_window);
   renderer_.reset(temp_renderer);
-  // Get pointer to current window surface
-  window_surface_ = SDL_GetWindowSurface(window_.get());
 
   // Set a fixed logical size, so rendering can use fixed pixel coordinates
   if (!SDL_SetRenderLogicalPresentation(

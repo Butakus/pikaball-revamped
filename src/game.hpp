@@ -45,11 +45,11 @@ private:
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
 
   // Frame rate management
-  Uint64 target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
+  unsigned int target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
   // Speed for slow motion effect (fixed to 5 FPS)
-  constexpr static Uint64 slow_motion_fps_ {5};
+  constexpr static unsigned int slow_motion_fps_ {5};
   // Time in nanoseconds per frame. This variable will be changed when slow  motion is applied
-  Uint64 target_time_per_frame_ {SDL_NS_PER_SECOND / target_fps_};
+  unsigned long target_time_per_frame_ {SDL_NS_PER_SECOND / target_fps_};
 
   // Game state
   bool running_ {false};

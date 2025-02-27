@@ -32,7 +32,6 @@ public:
 private:
   SDL_Window_ptr window_;
   SDL_Renderer_ptr renderer_;
-  SDL_Surface* window_surface_;
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};

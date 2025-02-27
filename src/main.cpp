@@ -3,7 +3,6 @@
 #include "game.hpp"
 
 int main() {
-    // Create a new window and load the sprite sheet textures
     pika::Game game;
     game.run();
     return 0;

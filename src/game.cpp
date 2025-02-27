@@ -16,7 +16,6 @@ Game::Game() {
   );
 }
 
-
 void Game::step() {
   // Get current input state from keyboard
   handle_input();
@@ -45,7 +44,7 @@ void Game::step() {
     volley_view_->set_input(player_input_left_, player_input_right_);
     state_ = volley_view_->update();
     // Check if the view needs slow motion and change the FPS
-    const Uint64 fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
+    const unsigned int fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
     target_time_per_frame_ = SDL_NS_PER_SECOND / fps;
     if (state_ == GameState::Intro) {
       intro_view_->start();
@@ -63,11 +62,11 @@ void Game::run() {
   intro_view_->start();
 
   while (running_) {
-    const Uint64 start_time = SDL_GetTicksNS();
+    const unsigned long start_time = SDL_GetTicksNS();
     step();
-    const Uint64 end_time = SDL_GetTicksNS();
+    const unsigned long end_time = SDL_GetTicksNS();
 
-    const Uint64 sleep_time = target_time_per_frame_ - (end_time - start_time);
+    const unsigned long sleep_time = target_time_per_frame_ - (end_time - start_time);
     SDL_DelayPrecise(sleep_time);
   }
 }
