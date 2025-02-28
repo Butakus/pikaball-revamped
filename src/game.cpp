@@ -82,7 +82,8 @@ void Game::handle_input() {
   // Enter / power-hit keys are handled by events to avoid repetitions
   PlayerInput player_input_left {};
   PlayerInput player_input_right {};
-  menu_input_.enter = false;
+  menu_input_.enter_left = false;
+  menu_input_.enter_right = false;
 
   // Event data
   SDL_Event event {};
@@ -97,12 +98,12 @@ void Game::handle_input() {
       switch (event.key.scancode) {
         case SDL_SCANCODE_Z:
           player_input_left.power_hit = true;
-          menu_input_.enter = true;
+          menu_input_.enter_left = true;
           break;
         case SDL_SCANCODE_RETURN:
         case SDL_SCANCODE_KP_ENTER:
           player_input_right.power_hit = true;
-          menu_input_.enter = true;
+          menu_input_.enter_right = true;
           break;
         default:
           break;
@@ -112,14 +113,16 @@ void Game::handle_input() {
 
   // Forget about events and just grab a snapshot of the current keyboard state
   const bool* keys = SDL_GetKeyboardState(nullptr);
-  player_input_left.left = keys[SDL_SCANCODE_D];
-  player_input_left.right = keys[SDL_SCANCODE_G];
-  player_input_left.up = keys[SDL_SCANCODE_R];
-  player_input_left.down = keys[SDL_SCANCODE_F];
-  player_input_right.left = keys[SDL_SCANCODE_LEFT];
-  player_input_right.right = keys[SDL_SCANCODE_RIGHT];
-  player_input_right.up = keys[SDL_SCANCODE_UP];
-  player_input_right.down = keys[SDL_SCANCODE_DOWN];
+
+  // Convert keys from bool to a DirX/DirY object and set the player input directions
+  player_input_left.direction_x =
+    get_input_direction_x(keys[SDL_SCANCODE_D], keys[SDL_SCANCODE_G]);
+  player_input_left.direction_y =
+    get_input_direction_y(keys[SDL_SCANCODE_R], keys[SDL_SCANCODE_F]);
+  player_input_right.direction_x =
+    get_input_direction_x(keys[SDL_SCANCODE_LEFT], keys[SDL_SCANCODE_RIGHT]);
+  player_input_right.direction_y =
+    get_input_direction_y(keys[SDL_SCANCODE_UP], keys[SDL_SCANCODE_DOWN]);
 
   // Pass keyboard inputs to the keyboard controllers (if controllers are keyboards)
   if (const auto kb_left = dynamic_cast<KeyboardController*>(controller_left_.get())) {
@@ -131,6 +134,7 @@ void Game::handle_input() {
 
   menu_input_.up = keys[SDL_SCANCODE_UP] | keys[SDL_SCANCODE_R];
   menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];
+  menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
 }
 
 } // namespace pika

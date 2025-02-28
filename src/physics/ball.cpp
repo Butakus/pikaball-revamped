@@ -147,18 +147,17 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
 
   if (player.state() == PlayerState::PowerHit) {
     // Player is jumping and power hitting
-    const int input_direction_x = get_input_direction_x(input);
-    const int input_direction_y = get_input_direction_y(input);
-    if (x_ < ground_h_width) {
-      velocity_x_ = (std::abs(input_direction_x) + 1) * 10;
+    // Base velocity is halved if no direction is pressed when power hitting
+    velocity_x_ = input.direction_x == DirX::None ? 10 : 20;
+    if (x_ >= ground_h_width) {
+      // CAUTION: If the ball is exactly at the middle, it will also go to the left!!
+      velocity_x_ = - velocity_x_;
     }
-    else {
-      velocity_x_ = -(std::abs(input_direction_x) + 1) * 10;
-    }
+
     punch_effect_x_ = x_;
     punch_effect_y_ = y_;
 
-    velocity_y_ = std::abs(velocity_y_) * input_direction_y * 2;
+    velocity_y_ = 2 * std::abs(velocity_y_) * static_cast<int>(input.direction_y);
     punch_effect_radius_ = ball_radius;
 
     // TODO: Sound

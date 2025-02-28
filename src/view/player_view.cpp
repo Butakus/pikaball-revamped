@@ -17,10 +17,10 @@ void PlayerView::draw_player(const Player &player) const {
   SDL_FlipMode flip = player.side() == FieldSide::Left ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
   // If the player is diving... Only flip it when diving to the left
   if (state == PlayerState::Diving || state == PlayerState::AfterDiving) {
-    if (player.side() == FieldSide::Left && player.diving_direction() == -1) {
+    if (player.side() == FieldSide::Left && player.diving_direction() == DirX::Left) {
       flip = SDL_FLIP_HORIZONTAL;
     }
-    else if (player.side() == FieldSide::Right && player.diving_direction() == 1) {
+    else if (player.side() == FieldSide::Right && player.diving_direction() == DirX::Right) {
       flip = SDL_FLIP_NONE;
     }
   }

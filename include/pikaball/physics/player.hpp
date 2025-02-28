@@ -89,7 +89,7 @@ private:
   FieldSide field_side_ {FieldSide::Left};
 
   // Diving direction. Possible values: -1 (left), 0 (no diving), 1 (right)
-  int diving_direction_ {0};     // 0xB4
+  DirX diving_direction_ {DirX::None};     // 0xB4
   // Remaining time for the player to lay on the ground after diving
   int lying_down_timer_ = {-1};  // 0xB8
 

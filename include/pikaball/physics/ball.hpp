@@ -70,6 +70,7 @@ public:
   [[nodiscard]] const auto& power_hit() const { return power_hit_; }
   [[nodiscard]] const auto& trailing_x() const { return trailing_x_; }
   [[nodiscard]] const auto& trailing_y() const { return trailing_y_; }
+  [[nodiscard]] const auto& expected_landing_x() const { return expected_landing_x_; }
 
   void decrease_punch_effect_radius();
 

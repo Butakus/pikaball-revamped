@@ -33,7 +33,7 @@ void Player::initialize_round() {
 
 void Player::update(const PlayerInput& input) {
   // Convert the left/right input keys to a [-1, 0, 1] integer
-  const int input_direction_x = get_input_direction_x(input);
+  // const int input_direction_x = get_input_direction_x(input);
 
   // if player is lying down... don't move
   if (state_ == PlayerState::AfterDiving) {
@@ -50,11 +50,11 @@ void Player::update(const PlayerInput& input) {
   case PlayerState::Normal:
   case PlayerState::Jumping:
   case PlayerState::PowerHit:
-    velocity_x = input_direction_x * 6;
+    velocity_x = static_cast<int>(input.direction_x) * 6;
     break;
   case PlayerState::Diving:
   case PlayerState::AfterDiving:
-    velocity_x = diving_direction_ * 8;
+    velocity_x = static_cast<int>(diving_direction_) * 8;
     break;
   default:
     break;
@@ -72,7 +72,9 @@ void Player::update(const PlayerInput& input) {
 
 
   // Jump!
-  if (state_ == PlayerState::Normal && input.up && y_ == player_ground_y) {
+  if (state_ == PlayerState::Normal &&
+      input.direction_y == DirY::Up &&
+      y_ == player_ground_y) {
     velocity_y_ = -16;
     state_ = PlayerState::Jumping;
     anim_frame_number_ = 0;
@@ -118,11 +120,11 @@ void Player::update(const PlayerInput& input) {
       // maybe-sound function (playerpointer + 0x90 + 0x14)? omitted
       // player.sound.pika = true;
     }
-    else if (state_ == PlayerState::Normal && input_direction_x != 0) {
+    else if (state_ == PlayerState::Normal && input.direction_x != DirX::None) {
       // Diving!!
       state_ = PlayerState::Diving;
       anim_frame_number_ = 0;
-      diving_direction_ = input_direction_x;
+      diving_direction_ = input.direction_x;
       velocity_y_ = -5;
 
       // TODO: Sound
