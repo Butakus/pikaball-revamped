@@ -63,13 +63,6 @@ private:
    */
   void collision_ball_player(Player& player, const PlayerInput& input);
 
-  /**
-   * Update the position of a player
-   * @param player a reference to one of the players
-   * @param input the input for the given player
-   */
-  static void update_player(Player& player, const PlayerInput& input);
-
 };
 
 /**

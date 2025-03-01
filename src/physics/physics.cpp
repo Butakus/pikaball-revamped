@@ -26,8 +26,8 @@ bool Physics::update(const PlayerInput& input_left,
   ball_.calculate_landing_point();
 
   // Update player positions
-  update_player(player_left_, input_left);
-  update_player(player_right_, input_right);
+  player_left_.update(input_left);
+  player_right_.update(input_right);
 
   // Check collision between ball and players and process it
   collision_ball_player(player_left_, input_left);
@@ -40,16 +40,6 @@ void Physics::end_game(const FieldSide& field_side) {
   player_left_.end_game(field_side == FieldSide::Left);
   player_right_.end_game(field_side == FieldSide::Right);
 }
-
-void Physics::update_player(Player &player, const PlayerInput &input) {
-  if (player.is_computer()) {
-    // TODO
-  }
-  else {
-    player.update(input);
-  }
-}
-
 
 void Physics::collision_ball_player(Player& player, const PlayerInput& input) {
   if (ball_.collision_with_player(player)) {

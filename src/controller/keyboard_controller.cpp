@@ -9,7 +9,7 @@ void KeyboardController::set_input(const PlayerInput &input) {
   input_ = input;
 }
 
-PlayerInput KeyboardController::update(const PhysicsView &) {
+PlayerInput KeyboardController::on_update(const PhysicsView &) {
   return input_;
 }
 

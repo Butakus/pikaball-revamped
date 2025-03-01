@@ -66,6 +66,15 @@ public:
    */
   [[nodiscard]] bool slow_motion() const { return slow_motion_; }
 
+  /**
+   * Check if the game just started a new round at this frame
+   *
+   * This is not elegant (the game object must check this everytime),
+   * but it is what it is right now.
+   * @return True if the game just started a new round at this frame
+   */
+  [[nodiscard]] bool new_round() const { return new_round_; }
+
 private:
   // Non-owning pointer to physics object to update the state of ball and players
   Physics* physics_;
@@ -81,6 +90,9 @@ private:
 
   // Slow Motion state. The Game object must manually check this to adjust the FPS
   bool slow_motion_ {false};
+
+  // Flag that is set at the transition when a new round starts
+  bool new_round_ {false};
 
   // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};

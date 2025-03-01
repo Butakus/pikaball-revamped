@@ -1,7 +1,5 @@
 #include "pikaball/controller/computer_controller.hpp"
-
 #include <pikaball/random.hpp>
-#include <ranges>
 
 namespace pika {
 
@@ -12,6 +10,10 @@ ComputerController::ComputerController(const FieldSide &side) :
  right_bound_((is_player_right_ + 1) * ground_h_width)
 {}
 
+void ComputerController::on_round_start(const PhysicsView &physics) {
+  // At the start of each round, reset the boldness to a random value
+  boldness_ = rand_int() % 5;
+}
 
 /**
  * Estimate where will the ball land if the player power hits with the given input.
@@ -75,7 +77,7 @@ bool ComputerController::decide_input_power_hit(const PhysicsView& physics_view,
   return false;
 }
 
-PlayerInput ComputerController::update(const PhysicsView &physics_view) {
+PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
   PlayerInput input {};
 
   // Initialize some values for later

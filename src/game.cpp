@@ -18,9 +18,9 @@ Game::Game() {
   );
   // By default, both players are controlled by the keyboard
   // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
-  // controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+  controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
   controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
-  controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
+  // controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
 }
 
 void Game::step() {
@@ -42,16 +42,23 @@ void Game::step() {
     if (state_ == GameState::VolleyGame) {
       const view::MenuPlayerSelection selection = menu_view_->get_selection();
       SDL_Log("Player selection: %d", selection);
+      controller_left_->on_game_start(PhysicsView(*physics_));
+      controller_right_->on_game_start(PhysicsView(*physics_));
       volley_view_->start();
     }
     break;
   case GameState::VolleyGame:
     // Send the current input state to the view
-    const PhysicsView physics_view {*physics_};
-    const PlayerInput input_left = controller_left_->update(physics_view);
-    const PlayerInput input_right = controller_right_->update(physics_view);
+    // TODO: Decide where to get input from controllers. Here or after render?
+    const PlayerInput input_left = controller_left_->on_update(PhysicsView(*physics_));
+    const PlayerInput input_right = controller_right_->on_update(PhysicsView(*physics_));
     volley_view_->set_input(input_left, input_right);
-    state_ = volley_view_->update();
+    state_ = volley_view_->update();  // The physics object is updated inside this view
+    // Check if a new round has started to update the controllers
+    if (volley_view_->new_round()) {
+      controller_left_->on_round_start(PhysicsView(*physics_));
+      controller_right_->on_round_start(PhysicsView(*physics_));
+    }
     // Check if the view needs slow motion and change the FPS
     const unsigned int fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
     target_time_per_frame_ = ns_per_second / fps;

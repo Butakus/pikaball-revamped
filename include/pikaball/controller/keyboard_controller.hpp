@@ -15,7 +15,7 @@ public:
    * The param PhysicsView is ignored.
    * @return The player input for the player that is being controlled according to the keyboard state.
    */
-  [[nodiscard]] PlayerInput update(const PhysicsView&) override;
+  [[nodiscard]] PlayerInput on_update(const PhysicsView&) override;
 
   /**
    * Set the current user input from main SDL event handler.

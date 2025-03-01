@@ -63,7 +63,6 @@ public:
   [[nodiscard]] const auto& side() const { return field_side_; }
   [[nodiscard]] const auto& diving_direction() const { return diving_direction_; }
   [[nodiscard]] const auto& anim_frame_number() const { return anim_frame_number_; }
-  [[nodiscard]] const auto& is_computer() const { return is_computer_; }
 
   // Flag to remember if the ball was already touched
   bool collision_with_ball {false};  // 0xBC
@@ -92,28 +91,6 @@ private:
 
   bool is_winner_ {false};    // 0xD0
   bool game_ended_ {false};   // 0xD0
-
-  bool is_computer_ {false};  // 0xA4
-  /**
-   * It flips randomly to 0 or 1 by the letComputerDecideUserInput function (FUN_00402360)
-   * when ball is hanging around on the other player's side.
-   * If it is 0, computer player stands by around the middle point of their side.
-   * If it is 1, computer player stands by adjacent to the net.
-   */
-  int computer_idle_position_ {0};  // 0xDC
-  /**
-   * This value is initialized to (_rand() % 5) before the start of every round.
-   * The greater the number, the bolder the computer player.
-   *
-   * If computer has higher boldness,
-   * judges more the ball is hanging around the other player's side,
-   * has greater distance to the expected landing point of the ball,
-   * jumps more, and dives less.
-   * See the source code of the letComputerDecideUserInput function (FUN_00402360).
-   *
-   * Possible values: 0, 1, 2, 3 or 4
-   */
-  int computer_boldness_ {0};  // 0xD8
 };
 
 } // namespace pika

@@ -16,7 +16,14 @@ public:
    * @param physics_view The current state of the game physics (Ball and players).
    * @return The player input for the player that is being controlled by the computer.
    */
-  [[nodiscard]] PlayerInput update(const PhysicsView& physics_view) override;
+  [[nodiscard]] PlayerInput on_update(const PhysicsView& physics_view) override;
+
+  /**
+   * This function will be called when a new round start.
+   * It can be overridden if the controller wants to do any setup before the round starts.
+   * @param physics The current state of the game physics (Ball and players).
+   */
+  void on_round_start(const PhysicsView& physics) override;
 
 private:
   Ball ball_ {};
@@ -30,7 +37,7 @@ private:
   const unsigned int right_bound_;
 
   /**
-   * It flips randomly to 0 or 1 by the letComputerDecideUserInput function (FUN_00402360)
+   * It flips randomly to 0 or 1 on each update (FUN_00402360)
    * when ball is hanging around on the other player's side.
    * If it is 0, computer player stands by around the middle point of their side.
    * If it is 1, computer player stands by adjacent to the net.
@@ -44,7 +51,7 @@ private:
    * judges more the ball is hanging around the other player's side,
    * has greater distance to the expected landing point of the ball,
    * jumps more, and dives less.
-   * See the source code of the letComputerDecideUserInput function (FUN_00402360).
+   * See comments inside decide_input_power_hit function (FUN_00402360).
    *
    * Possible values: 0, 1, 2, 3 or 4
    */

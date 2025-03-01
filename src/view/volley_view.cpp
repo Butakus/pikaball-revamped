@@ -42,10 +42,12 @@ GameState VolleyView::update() {
       if (frame_counter_ >= start_round_frames) {
         // Start the next round
         black_fade_alpha_ = 0.0;
+        new_round_ = true;
         volley_game_state_ = VolleyGameState::PlayRound;
       }
     break;
     case VolleyGameState::PlayRound:
+      new_round_ = false;
       // Update physics and check if the ball is touching the ground
       if (physics_->update(input_left_, input_right_)) {
         // End of the round
@@ -109,6 +111,7 @@ void VolleyView::start() {
   frame_counter_ = 0;
   black_fade_alpha_ = 1.0f;
   slow_motion_ = false;
+  new_round_ = false;
   if (!background_texture_) {
     preload_background();
   }

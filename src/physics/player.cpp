@@ -24,11 +24,6 @@ void Player::initialize_round() {
   anim_frame_number_ = 0;
   anim_arm_direction_ = 1;
   anim_frame_delay_ = 0;
-
-  // TODO: This must be initialized at the ComputerController class
-  if (is_computer_) {
-    computer_boldness_ = rand_int() % 5;
-  }
 }
 
 void Player::update(const PlayerInput& input) {

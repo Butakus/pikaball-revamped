@@ -27,7 +27,21 @@ public:
    * @param physics The current state of the game physics (Ball and players)
    * @return The player input for the player that is being controlled.
    */
-  [[nodiscard]] virtual PlayerInput update(const PhysicsView& physics) = 0;
+  [[nodiscard]] virtual PlayerInput on_update(const PhysicsView& physics) = 0;
+
+  /**
+   * This function will be called when a new game start.
+   * It can be overridden if the controller wants to do any setup before the game starts.
+   * @param physics The current state of the game physics (Ball and players).
+   */
+  virtual void on_game_start(const PhysicsView& physics) {}
+
+  /**
+   * This function will be called when a new round start.
+   * It can be overridden if the controller wants to do any setup before the round starts.
+   * @param physics The current state of the game physics (Ball and players).
+   */
+  virtual void on_round_start(const PhysicsView& physics) {}
 
 protected:
   FieldSide field_side_;
