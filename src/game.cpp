@@ -1,6 +1,7 @@
 #include "game.hpp"
-#include <pikaball/controller/keyboard_controller.hpp>
 #include "SDL3/SDL.h"
+#include <pikaball/controller/keyboard_controller.hpp>
+#include <pikaball/controller/computer_controller.hpp>
 
 namespace pika {
 
@@ -16,8 +17,10 @@ Game::Game() {
     physics_.get()
   );
   // By default, both players are controlled by the keyboard
-  controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
-  controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+  // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
+  // controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+  controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
+  controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
 }
 
 void Game::step() {
@@ -39,7 +42,6 @@ void Game::step() {
     if (state_ == GameState::VolleyGame) {
       const view::MenuPlayerSelection selection = menu_view_->get_selection();
       SDL_Log("Player selection: %d", selection);
-      physics_->restart(false, false);  // Is computer is always false for now
       volley_view_->start();
     }
     break;

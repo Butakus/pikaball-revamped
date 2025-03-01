@@ -64,7 +64,7 @@ public:
    * but it is what it is right now.
    * @return True if the game should run in slow motion.
    */
-  bool slow_motion() const { return slow_motion_; }
+  [[nodiscard]] bool slow_motion() const { return slow_motion_; }
 
 private:
   // Non-owning pointer to physics object to update the state of ball and players

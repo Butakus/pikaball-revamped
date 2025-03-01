@@ -3,13 +3,8 @@
 namespace pika {
 
 Physics::Physics() :
-  player_left_(FieldSide::Left, false),
-  player_right_(FieldSide::Right, false)
-{}
-
-Physics::Physics(const bool is_computer_left, const bool is_computer_right) :
-  player_left_(FieldSide::Left, is_computer_left),
-  player_right_(FieldSide::Right, is_computer_right)
+  player_left_(FieldSide::Left),
+  player_right_(FieldSide::Right)
 {}
 
 void Physics::init_round(const FieldSide &field_side) {
@@ -18,10 +13,10 @@ void Physics::init_round(const FieldSide &field_side) {
   player_right_.initialize_round();
 }
 
-void Physics::restart(const bool is_computer_left, const bool is_computer_right) {
+void Physics::restart() {
   ball_.initialize(FieldSide::Left);
-  player_left_.initialize_game(is_computer_left);
-  player_right_.initialize_game(is_computer_right);
+  player_left_.initialize_game();
+  player_right_.initialize_game();
 }
 
 bool Physics::update(const PlayerInput& input_left,

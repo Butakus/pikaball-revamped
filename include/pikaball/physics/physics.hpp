@@ -15,7 +15,6 @@ public:
   using Ptr = std::unique_ptr<Physics>;
 
   Physics();
-  Physics(bool is_computer_left, bool is_computer_right);
   ~Physics() = default;
 
   // Delete copy and move operations
@@ -30,12 +29,8 @@ public:
    */
   void init_round(const FieldSide& field_side);
 
-  /**
-   * Reset ball and players positions for a new game
-   * @param is_computer_left True if the left player is controlled by the computer
-   * @param is_computer_right True if the right player is controlled by the computer
-   */
-  void restart(bool is_computer_left, bool is_computer_right);
+  /** Reset ball and players positions for a new game */
+  void restart();
 
   /**
    * Update the world state based on the user input.

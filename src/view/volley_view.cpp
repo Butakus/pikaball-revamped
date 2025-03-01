@@ -118,7 +118,7 @@ void VolleyView::start() {
   score_left_ = 0;
   score_right_ = 0;
   next_serve_side_ = FieldSide::Left;
-  physics_->restart(false, false);
+  physics_->restart();
   volley_game_state_ = VolleyGameState::NewGame;
 }
 

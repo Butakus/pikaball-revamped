@@ -72,6 +72,9 @@ public:
   [[nodiscard]] const auto& trailing_y() const { return trailing_y_; }
   [[nodiscard]] const auto& expected_landing_x() const { return expected_landing_x_; }
 
+  void set_velocity_x(const int vel_x) { velocity_x_ = vel_x; }
+  void set_velocity_y(const int vel_y) { velocity_y_ = vel_y; }
+
   void decrease_punch_effect_radius();
 
 private:

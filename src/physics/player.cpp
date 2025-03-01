@@ -3,13 +3,12 @@
 #include <pikaball/random.hpp>
 
 namespace pika {
-Player::Player(const FieldSide &field_side, const bool is_computer) {
+Player::Player(const FieldSide &field_side) {
   field_side_ = field_side;
-  initialize_game(is_computer);
+  initialize_game();
 }
 
-void Player::initialize_game(const bool is_computer) {
-  is_computer_ = is_computer;
+void Player::initialize_game() {
   game_ended_ = false;
   is_winner_ = false;
   initialize_round();
@@ -26,6 +25,7 @@ void Player::initialize_round() {
   anim_arm_direction_ = 1;
   anim_frame_delay_ = 0;
 
+  // TODO: This must be initialized at the ComputerController class
   if (is_computer_) {
     computer_boldness_ = rand_int() % 5;
   }

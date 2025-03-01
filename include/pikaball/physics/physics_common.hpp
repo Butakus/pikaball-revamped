@@ -10,11 +10,11 @@ namespace pika {
 /** Ground width */
 constexpr unsigned int ground_width = screen_width;
 /** Ground half-width, also the x coordinate for the net pillar */
-constexpr unsigned int ground_h_width = (ground_width / 2);
+constexpr unsigned int ground_h_width = ground_width / 2;
 /** Player (Pikachu) size: width = height = 64 */
 constexpr unsigned int player_size = 64;
 /** Player half size */
-constexpr unsigned int player_h_size = (player_size / 2); // integer division
+constexpr unsigned int player_h_size = player_size / 2;
 /** Player's y coordinate when they are touching ground */
 constexpr unsigned int player_ground_y = 244;
 /** Ball's radius */

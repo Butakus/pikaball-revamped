@@ -30,7 +30,7 @@ enum class PlayerState {
  */
 class Player {
 public:
-  Player(const FieldSide& field_side, bool is_computer);
+  explicit Player(const FieldSide& field_side);
   ~Player() = default;
   Player(const Player&) = default;
   Player& operator=(const Player&) = default;
@@ -39,11 +39,8 @@ public:
   Player(Player&&) = delete;
   Player& operator=(Player&&) = delete;
 
-  /**
-   * Initialize the player for a new game (reset state)
-   * @param is_computer True if the player will be controlled by the computer
-   */
-  void initialize_game(bool is_computer);
+  /** Initialize the player for a new game (reset state) */
+  void initialize_game();
 
   /**
    * Initialize the player for a new round (reset state)
