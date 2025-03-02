@@ -54,6 +54,7 @@ private:
 
   // Game state
   bool running_ {false};
+  unsigned int frame_counter_ {0};
   GameState state_ {GameState::Intro};
 
   // Inputs
@@ -66,6 +67,9 @@ private:
   * Handle keyboard input and update input structs
   */
   void handle_input();
+
+  /** Control the game's logic for the Intro state */
+  void intro_state();
 };
 
 } // namespace pika

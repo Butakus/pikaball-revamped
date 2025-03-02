@@ -30,29 +30,37 @@ constexpr static SDL_FRect mlp_dst {
 };
 
 public:
-  explicit IntroView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet);
   ~IntroView() override = default;
+  explicit IntroView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
+    View(renderer, sprite_sheet)
+  {}
 
-  /**
-   * Update the state and render the new frame.s
-   * @return The next game state.
-   */
-  GameState update() override;
+  /** Render the intro messages and the fade in/out effects */
+  void render(unsigned int frame_counter) {
+    if (renderer_ == nullptr || sprite_sheet_ == nullptr) {
+      return;
+    }
 
-  /**
-   * Start the view. Set the frame counter to zero.
-   */
-  void start() override;
+    // Fill the background black
+    SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderClear(renderer_);
 
-  /**
-   * Update the menu input to be used in the update() call.
-   * Only the enter field is used (to skip the intro).
-   * @param input MenuInput
-   */
-  void set_input(const MenuInput& input);
+    // Render intro sprites
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::msg_sachisoft, &sachi_dst);
+    SDL_RenderTexture(
+      renderer_, sprite_sheet_, &sprite::msg_init_mark_mlp, &mlp_dst);
 
-private:
-  MenuInput input_ {};
+    // Apply fade-in and fade-out effects
+    if (frame_counter <= 25) {
+      fade_in(1.0f / 25);
+    }
+    else if (frame_counter > 100) {
+      fade_out(1.0f / 25);
+    }
+
+    SDL_RenderPresent(renderer_);
+  }
 };
 
 } // namespace pika::view

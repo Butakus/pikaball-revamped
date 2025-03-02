@@ -16,9 +16,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     game.cpp
     view/wave.cpp
     view/cloud.cpp
-    view/view.cpp
     view/volley_view.cpp
-    view/intro_view.cpp
     view/menu_view.cpp
     view/ball_view.cpp
     view/player_view.cpp

@@ -29,12 +29,7 @@ void Game::step() {
 
   switch (state_) {
   case GameState::Intro:
-    intro_view_->set_input(menu_input_);
-    state_ = intro_view_->update();
-    // Check transition
-    if (state_ == GameState::Menu) {
-      menu_view_->start();
-    }
+    intro_state();
     break;
   case GameState::Menu:
     menu_view_->set_input(menu_input_);
@@ -145,5 +140,16 @@ void Game::handle_input() {
   menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];
   menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
 }
+
+void Game::intro_state() {
+  // Update frame counter and check if the state must change
+  frame_counter_++;
+  intro_view_->render(frame_counter_);
+  if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
+    state_ = GameState::Menu;
+    menu_view_->start();
+  }
+}
+
 
 } // namespace pika
