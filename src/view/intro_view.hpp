@@ -31,12 +31,17 @@ constexpr static SDL_FRect mlp_dst {
 
 public:
   ~IntroView() override = default;
+  IntroView(IntroView const&) = delete;
+  IntroView(IntroView &&) = delete;
+  IntroView &operator=(IntroView const&) = delete;
+  IntroView &operator=(IntroView &&) = delete;
+
   explicit IntroView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
     View(renderer, sprite_sheet)
   {}
 
   /** Render the intro messages and the fade in/out effects */
-  void render(unsigned int frame_counter) {
+  void render(const unsigned int frame_counter) {
     if (renderer_ == nullptr || sprite_sheet_ == nullptr) {
       return;
     }

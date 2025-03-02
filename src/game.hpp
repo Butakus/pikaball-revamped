@@ -56,6 +56,8 @@ private:
   bool running_ {false};
   unsigned int frame_counter_ {0};
   GameState state_ {GameState::Intro};
+  MenuState menu_state_ {MenuState::Menu};
+  MenuPlayerSelection player_selection_ {MenuPlayerSelection::SINGLE_PLAYER};
 
   // Inputs
   MenuInput menu_input_ {};
@@ -70,6 +72,8 @@ private:
 
   /** Control the game's logic for the Intro state */
   void intro_state();
+  /** Control the game's logic for the Menu state */
+  void menu_state();
 };
 
 } // namespace pika

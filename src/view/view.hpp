@@ -86,6 +86,12 @@ public:
     render_fade_in_out();
   }
 
+  /**
+   * Get the current alpha value of the black cover texture
+   * @return the current alpha value
+   */
+  [[nodiscard]] float get_fade_alpha() const { return black_fade_alpha_; }
+
 protected:
   // Convenient type alias to hold owning textures
   using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;

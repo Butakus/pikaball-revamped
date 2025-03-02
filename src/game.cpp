@@ -32,15 +32,7 @@ void Game::step() {
     intro_state();
     break;
   case GameState::Menu:
-    menu_view_->set_input(menu_input_);
-    state_ = menu_view_->update();
-    if (state_ == GameState::VolleyGame) {
-      const view::MenuPlayerSelection selection = menu_view_->get_selection();
-      SDL_Log("Player selection: %d", selection);
-      controller_left_->on_game_start(PhysicsView(*physics_));
-      controller_right_->on_game_start(PhysicsView(*physics_));
-      volley_view_->start();
-    }
+    menu_state();
     break;
   case GameState::VolleyGame:
     // Send the current input state to the view
@@ -58,6 +50,7 @@ void Game::step() {
     const unsigned int fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
     target_time_per_frame_ = ns_per_second / fps;
     if (state_ == GameState::Intro) {
+      frame_counter_ = 0;
       intro_view_->start();
     }
     break;
@@ -142,12 +135,66 @@ void Game::handle_input() {
 }
 
 void Game::intro_state() {
-  // Update frame counter and check if the state must change
-  frame_counter_++;
+  // Render the view and update frame counter
   intro_view_->render(frame_counter_);
+  frame_counter_++;
+  // Check if the state must change
   if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
+    // Setup stuff for next state
     state_ = GameState::Menu;
+    menu_state_ = MenuState::Menu;
+    player_selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+    frame_counter_ = 0;
     menu_view_->start();
+  }
+}
+
+void Game::menu_state() {
+  // Render the view and update frame counter
+  menu_view_->render(frame_counter_);
+  frame_counter_++;
+
+  // Update menu state
+  switch (menu_state_) {
+  case MenuState::Menu:
+    if (frame_counter_ < view::MenuView::start_frames && menu_input_.enter) {
+      // The animation is skipped by pressing enter
+      frame_counter_ = view::MenuView::start_frames;
+      return;
+    }
+    // On the first frames, just render the animation (skip input processing).
+    if (frame_counter_ <= view::MenuView::start_frames) {
+      return;
+    }
+
+    // Process input to update the game mode selection
+    if (player_selection_ == MenuPlayerSelection::SINGLE_PLAYER && menu_input_.down) {
+      player_selection_ = MenuPlayerSelection::MULTI_PLAYER;
+      menu_view_->change_selection(player_selection_);
+    }
+    else if (player_selection_ == MenuPlayerSelection::MULTI_PLAYER && menu_input_.up) {
+      player_selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+      menu_view_->change_selection(player_selection_);
+    }
+
+    // Process input to check if the game must start
+    if (menu_input_.enter) {
+      menu_state_ = MenuState::FadeOut;
+      menu_view_->set_state(menu_state_);
+    }
+    break;
+  case MenuState::FadeOut:
+    // After fading out completely, change game state to start the game
+    if (menu_view_->get_fade_alpha() >= 1.0) {
+      // Trigger transition to VolleyGame state
+      state_ = GameState::VolleyGame;
+      frame_counter_ = 0;
+      SDL_Log("Player selection: %d", player_selection_);
+      controller_left_->on_game_start(PhysicsView(*physics_));
+      controller_right_->on_game_start(PhysicsView(*physics_));
+      volley_view_->start();
+    }
+    break;
   }
 }
 

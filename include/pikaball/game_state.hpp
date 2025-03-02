@@ -3,24 +3,24 @@
 
 namespace pika {
 
-// TODO: Combine states inside each View (with its own FSM)
+// Main game (outer) states
 enum class GameState {
   Intro,
   Menu,
   VolleyGame,
 };
 
-// Game states in the JS game version (including transitions)
-// enum class GameState {
-//   Intro,
-//   Menu,
-//   AfterMenuSelection,
-//   BeforeNewGame,
-//   StartNewGame,
-//   Round,
-//   AfterRoundEnd,
-//   BeforeNextRound
-// };
+// Menu sub-states
+enum class MenuState {
+  Menu,
+  FadeOut
+};
+
+// Possible game modes (selection at menu state)
+enum class MenuPlayerSelection {
+  SINGLE_PLAYER,
+  MULTI_PLAYER,
+};
 
 } // namespace pika
 
