@@ -28,9 +28,8 @@ public:
   VolleyView &operator=(VolleyView const&) = delete;
   VolleyView &operator=(VolleyView &&) = delete;
 
-  explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet, Physics* physics) :
+  explicit VolleyView(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
     View(renderer, sprite_sheet),
-    physics_(physics),
     ball_view_(renderer, sprite_sheet),
     player_view_left_(renderer, sprite_sheet),
     player_view_right_(renderer, sprite_sheet)

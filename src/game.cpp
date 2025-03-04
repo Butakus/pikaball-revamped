@@ -12,10 +12,7 @@ Game::Game() {
   menu_view_ = std::make_unique<view::MenuView>(
     window_.get_renderer(), window_.get_sprite_sheet());
   volley_view_ = std::make_unique<view::VolleyView>(
-    window_.get_renderer(),
-    window_.get_sprite_sheet(),
-    physics_.get()
-  );
+    window_.get_renderer(), window_.get_sprite_sheet());
   // By default, both players are controlled by the keyboard
   // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
