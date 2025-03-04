@@ -64,7 +64,6 @@ public:
     if (state_ == MenuState::FadeOut) {
       fade_out(1.0f / fade_out_frames);
     }
-    SDL_RenderPresent(renderer_);
   }
 
   /**

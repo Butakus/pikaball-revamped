@@ -3,23 +3,32 @@
 
 namespace pika {
 
-// Main game (outer) states
+/** Main game (outer) states */
 enum class GameState {
   Intro,
   Menu,
   VolleyGame,
 };
 
-// Menu sub-states
+/** Menu sub-states */
 enum class MenuState {
   Menu,
   FadeOut
 };
 
-// Possible game modes (selection at menu state)
+/** Possible game modes (selection at menu state) */
 enum class MenuPlayerSelection {
   SINGLE_PLAYER,
   MULTI_PLAYER,
+};
+
+/** VolleyGame sub-states */
+enum class VolleyGameState {
+  NewGame,
+  StartRound,
+  PlayRound,
+  EndRound,
+  GameEnd
 };
 
 } // namespace pika

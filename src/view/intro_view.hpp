@@ -63,8 +63,6 @@ public:
     else if (frame_counter > 100) {
       fade_out(1.0f / 25);
     }
-
-    SDL_RenderPresent(renderer_);
   }
 };
 

@@ -37,24 +37,17 @@ void Game::step() {
   case GameState::VolleyGame:
     // Send the current input state to the view
     // TODO: Decide where to get input from controllers. Here or after render?
-    const PlayerInput input_left = controller_left_->on_update(PhysicsView(*physics_));
-    const PlayerInput input_right = controller_right_->on_update(PhysicsView(*physics_));
-    volley_view_->set_input(input_left, input_right);
-    state_ = volley_view_->update();  // The physics object is updated inside this view
-    // Check if a new round has started to update the controllers
-    if (volley_view_->new_round()) {
-      controller_left_->on_round_start(PhysicsView(*physics_));
-      controller_right_->on_round_start(PhysicsView(*physics_));
-    }
+    input_left_ = controller_left_->on_update(PhysicsView(*physics_));
+    input_right_ = controller_right_->on_update(PhysicsView(*physics_));
+    // volley_view_->set_input(input_left_, input_right_);
+    // state_ = volley_view_->update();  // The physics object is updated inside this view
+    volley_state();
     // Check if the view needs slow motion and change the FPS
-    const unsigned int fps = volley_view_->slow_motion() ? slow_motion_fps_ : target_fps_;
+    const unsigned int fps = slow_motion_ ? slow_motion_fps_ : target_fps_;
     target_time_per_frame_ = ns_per_second / fps;
-    if (state_ == GameState::Intro) {
-      frame_counter_ = 0;
-      intro_view_->start();
-    }
     break;
   }
+  SDL_RenderPresent(window_.get_renderer());
 }
 
 void Game::run() {
@@ -190,6 +183,7 @@ void Game::menu_state() {
       state_ = GameState::VolleyGame;
       frame_counter_ = 0;
       SDL_Log("Player selection: %d", player_selection_);
+      // TODO: Change controllers based on game mode selection
       controller_left_->on_game_start(PhysicsView(*physics_));
       controller_right_->on_game_start(PhysicsView(*physics_));
       volley_view_->start();
@@ -198,5 +192,98 @@ void Game::menu_state() {
   }
 }
 
+void Game::volley_state() {
+  // Render the view and update frame counter
+  volley_view_->render(frame_counter_, PhysicsView(*physics_));
+  frame_counter_++;
+
+  switch (volley_state_) {
+  case VolleyGameState::NewGame:
+      // TODO: Maybe check transitions after rendering and updating
+      if (frame_counter_ >= view::VolleyView::new_game_frames) {
+        volley_state_ = VolleyGameState::PlayRound;
+        volley_view_->set_state(volley_state_);
+      }
+    break;
+    case VolleyGameState::StartRound:
+      if (frame_counter_ >= view::VolleyView::start_round_frames) {
+        // Start the next round
+        // When a new round stars, update the controllers
+        controller_left_->on_round_start(PhysicsView(*physics_));
+        controller_right_->on_round_start(PhysicsView(*physics_));
+        volley_state_ = VolleyGameState::PlayRound;
+        volley_view_->set_state(volley_state_);
+      }
+    break;
+    case VolleyGameState::PlayRound:
+      // Update physics and check if the ball is touching the ground
+      if (physics_->update(input_left_, input_right_)) {
+        // End of the round
+        next_serve_side_ = update_score();
+        volley_view_->set_score(score_left_, score_right_);
+        if (score_left_ >= win_score || score_right_ >= win_score) {
+          // Game ended
+          physics_->end_game(next_serve_side_);
+          frame_counter_ = 0;
+          volley_state_ = VolleyGameState::GameEnd;
+          volley_view_->set_state(volley_state_);
+        }
+        else {
+          // Apply end-of-round effects and start next round
+          frame_counter_ = 0;
+          volley_state_ = VolleyGameState::EndRound;
+          volley_view_->set_state(volley_state_);
+        }
+      }
+    break;
+    case VolleyGameState::EndRound:
+      // Apply and manage slow motion and fading effects
+      // Slow motion will be active for the first 6 frames after the point
+      slow_motion_ = frame_counter_ <= 6;
+      // We keep updating the physics, but without checking the ball
+      physics_->update(input_left_, input_right_);
+      if (frame_counter_ >= view::VolleyView::end_round_frames) {
+        // Start the next round
+        frame_counter_ = 0;
+        volley_view_->fade_out(1.0);
+        physics_->init_round(next_serve_side_);
+        volley_state_ = VolleyGameState::StartRound;
+        volley_view_->set_state(volley_state_);
+      }
+    break;
+    case VolleyGameState::GameEnd:
+      // Check if the user wants to skip the end frames
+      const bool skip =
+        frame_counter_ > view::VolleyView::game_end_skip_frames && menu_input_.enter;
+      // Or, end the game after the total animation frames
+      if (skip || frame_counter_ > view::VolleyView::game_end_frames) {
+        reset_volley_game_state();
+        frame_counter_ = 0;
+        state_ = GameState::Intro;
+        intro_view_->start();
+        return;
+      }
+      // Keep updating physics in the end state, without checking the ball touching ground.
+      physics_->update(input_left_, input_right_);
+    break;
+  }
+}
+
+FieldSide Game::update_score() {
+  if (physics_->ball().punch_effect_x() < ground_h_width) {
+    score_right_++;
+    return FieldSide::Right;
+  }
+  score_left_++;
+  return FieldSide::Left;
+}
+
+void Game::reset_volley_game_state() {
+  score_left_ = 0;
+  score_right_ = 0;
+  next_serve_side_ = FieldSide::Left;
+  volley_state_ = VolleyGameState::NewGame;
+  physics_->restart();
+}
 
 } // namespace pika

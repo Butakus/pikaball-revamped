@@ -56,11 +56,25 @@ private:
   bool running_ {false};
   unsigned int frame_counter_ {0};
   GameState state_ {GameState::Intro};
+  // Menu state data
   MenuState menu_state_ {MenuState::Menu};
   MenuPlayerSelection player_selection_ {MenuPlayerSelection::SINGLE_PLAYER};
+  // VolleyGame state data
+  VolleyGameState volley_state_ {VolleyGameState::NewGame};
+  unsigned int score_left_ {0};
+  unsigned int score_right_ {0};
+  // TODO: This must come from the game settings
+  static constexpr unsigned int win_score = 5;
+
+  FieldSide next_serve_side_ {FieldSide::Left};
+  // Slow Motion state. The Game object must manually check this to adjust the FPS
+  bool slow_motion_ {false};
+
 
   // Inputs
   MenuInput menu_input_ {};
+  PlayerInput input_left_ {};
+  PlayerInput input_right_ {};
   // Player controllers
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
@@ -70,10 +84,20 @@ private:
   */
   void handle_input();
 
+  /** Cleans up all the variables after ending a volley game */
+  void reset_volley_game_state();
   /** Control the game's logic for the Intro state */
   void intro_state();
   /** Control the game's logic for the Menu state */
   void menu_state();
+  /** Control the game's logic for the VolleyGame state */
+  void volley_state();
+
+  /** Update the score based on the position of the ball punch effect.
+   *
+   * @return The side that won the point
+   */
+  FieldSide update_score();
 };
 
 } // namespace pika
