@@ -123,8 +123,10 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
     }
   }
   else if (rand_int() % 20 == 0) {
+    // If player is not far or is too bold... Update (randomly) idle position for next round
     computer_idle_position_ = rand_int() % 2;
   }
+
   if (player_.state() == PlayerState::Normal) {
     // If the player is on the ground, decide whether to jump, or dive
 
@@ -141,18 +143,24 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
       input.direction_y = DirY::Up;
     }
 
+    // Deviation from OG game: Now check distance to landing point instead of current ball x.
     /* The computer decides to dive if these conditions are met:
      * 1. The ball is landing on our side
      * 2. The ball is currently on our side
-     * 3. Ball is far from the player and we are not bold enough
+     * 3. Ball is landing far from the player and we are not bold enough
      * 4. Ball is close to the ground (lower than 174)
+     * 5. Ball is going down
      */
+    const unsigned int ball_land_distance =
+      std::abs(static_cast<int>(ball_land_x) - static_cast<int>(player_.x()));
     if (ball_land_x > left_bound_ && ball_land_x < right_bound_ &&
         ball_.x() > left_bound_ && ball_.x() < right_bound_ &&
-        ball_distance_x > boldness_ * 5 + player_size &&
-        ball_.y() > 174) {
+        ball_land_distance > boldness_ * 5 + player_size &&
+        ball_.y() > 174 && ball_.velocity_y() > 0) {
       input.power_hit = true;
-      if (player_.x() < ball_.x()) {
+      // Deviation from OG game: This should be the landing x.
+      // if (player_.x() < ball_.x()) {
+      if (player_.x() < ball_land_x) {
         input.direction_x = DirX::Right;
       }
       else {
@@ -162,7 +170,9 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
   }
   else if (player_.state() == PlayerState::Jumping || player_.state() == PlayerState::PowerHit) {
     // If the player is jumping or power hitting...
-    if (ball_distance_x > 8) {
+    // Deviation from OG game: Increase ball distance from 8 to 16 to approach
+    // if (ball_distance_x > 8) {
+    if (ball_distance_x > 16) {
       // If the ball is far, move towards it
       if (player_.x() < ball_.x()) {
         input.direction_x = DirX::Right;

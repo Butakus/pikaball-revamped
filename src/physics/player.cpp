@@ -86,7 +86,8 @@ void Player::update(const PlayerInput& input) {
   y_ = next_y;
   if (next_y < player_ground_y) {
     velocity_y_ += 1;
-  } else if (next_y > player_ground_y) {
+  }
+  else if (velocity_y_ > 0) {
     // if player is landing...
     velocity_y_ = 0;
     y_ = player_ground_y;
@@ -96,7 +97,8 @@ void Player::update(const PlayerInput& input) {
       state_ = PlayerState::AfterDiving;
       anim_frame_number_ = 0;
       lying_down_timer_ = 3;
-    } else {
+    }
+    else {
       state_ = PlayerState::Normal;
     }
   }
