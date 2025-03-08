@@ -6,7 +6,7 @@
 #include "view/intro_view.hpp"
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
-#include "window.hpp"
+#include "sdl_system.hpp"
 
 #include <pikaball/controller/player_controller.hpp>
 #include <pikaball/physics/physics.hpp>
@@ -35,7 +35,7 @@ public:
   void run();
 
 private:
-  Window window_;
+  SDLSystem sdl_sys_;
 
   // Main (and only) physics object to update the state of ball and players
   Physics::Ptr physics_ {nullptr};

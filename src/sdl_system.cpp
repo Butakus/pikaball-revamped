@@ -1,5 +1,4 @@
-#include "window.hpp"
-#include "pikaball/sprites.hpp"
+#include "sdl_system.hpp"
 #include "pikaball/common.hpp"
 
 namespace pika {
@@ -7,7 +6,7 @@ namespace pika {
 constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
 constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
 
-Window::Window() :
+SDLSystem::SDLSystem() :
       window_(nullptr, SDL_DestroyWindow),
       renderer_(nullptr, SDL_DestroyRenderer)
 {
@@ -46,7 +45,7 @@ Window::Window() :
   SDL_Log("Done!");
 }
 
-Window::~Window() {
+SDLSystem::~SDLSystem() {
   // This might be required to free the window resources before calling SDL_Quit
   // if (window_) {
   //     window_.reset();
@@ -55,7 +54,7 @@ Window::~Window() {
   SDL_Quit();
 }
 
-void Window::render() const {
+void SDLSystem::render() const {
   // Fill the background white
   SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
   SDL_RenderClear(renderer_.get());
@@ -65,7 +64,7 @@ void Window::render() const {
   // SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
 }
 
-void Window::load_sprite_sheet() {
+void SDLSystem::load_sprite_sheet() {
   // Load BMP from file, and throw if error
   SDL_Surface* sprites_surface = SDL_LoadBMP(sprite_sheet_filename);
   if (sprites_surface == nullptr) {

@@ -6,27 +6,32 @@
 
 namespace pika {
 
-/** TODO: Docs
- *
+/**
+ * A class to handle SDL resources (Window, Renderer, Audio, etc.)
+ * Owns and manages the SDL objects.
+ * It is responsible for calling SDL_Init and SDL_Quit.
  */
-class Window {
+class SDLSystem {
 public:
   using SDL_Window_ptr = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>;
   using SDL_Renderer_ptr = std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)>;
   using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
 
-  Window();
-  ~Window();
+  SDLSystem();
+  ~SDLSystem();
+  SDLSystem(SDLSystem const&) = delete;
+  SDLSystem(SDLSystem &&) = delete;
+  SDLSystem &operator=(SDLSystem const&) = delete;
+  SDLSystem &operator=(SDLSystem &&) = delete;
 
-  /** Render the next frame
-   * DEPRECATED: It will just render a white background.
+  /** Get a non-owning pointer to the renderer
+   * @return a non-owning pointer to the SDL renderer for this window
    */
-  void render() const;
-
-  /** Get a non-owning pointer to the renderer */
   [[nodiscard]] SDL_Renderer* get_renderer() const { return renderer_.get(); }
 
-  /** Get a non-owning pointer to the sprite sheet texture */
+  /** Get a non-owning pointer to the sprite sheet texture
+   * @return a non-owning pointer to the SDL texture with the sprite sheet
+   */
   [[nodiscard]] SDL_Texture* get_sprite_sheet() const { return sprite_sheet_.get(); }
 
 private:
