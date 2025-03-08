@@ -4,7 +4,7 @@
 
 namespace pika {
 
-constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO; // | SDL_INIT_AUDIO
+constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
 constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
 
 Window::Window() :
@@ -20,7 +20,7 @@ Window::Window() :
         window_name,
         screen_width,
         screen_height,
-        sdl_init_flags,
+        sdl_window_flags,
         &temp_window,
         &temp_renderer)
   ) {
