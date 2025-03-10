@@ -3,6 +3,7 @@
 
 #include "SDL3/SDL.h"
 #include <memory>
+#include "pika_sound.hpp"
 
 namespace pika {
 
@@ -29,6 +30,11 @@ public:
    */
   [[nodiscard]] SDL_Renderer* get_renderer() const { return renderer_.get(); }
 
+  /** Get a non-owning pointer to the sound system
+   * @return a non-owning pointer to the sound system to play sounds
+   */
+  [[nodiscard]] PikaSound* get_sound() const { return sound_.get(); }
+
   /** Get a non-owning pointer to the sprite sheet texture
    * @return a non-owning pointer to the SDL texture with the sprite sheet
    */
@@ -37,6 +43,7 @@ public:
 private:
   SDL_Window_ptr window_;
   SDL_Renderer_ptr renderer_;
+  std::unique_ptr<PikaSound> sound_;
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};

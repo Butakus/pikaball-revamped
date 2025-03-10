@@ -7,8 +7,9 @@ constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
 constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
 
 SDLSystem::SDLSystem() :
-      window_(nullptr, SDL_DestroyWindow),
-      renderer_(nullptr, SDL_DestroyRenderer)
+  window_(nullptr, SDL_DestroyWindow),
+  renderer_(nullptr, SDL_DestroyRenderer),
+  sound_(nullptr)
 {
   if (!SDL_Init(sdl_init_flags)) {
     throw std::runtime_error("Failed to init SDL");
@@ -39,6 +40,9 @@ SDLSystem::SDLSystem() :
     // TODO: Throw?? We actually need this for the physics engine
   }
 
+  // Initialize sound subsystem
+  sound_ = std::make_unique<PikaSound>();
+
   // Load sprites and build the static background
   SDL_Log("Loading sprites...");
   load_sprite_sheet();
@@ -46,22 +50,20 @@ SDLSystem::SDLSystem() :
 }
 
 SDLSystem::~SDLSystem() {
-  // This might be required to free the window resources before calling SDL_Quit
-  // if (window_) {
-  //     window_.reset();
-  // }
+  // Force free the window resources before calling SDL_Quit
+  if (renderer_) {
+      renderer_.reset();
+  }
+  if (window_) {
+      window_.reset();
+  }
+
+  // Force Sound System to free resources before calling SDL_Quit
+  if (sound_) {
+      sound_.reset();
+  }
 
   SDL_Quit();
-}
-
-void SDLSystem::render() const {
-  // Fill the background white
-  SDL_SetRenderDrawColor(renderer_.get(), 0xFF, 0xFF, 0xFF, 0xFF );
-  SDL_RenderClear(renderer_.get());
-
-  // Update screen
-  SDL_RenderPresent(renderer_.get());
-  // SDL_Log("Render time: %d ms - %d fps", current_time -  last_render_time_, 1000 / (current_time -  last_render_time_));
 }
 
 void SDLSystem::load_sprite_sheet() {

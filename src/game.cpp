@@ -161,16 +161,19 @@ void Game::menu_state() {
     if (player_selection_ == MenuPlayerSelection::SINGLE_PLAYER && menu_input_.down) {
       player_selection_ = MenuPlayerSelection::MULTI_PLAYER;
       menu_view_->change_selection(player_selection_);
+      sdl_sys_.get_sound()->pi();
     }
     else if (player_selection_ == MenuPlayerSelection::MULTI_PLAYER && menu_input_.up) {
       player_selection_ = MenuPlayerSelection::SINGLE_PLAYER;
       menu_view_->change_selection(player_selection_);
+      sdl_sys_.get_sound()->pi();
     }
 
     // Process input to check if the game must start
     if (menu_input_.enter) {
       menu_state_ = MenuState::FadeOut;
       menu_view_->set_state(menu_state_);
+      sdl_sys_.get_sound()->pikachu();
     }
     break;
   case MenuState::FadeOut:
