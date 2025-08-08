@@ -33,6 +33,5 @@ add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD COMMAND ${CMAKE_COMMAND}
         -E create_symlink ${link_src} ${link_dst}
-        DEPENDS ${link_dst}
         COMMENT "symbolic link ${link_src} => ${link_dst}"
 )
