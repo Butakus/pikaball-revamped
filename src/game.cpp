@@ -44,6 +44,15 @@ void Game::step() {
     target_time_per_frame_ = ns_per_second / fps;
     break;
   }
+
+  /* TODO: Handle audio
+   * Create a SoundState enum type for Player and Ball physics objects
+   * The physics objects will update their sound state whenever the sound is triggered
+   * A method here will "scan" the players and ball objects to check if the sound is required
+   * and play whatever using the mixer API.
+   *
+   * TODO 2: Think about how to handle the sound reset so it is not retriggered.
+  */
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
 

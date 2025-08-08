@@ -36,8 +36,8 @@ public:
   PikaSound &operator=(PikaSound &&) = delete;
 
   PikaSound() {
-    // Initialize mixer with support for mp3 files
-    Mix_Init(MIX_INIT_MP3);
+    // Initialize mixer
+    MIX_Init();
     // Open default audio device
     audio_dev_id_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec_);
     if(audio_dev_id_ == 0) {
@@ -45,7 +45,8 @@ public:
       throw std::runtime_error("Failed to open audio device");
     }
     // Initialize SDL_mixer
-    if(!Mix_OpenAudio(audio_dev_id_, &audio_spec_))
+    mixer_ = MIX_CreateMixerDevice(audio_dev_id_, &audio_spec_);
+    if(!mixer_)
     {
       SDL_Log( "SDL_mixer could not initialize! SDL_mixer error: %s\n", SDL_GetError());
       throw std::runtime_error("SDL_mixer could not initialize");
@@ -60,33 +61,36 @@ public:
     sound_ball_hit_ = load_chunk(sound_ball_hit_filename);
     sound_ball_ground_ = load_chunk(sound_ball_ground_filename);
 
-    // Allocate channels
-    if (Mix_AllocateChannels(num_channels) != num_channels) {
-      SDL_Log("Unable to allocate channels! SDL_mixer error: %s\n", SDL_GetError());
-      return;
-    }
+    // Initialize tracks
+    general_track_ = createTrack();
+    pika_left_track_ = createTrack();
+    pika_right_track_ = createTrack();
+    ball_track_ = createTrack();
+    // TODO: Manage track left/right panning
   }
 
   ~PikaSound() {
     // Free audio chunks
-    Mix_FreeChunk(sound_pi_);
-    Mix_FreeChunk(sound_pika_);
-    Mix_FreeChunk(sound_chu_);
-    Mix_FreeChunk(sound_pikachu_);
-    Mix_FreeChunk(sound_pipikachu_);
-    Mix_FreeChunk(sound_ball_hit_);
-    Mix_FreeChunk(sound_ball_ground_);
+    MIX_DestroyAudio(sound_pi_);
+    MIX_DestroyAudio(sound_pika_);
+    MIX_DestroyAudio(sound_chu_);
+    MIX_DestroyAudio(sound_pikachu_);
+    MIX_DestroyAudio(sound_pipikachu_);
+    MIX_DestroyAudio(sound_ball_hit_);
+    MIX_DestroyAudio(sound_ball_ground_);
 
     // Close audio mixer and audio device
-    Mix_CloseAudio();
-    Mix_Quit();
+    MIX_DestroyMixer(mixer_);
+    MIX_Quit();
     SDL_CloseAudioDevice(audio_dev_id_);
   }
 
   /** Play the "Pi" sound used in the main menu */
   void pi() const {
     SDL_Log("PI");
-    Mix_PlayChannel(static_cast<int>(SoundChannel::General), sound_pi_, 0);
+    MIX_SetTrackAudio(general_track_, sound_pi_);
+    MIX_PlayTrack(general_track_, {});
+    // MIX_PlayChannel(static_cast<int>(SoundChannel::General), sound_pi_, 0);
   }
 
   /** Play the "Pika!" sound (when a player power-hits)
@@ -96,10 +100,14 @@ public:
   void pika(const FieldSide& side) const {
     switch(side) {
     case FieldSide::Left:
-      Mix_PlayChannel(static_cast<int>(SoundChannel::PikaLeft), sound_pika_, 0);
+      MIX_SetTrackAudio(pika_left_track_, sound_pika_);
+      MIX_PlayTrack(pika_left_track_, {});
+      // MIX_PlayChannel(static_cast<int>(SoundChannel::PikaLeft), sound_pika_, 0);
       break;
     case FieldSide::Right:
-      Mix_PlayChannel(static_cast<int>(SoundChannel::PikaRight), sound_pika_, 0);
+      MIX_SetTrackAudio(pika_right_track_, sound_pika_);
+      MIX_PlayTrack(pika_right_track_, {});
+      // MIX_PlayChannel(static_cast<int>(SoundChannel::PikaRight), sound_pika_, 0);
       break;
     }
   }
@@ -111,32 +119,44 @@ public:
   void chu(const FieldSide& side) const {
     switch(side) {
     case FieldSide::Left:
-      Mix_PlayChannel(static_cast<int>(SoundChannel::PikaLeft), sound_pika_, 0);
+      MIX_SetTrackAudio(pika_left_track_, sound_chu_);
+      MIX_PlayTrack(pika_left_track_, {});
+      // MIX_PlayChannel(static_cast<int>(SoundChannel::PikaLeft), sound_chu_, 0);
       break;
     case FieldSide::Right:
-      Mix_PlayChannel(static_cast<int>(SoundChannel::PikaRight), sound_pika_, 0);
+      MIX_SetTrackAudio(pika_right_track_, sound_chu_);
+      MIX_PlayTrack(pika_right_track_, {});
+      // MIX_PlayChannel(static_cast<int>(SoundChannel::PikaRight), sound_chu_, 0);
       break;
     }
   }
 
   /** Play the "Pikachu" sound (when a game starts) */
   void pikachu() const {
-    Mix_PlayChannel(static_cast<int>(SoundChannel::General), sound_pikachu_, 0);
+    MIX_SetTrackAudio(general_track_, sound_pikachu_);
+    MIX_PlayTrack(general_track_, {});
+    // MIX_PlayChannel(static_cast<int>(SoundChannel::General), sound_pikachu_, 0);
   }
 
   /** Play the "PiPikachu" sound (when a game ends) */
   void pipikachu() const {
-    Mix_PlayChannel(static_cast<int>(SoundChannel::General), sound_pipikachu_, 0);
+    MIX_SetTrackAudio(general_track_, sound_pipikachu_);
+    MIX_PlayTrack(general_track_, {});
+    // MIX_PlayChannel(static_cast<int>(SoundChannel::General), sound_pipikachu_, 0);
   }
 
   /** Play the "Ball hit" sound (when a player power-hits the ball) */
   void ball_hit() const {
-    Mix_PlayChannel(static_cast<int>(SoundChannel::Ball), sound_ball_hit_, 0);
+    MIX_SetTrackAudio(ball_track_, sound_ball_hit_);
+    MIX_PlayTrack(ball_track_, {});
+    // MIX_PlayChannel(static_cast<int>(SoundChannel::Ball), sound_ball_hit_, 0);
   }
 
   /** Play the sound when the ball touches the ground */
   void ball_ground() const {
-    Mix_PlayChannel(static_cast<int>(SoundChannel::Ball), sound_ball_ground_, 0);
+    MIX_SetTrackAudio(ball_track_, sound_ball_ground_);
+    MIX_PlayTrack(ball_track_, {});
+    // MIX_PlayChannel(static_cast<int>(SoundChannel::Ball), sound_ball_ground_, 0);
   }
 
 private:
@@ -146,23 +166,38 @@ private:
     .freq = 44100,
   };
   SDL_AudioDeviceID audio_dev_id_ {0};
+  // Mixer and audio tracks
+  MIX_Mixer* mixer_;
+  MIX_Track* general_track_;
+  MIX_Track* pika_left_track_;
+  MIX_Track* pika_right_track_;
+  MIX_Track* ball_track_;
 
   // Sound chunks
-  Mix_Chunk* sound_pi_ {nullptr};
-  Mix_Chunk* sound_pika_ {nullptr};
-  Mix_Chunk* sound_chu_ {nullptr};
-  Mix_Chunk* sound_pikachu_ {nullptr};
-  Mix_Chunk* sound_pipikachu_ {nullptr};
-  Mix_Chunk* sound_ball_hit_ {nullptr};
-  Mix_Chunk* sound_ball_ground_ {nullptr};
+  MIX_Audio* sound_pi_ {nullptr};
+  MIX_Audio* sound_pika_ {nullptr};
+  MIX_Audio* sound_chu_ {nullptr};
+  MIX_Audio* sound_pikachu_ {nullptr};
+  MIX_Audio* sound_pipikachu_ {nullptr};
+  MIX_Audio* sound_ball_hit_ {nullptr};
+  MIX_Audio* sound_ball_ground_ {nullptr};
 
-  static Mix_Chunk* load_chunk(const char* filename) {
-    Mix_Chunk* chunk = Mix_LoadWAV(filename);
+  [[nodiscard]] MIX_Audio* load_chunk(const char* filename) const {
+    MIX_Audio* chunk = MIX_LoadAudio(mixer_, filename, true);
     if (chunk == nullptr) {
       SDL_Log("Unable to load sound! Filename: %s - SDL_mixer error: %s\n", filename, SDL_GetError());
       throw std::runtime_error("Failed to open audio file");
     }
     return chunk;
+  }
+
+  [[nodiscard]] MIX_Track* createTrack() const {
+    MIX_Track* track = MIX_CreateTrack(mixer_);
+    if (track == nullptr) {
+      SDL_Log("Unable to create audio track! SDL_mixer error: %s\n", SDL_GetError());
+      throw std::runtime_error("Failed to create audio track");
+    }
+    return track;
   }
 };
 
