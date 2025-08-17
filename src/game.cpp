@@ -1,7 +1,8 @@
 #include "game.hpp"
 #include "SDL3/SDL.h"
-#include <pikaball/controller/keyboard_controller.hpp>
+
 #include <pikaball/controller/computer_controller.hpp>
+#include <pikaball/controller/keyboard_controller.hpp>
 
 namespace pika {
 
@@ -39,20 +40,15 @@ void Game::step() {
     // volley_view_->set_input(input_left_, input_right_);
     // state_ = volley_view_->update();  // The physics object is updated inside this view
     volley_state();
+
+    // Check physics state and play sounds accordingly
+    handle_sound();
+
     // Check if the view needs slow motion and change the FPS
     const unsigned int fps = slow_motion_ ? slow_motion_fps_ : target_fps_;
     target_time_per_frame_ = ns_per_second / fps;
     break;
   }
-
-  /* TODO: Handle audio
-   * Create a SoundState enum type for Player and Ball physics objects
-   * The physics objects will update their sound state whenever the sound is triggered
-   * A method here will "scan" the players and ball objects to check if the sound is required
-   * and play whatever using the mixer API.
-   *
-   * TODO 2: Think about how to handle the sound reset so it is not retriggered.
-  */
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
 
@@ -131,6 +127,40 @@ void Game::handle_input() {
   menu_input_.up = keys[SDL_SCANCODE_UP] | keys[SDL_SCANCODE_R];
   menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];
   menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
+}
+
+void Game::handle_player_sound(const FieldSide side) const {
+  switch (physics_->player(side).sound()) {
+  case PlayerSound::Pika:
+    sdl_sys_.get_sound()->pika(side);
+    break;
+  case PlayerSound::Chu:
+    sdl_sys_.get_sound()->chu(side);
+    break;
+  case PlayerSound::Pipikachu:
+    sdl_sys_.get_sound()->pipikachu();
+    break;
+  default:
+    break;
+  }
+}
+
+void Game::handle_sound() const {
+  // Handle Player sounds
+  handle_player_sound(FieldSide::Left);
+  handle_player_sound(FieldSide::Right);
+  // Handle Ball sound
+  switch (physics_->ball().sound()) {
+  case BallSound::Hit:
+    sdl_sys_.get_sound()->ball_hit();
+    break;
+  case BallSound::Ground:
+    sdl_sys_.get_sound()->ball_ground();
+    break;
+  default:
+    break;
+  }
+  physics_->reset_sound();
 }
 
 void Game::intro_state() {

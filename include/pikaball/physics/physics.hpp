@@ -49,6 +49,9 @@ public:
    */
   void end_game(const FieldSide& field_side);
 
+  /** Reset sounds of players and ball after an iteration */
+  void reset_sound();
+
   [[nodiscard]] const Ball& ball() const { return ball_; }
   [[nodiscard]] const Player& player(const FieldSide& side) const;
 private:

@@ -57,5 +57,10 @@ const Player& Physics::player(const FieldSide& side) const {
   return (side == FieldSide::Left) ? player_left_ : player_right_;
 }
 
+void Physics::reset_sound() {
+  player_left_.reset_sound();
+  player_right_.reset_sound();
+  ball_.reset_sound();
+}
 
 } // namespace pika

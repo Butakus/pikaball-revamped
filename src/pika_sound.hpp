@@ -13,12 +13,12 @@ namespace pika {
  * Different audio channels that can play sounds at the same time.
  * If the same channel is used to play a new sound, the previous one is stopped.
  */
-enum class SoundChannel {
-  General = 0,    // Used for menu sounds and start/end sounds
-  PikaLeft = 1,   // Used for left player sounds
-  PikaRight = 2,  // Used for right player sounds
-  Ball = 3        // Used for ball hit/ground sounds
-};
+// enum class SoundChannel {
+//   General = 0,    // Used for menu sounds and start/end sounds
+//   PikaLeft = 1,   // Used for left player sounds
+//   PikaRight = 2,  // Used for right player sounds
+//   Ball = 3        // Used for ball hit/ground sounds
+// };
 
 /**
  * A class to handle SDL resources (Window, Renderer, Audio, etc.)
@@ -138,7 +138,9 @@ public:
     // MIX_PlayChannel(static_cast<int>(SoundChannel::General), sound_pikachu_, 0);
   }
 
-  /** Play the "PiPikachu" sound (when a game ends) */
+  /** Play the "PiPikachu" sound (when a game ends)
+   * TODO: Add FieldSide??
+   */
   void pipikachu() const {
     MIX_SetTrackAudio(general_track_, sound_pipikachu_);
     MIX_PlayTrack(general_track_, {});

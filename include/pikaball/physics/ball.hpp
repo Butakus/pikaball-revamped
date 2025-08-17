@@ -9,6 +9,12 @@
 
 namespace pika {
 
+enum class BallSound {
+  None,
+  Hit,
+  Ground
+};
+
 class Ball {
 public:
   Ball() = default;
@@ -59,23 +65,26 @@ public:
   void process_player_hit(const Player& player, const PlayerInput& input);
 
   // Getters
-  [[nodiscard]] const auto& x() const { return x_; }
-  [[nodiscard]] const auto& y() const { return y_; }
-  [[nodiscard]] const auto& velocity_x() const { return velocity_x_; }
-  [[nodiscard]] const auto& velocity_y() const { return velocity_y_; }
-  [[nodiscard]] const auto& rotation() const { return rotation_; }
-  [[nodiscard]] const auto& punch_effect_radius() const { return punch_effect_radius_; }
-  [[nodiscard]] const auto& punch_effect_x() const { return punch_effect_x_; }
-  [[nodiscard]] const auto& punch_effect_y() const { return punch_effect_y_; }
-  [[nodiscard]] const auto& power_hit() const { return power_hit_; }
-  [[nodiscard]] const auto& trailing_x() const { return trailing_x_; }
-  [[nodiscard]] const auto& trailing_y() const { return trailing_y_; }
-  [[nodiscard]] const auto& expected_landing_x() const { return expected_landing_x_; }
+  [[nodiscard]] auto x() const { return x_; }
+  [[nodiscard]] auto y() const { return y_; }
+  [[nodiscard]] auto velocity_x() const { return velocity_x_; }
+  [[nodiscard]] auto velocity_y() const { return velocity_y_; }
+  [[nodiscard]] auto rotation() const { return rotation_; }
+  [[nodiscard]] auto punch_effect_radius() const { return punch_effect_radius_; }
+  [[nodiscard]] auto punch_effect_x() const { return punch_effect_x_; }
+  [[nodiscard]] auto punch_effect_y() const { return punch_effect_y_; }
+  [[nodiscard]] auto power_hit() const { return power_hit_; }
+  [[nodiscard]] auto trailing_x() const { return trailing_x_; }
+  [[nodiscard]] auto trailing_y() const { return trailing_y_; }
+  [[nodiscard]] auto expected_landing_x() const { return expected_landing_x_; }
+  [[nodiscard]] auto sound() const { return sound_; }
 
   void set_velocity_x(const int vel_x) { velocity_x_ = vel_x; }
   void set_velocity_y(const int vel_y) { velocity_y_ = vel_y; }
 
   void decrease_punch_effect_radius();
+  /** Resets the current sound state to avoid re-triggers */
+  void reset_sound();
 
 private:
   // Ball coordinates and velocities
@@ -94,14 +103,15 @@ private:
   // Coordinates and size of the punch effect
   unsigned int punch_effect_x_ {0};       // 0x50
   unsigned int punch_effect_y_ {0};       // 0x54
-  unsigned int punch_effect_radius_ {0};  // 0x4C
-  bool power_hit_ {false};                // 0x68
-  unsigned int expected_landing_x_ {0};   // 0x40
-
   // Previous ball coordinates for trailing effect for power hit
   std::array<int, 2> trailing_x_ {0};  // 0x58, 0x5C
   std::array<int, 2> trailing_y_ {0};  // 0x60, 0x64
+  unsigned int punch_effect_radius_ {0};  // 0x4C
+  unsigned int expected_landing_x_ {0};   // 0x40
+  bool power_hit_ {false};                // 0x68
 
+  // Current sound state for the ball
+  BallSound sound_ {BallSound::None};
 
   /**
    * Part of the update() function (FUN_00402dc0) that only

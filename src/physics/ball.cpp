@@ -11,6 +11,7 @@ void Ball::initialize(const FieldSide& field_side) {
   velocity_y_ = 1;
   punch_effect_radius_ = 0;
   power_hit_ = false;
+  sound_ = BallSound::None;
 
   // The reset of the variables below is not included in the original game not the js version
   rotation_ = 0;
@@ -111,6 +112,8 @@ bool Ball::update_position() {
     // the omitted two functions maybe do a part of sound playback role.
 
     // ball.sound.ballTouchesGround = true;
+    // Play the "ball touches ground" sound
+    sound_ = BallSound::Ground;
 
     velocity_y_ = - velocity_y_;
     punch_effect_x_ = x_;
@@ -166,6 +169,9 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
     // maybe-soundcode function (ballpointer + 0x24 + 0x10) omitted:
     // ball.sound.powerHit = true;
 
+    // Play the "Ball hit by player" sound
+    sound_ = BallSound::Hit;
+
     power_hit_ = true;
   }
   else {
@@ -214,5 +220,8 @@ void Ball::decrease_punch_effect_radius() {
   }
 }
 
+void Ball::reset_sound() {
+  sound_ = BallSound::None;
+}
 
 } // pika

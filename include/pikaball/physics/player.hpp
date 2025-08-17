@@ -17,6 +17,13 @@ enum class PlayerState {
   Loser
 };
 
+enum class PlayerSound {
+  None,
+  Pika,
+  Chu,
+  Pipikachu
+};
+
 /**
  * Class representing a Pikachu player.
  *
@@ -56,13 +63,17 @@ public:
 
   void end_game(bool is_winner);
 
+  /** Resets the current sound state to avoid re-triggers */
+  void reset_sound();
+
   // Getters
-  [[nodiscard]] const auto& x() const { return x_; }
-  [[nodiscard]] const auto& y() const { return y_; }
-  [[nodiscard]] const auto& state() const { return state_; }
-  [[nodiscard]] const auto& side() const { return field_side_; }
-  [[nodiscard]] const auto& diving_direction() const { return diving_direction_; }
-  [[nodiscard]] const auto& anim_frame_number() const { return anim_frame_number_; }
+  [[nodiscard]] auto x() const { return x_; }
+  [[nodiscard]] auto y() const { return y_; }
+  [[nodiscard]] auto state() const { return state_; }
+  [[nodiscard]] auto side() const { return field_side_; }
+  [[nodiscard]] auto diving_direction() const { return diving_direction_; }
+  [[nodiscard]] auto anim_frame_number() const { return anim_frame_number_; }
+  [[nodiscard]] auto sound() const { return sound_; }
 
   // Flag to remember if the ball was already touched
   bool collision_with_ball {false};  // 0xBC
@@ -73,7 +84,7 @@ private:
   unsigned int y_ {player_ground_y};  // 0xAC
   // y velocity is positive when going down (gravity)
   int velocity_y_ {0};                // 0xB0
-  PlayerState state_ {PlayerState::Normal};  // 0xC0 (the state is an integer in the OG game).
+
   // Current animation frame number
   unsigned int anim_frame_number_ {0};  // 0xC4
   // Arm swinging direction in the normal mode animation
@@ -81,13 +92,17 @@ private:
   // Delay before switching to the next frame in the animation sequence.
   int anim_frame_delay_ {0};    // 0xCC
 
+  // Remaining time for the player to lay on the ground after diving
+  int lying_down_timer_ = {-1};  // 0xB8
+
   // The side of the volley field where this player plays
   FieldSide field_side_ {FieldSide::Left};
 
+  PlayerState state_ {PlayerState::Normal};  // 0xC0 (the state is an integer in the OG game).
+  // Current sound state for this player
+  PlayerSound sound_ {PlayerSound::None};
   // Diving direction. Possible values: -1 (left), 0 (no diving), 1 (right)
   DirX diving_direction_ {DirX::None};     // 0xB4
-  // Remaining time for the player to lay on the ground after diving
-  int lying_down_timer_ = {-1};  // 0xB8
 
   bool is_winner_ {false};    // 0xD0
   bool game_ended_ {false};   // 0xD0

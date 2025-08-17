@@ -79,10 +79,12 @@ private:
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
 
-  /**
-  * Handle keyboard input and update input structs
-  */
+  /** Handle keyboard input and update input structs */
   void handle_input();
+
+  /** Handle player and ball sounds */
+  void handle_sound() const;
+  void handle_player_sound(FieldSide side) const;
 
   /** Cleans up all the variables after ending a volley game */
   void reset_volley_game_state();

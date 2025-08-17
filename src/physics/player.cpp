@@ -1,3 +1,5 @@
+#include "pikaball/physics/ball.hpp"
+
 #include <algorithm>
 #include <pikaball/physics/player.hpp>
 #include <pikaball/random.hpp>
@@ -24,6 +26,7 @@ void Player::initialize_round() {
   anim_frame_number_ = 0;
   anim_arm_direction_ = 1;
   anim_frame_delay_ = 0;
+  sound_ = PlayerSound::None;
 }
 
 void Player::update(const PlayerInput& input) {
@@ -79,6 +82,7 @@ void Player::update(const PlayerInput& input) {
     // refer to a detailed comment above about this function
     // maybe-sound code function (playerpointer + 0x90 + 0x10)? omitted
     // player.sound.chu = true;
+    sound_ = PlayerSound::Chu;
   }
 
   // Gravity
@@ -116,6 +120,7 @@ void Player::update(const PlayerInput& input) {
       // refer to a detailed comment above about this function
       // maybe-sound function (playerpointer + 0x90 + 0x14)? omitted
       // player.sound.pika = true;
+      sound_ = PlayerSound::Pika;
     }
     else if (state_ == PlayerState::Normal && input.direction_x != DirX::None) {
       // Diving!!
@@ -129,6 +134,7 @@ void Player::update(const PlayerInput& input) {
       // refer to a detailed comment above about this function
       // maybe-sound code function (playerpointer + 0x90 + 0x10)? omitted
       // player.sound.chu = true;
+      sound_ = PlayerSound::Chu;
     }
   }
 
@@ -172,6 +178,7 @@ void Player::update(const PlayerInput& input) {
         // refer to a detailed comment above about this function
         // maybe-sound code function (0x98 + 0x10) omitted
         // player.sound.pipikachu = true;
+        sound_ = PlayerSound::Pipikachu;
       }
       else {
         state_ = PlayerState::Loser;
@@ -197,6 +204,10 @@ void Player::update(const PlayerInput& input) {
 void Player::end_game(const bool is_winner) {
   game_ended_ = true;
   is_winner_ = is_winner;
+}
+
+void Player::reset_sound() {
+  sound_ = PlayerSound::None;
 }
 
 
