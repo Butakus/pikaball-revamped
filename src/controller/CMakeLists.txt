@@ -14,6 +14,7 @@ target_include_directories(${KEYBOARD_CONTROLLER_LIB_NAME} PUBLIC
 target_link_libraries(${KEYBOARD_CONTROLLER_LIB_NAME} PUBLIC
     ${CONTROLLER_BASE_LIB_NAME}
 )
+target_compile_features(${KEYBOARD_CONTROLLER_LIB_NAME} PRIVATE cxx_std_20)
 
 # Computer controller module (original computer mode)
 add_library(${COMPUTER_CONTROLLER_LIB_NAME}
@@ -25,3 +26,4 @@ target_include_directories(${COMPUTER_CONTROLLER_LIB_NAME} PUBLIC
 target_link_libraries(${COMPUTER_CONTROLLER_LIB_NAME} PUBLIC
         ${CONTROLLER_BASE_LIB_NAME}
 )
+target_compile_features(${COMPUTER_CONTROLLER_LIB_NAME} PRIVATE cxx_std_20)

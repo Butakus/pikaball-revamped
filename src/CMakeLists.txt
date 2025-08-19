@@ -25,6 +25,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${KEYBOARD_CONTROLLER_LIB_NAME}
     ${COMPUTER_CONTROLLER_LIB_NAME}
 )
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 # Link assets to build directory
 set(link_src "${CMAKE_SOURCE_DIR}/assets")
