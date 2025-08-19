@@ -221,11 +221,12 @@ void Game::menu_state() {
       // Trigger transition to VolleyGame state
       state_ = GameState::VolleyGame;
       frame_counter_ = 0;
-      SDL_Log("Player selection: %d", player_selection_);
       // TODO: Change controllers based on game mode selection
       controller_left_->on_game_start(PhysicsView(*physics_));
       controller_right_->on_game_start(PhysicsView(*physics_));
       volley_view_->start();
+      // Start the music
+      sdl_sys_.get_sound()->start_music();
     }
     break;
   }
@@ -266,6 +267,8 @@ void Game::volley_state() {
           frame_counter_ = 0;
           volley_state_ = VolleyGameState::GameEnd;
           volley_view_->set_state(volley_state_);
+          // Stop music
+          sdl_sys_.get_sound()->stop_music();
         }
         else {
           // Apply end-of-round effects and start next round
