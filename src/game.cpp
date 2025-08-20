@@ -19,10 +19,16 @@ Game::Game() {
     sdl_sys_.get_sprite_sheet(),
     sdl_sys_.get_font()
   );
+  // Initialize default option values
+  options_view_->select_option(option_menu_select_);
+  options_view_->select_speed_option(speed_opt_select_);
+  options_view_->select_points_option(points_opt_select_);
+  options_view_->select_music_option(music_opt_select_);
+
   // By default, both players are controlled by the keyboard
   // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
-  controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
+  controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
   // controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
 }
 
@@ -40,6 +46,7 @@ void Game::step() {
   case GameState::VolleyGame:
     // Send the current input state to the view
     // TODO: Decide where to get input from controllers. Here or after render?
+    // TODO: If game is paused, controllers should not be queried
     input_left_ = controller_left_->on_update(PhysicsView(*physics_));
     input_right_ = controller_right_->on_update(PhysicsView(*physics_));
     volley_state();
@@ -52,9 +59,8 @@ void Game::step() {
     target_time_per_frame_ = ns_per_second / fps;
     break;
   }
-
-  // DEBUG options
-  // options_view_->render();
+  // Always enter the menu state. If the game is not paused it will return immediately.
+  menu_options_state();
 
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
@@ -81,8 +87,8 @@ void Game::handle_input() {
   // Enter / power-hit keys are handled by events to avoid repetitions
   PlayerInput player_input_left {};
   PlayerInput player_input_right {};
-  menu_input_.enter_left = false;
-  menu_input_.enter_right = false;
+  // Same applies to menu input
+  menu_input_ = {};
 
   // Event data
   SDL_Event event {};
@@ -104,7 +110,29 @@ void Game::handle_input() {
           player_input_right.power_hit = true;
           menu_input_.enter_right = true;
           break;
-        default:
+        case SDL_SCANCODE_ESCAPE:
+          // When ESC is pressed, the game is paused / unpaused
+          if (state_ != GameState::Intro) {
+            pause_ = !pause_;
+          }
+          break;
+        case SDL_SCANCODE_UP:
+        case SDL_SCANCODE_R:
+          menu_input_.up = true;
+          break;
+        case SDL_SCANCODE_DOWN:
+        case SDL_SCANCODE_F:
+          menu_input_.down = true;
+          break;
+        case SDL_SCANCODE_LEFT:
+        case SDL_SCANCODE_D:
+          menu_input_.left = true;
+          break;
+        case SDL_SCANCODE_RIGHT:
+        case SDL_SCANCODE_G:
+          menu_input_.right = true;
+          break;
+      default:
           break;
       }
     }
@@ -131,8 +159,6 @@ void Game::handle_input() {
     kb_right->set_input(player_input_right);
   }
 
-  menu_input_.up = keys[SDL_SCANCODE_UP] | keys[SDL_SCANCODE_R];
-  menu_input_.down = keys[SDL_SCANCODE_DOWN] | keys[SDL_SCANCODE_F];
   menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
 }
 
@@ -179,15 +205,22 @@ void Game::intro_state() {
     // Setup stuff for next state
     state_ = GameState::Menu;
     menu_state_ = MenuState::Menu;
-    player_selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+    player_selection_ = MenuPlayerSelection::SinglePlayer;
     frame_counter_ = 0;
     menu_view_->start();
   }
 }
 
 void Game::menu_state() {
-  // Render the view and update frame counter
+  // Render the view
   menu_view_->render(frame_counter_);
+
+  // If the game is paused (options are on the screen) just render and exit without an update
+  if (pause_) {
+    return;
+  }
+
+  // Update the frame counter
   frame_counter_++;
 
   // Update menu state
@@ -204,13 +237,13 @@ void Game::menu_state() {
     }
 
     // Process input to update the game mode selection
-    if (player_selection_ == MenuPlayerSelection::SINGLE_PLAYER && menu_input_.down) {
-      player_selection_ = MenuPlayerSelection::MULTI_PLAYER;
+    if (player_selection_ == MenuPlayerSelection::SinglePlayer && menu_input_.down) {
+      player_selection_ = MenuPlayerSelection::MultiPlayer;
       menu_view_->change_selection(player_selection_);
       sdl_sys_.get_sound()->pi();
     }
-    else if (player_selection_ == MenuPlayerSelection::MULTI_PLAYER && menu_input_.up) {
-      player_selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+    else if (player_selection_ == MenuPlayerSelection::MultiPlayer && menu_input_.up) {
+      player_selection_ = MenuPlayerSelection::SinglePlayer;
       menu_view_->change_selection(player_selection_);
       sdl_sys_.get_sound()->pi();
     }
@@ -232,16 +265,110 @@ void Game::menu_state() {
       controller_left_->on_game_start(PhysicsView(*physics_));
       controller_right_->on_game_start(PhysicsView(*physics_));
       volley_view_->start();
-      // Start the music
-      sdl_sys_.get_sound()->start_music();
+      // Start the music (if enabled)
+      if (music_opt_select_ == OnOffSelection::On) {
+        sdl_sys_.get_sound()->start_music();
+      }
     }
     break;
   }
 }
 
+void Game::menu_options_state() {
+  if (!pause_ || state_ == GameState::Intro) {
+    return;
+  }
+
+  switch (option_menu_select_) {
+  case OptionMenuSelection::Speed:
+    if (menu_input_.down) {
+      option_menu_select_ = OptionMenuSelection::Points;
+    } else if (menu_input_.up) {
+      option_menu_select_ = OptionMenuSelection::Music;
+    }
+    // Change option values if left/right
+    switch (speed_opt_select_) {
+    case SpeedOptionSelection::Slow:
+      if (menu_input_.right) {
+        change_game_speed(SpeedOptionSelection::Medium);
+      }
+      break;
+    case SpeedOptionSelection::Medium:
+      if (menu_input_.right) {
+        change_game_speed(SpeedOptionSelection::Fast);
+      } else if (menu_input_.left) {
+        change_game_speed(SpeedOptionSelection::Slow);
+      }
+      break;
+    case SpeedOptionSelection::Fast:
+      if (menu_input_.left) {
+        change_game_speed(SpeedOptionSelection::Medium);
+      }
+      break;
+    }
+    break;
+  case OptionMenuSelection::Points:
+    if (menu_input_.down) {
+      option_menu_select_ = OptionMenuSelection::Music;
+    } else if (menu_input_.up) {
+      option_menu_select_ = OptionMenuSelection::Speed;
+    }
+    // Change option values if left/right
+    switch (points_opt_select_) {
+    case PointsOptionSelection::Five:
+      if (menu_input_.right) {
+        change_win_score(PointsOptionSelection::Ten);
+      }
+      break;
+    case PointsOptionSelection::Ten:
+      if (menu_input_.right) {
+        change_win_score(PointsOptionSelection::Fifteen);
+      } else if (menu_input_.left) {
+        change_win_score(PointsOptionSelection::Five);
+      }
+      break;
+    case PointsOptionSelection::Fifteen:
+      if (menu_input_.left) {
+        change_win_score(PointsOptionSelection::Ten);
+      }
+      break;
+    }
+    break;
+  case OptionMenuSelection::Music:
+    if (menu_input_.down) {
+      option_menu_select_ = OptionMenuSelection::Speed;
+    } else if (menu_input_.up) {
+      option_menu_select_ = OptionMenuSelection::Points;
+    }
+    // Change option values if left/right
+    if (music_opt_select_ == OnOffSelection::On && menu_input_.right) {
+      toggle_music();
+      music_opt_select_ = OnOffSelection::Off;
+    } else if (music_opt_select_ == OnOffSelection::Off && menu_input_.left) {
+      toggle_music();
+      music_opt_select_ = OnOffSelection::On;
+    }
+    break;
+  }
+
+  options_view_->select_option(option_menu_select_);
+  options_view_->select_speed_option(speed_opt_select_);
+  options_view_->select_points_option(points_opt_select_);
+  options_view_->select_music_option(music_opt_select_);
+
+  options_view_->render();
+}
+
 void Game::volley_state() {
-  // Render the view and update frame counter
+  // Render the view
   volley_view_->render(frame_counter_, PhysicsView(*physics_));
+
+  // If the game is paused (options are on the screen) just render and exit without an update
+  if (pause_) {
+    return;
+  }
+
+  // Update frame counter
   frame_counter_++;
 
   switch (volley_state_) {
@@ -325,6 +452,49 @@ FieldSide Game::update_score() {
   }
   score_left_++;
   return FieldSide::Left;
+}
+
+void Game::change_game_speed(const SpeedOptionSelection speed) {
+  speed_opt_select_ = speed;
+  switch (speed) {
+    case SpeedOptionSelection::Slow:
+      target_fps_ = 20;
+      break;
+    case SpeedOptionSelection::Medium:
+      target_fps_ = 25;
+      break;
+    case SpeedOptionSelection::Fast:
+      target_fps_ = 30;
+      break;
+  }
+  target_time_per_frame_ = ns_per_second / target_fps_;
+}
+void Game::change_win_score(const PointsOptionSelection win_points) {
+  points_opt_select_ = win_points;
+  switch (win_points) {
+  case PointsOptionSelection::Five:
+    win_score = 5;
+    break;
+  case PointsOptionSelection::Ten:
+    win_score = 10;
+    break;
+  case PointsOptionSelection::Fifteen:
+    win_score = 15;
+    break;
+  }
+}
+
+void Game::toggle_music() {
+  if (music_opt_select_ == OnOffSelection::Off) {
+    // Only start the music if inside a game
+    if (state_ == GameState::VolleyGame) {
+      sdl_sys_.get_sound()->start_music();
+    }
+    music_opt_select_ = OnOffSelection::On;
+  } else {
+    sdl_sys_.get_sound()->stop_music();
+    music_opt_select_ = OnOffSelection::Off;
+  }
 }
 
 void Game::reset_volley_game_state() {

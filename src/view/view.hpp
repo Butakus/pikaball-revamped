@@ -3,13 +3,15 @@
 
 #include <memory>
 #include <SDL3/SDL_render.h>
-#include <pikaball/game_state.hpp>
 #include <pikaball/common.hpp>
 
 namespace pika::view {
 
 class View {
 public:
+  // Convenient type alias to hold owning textures
+  using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
+
   virtual ~View() = default;
 
   View(View const&) = delete;
@@ -86,8 +88,6 @@ public:
   [[nodiscard]] float get_fade_alpha() const { return black_fade_alpha_; }
 
 protected:
-  // Convenient type alias to hold owning textures
-  using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
   // Non-owning pointer to the window renderer. Should be set in the constructor
   SDL_Renderer* renderer_ {nullptr};
   // Non-owning pointer to the sprite sheet texture. Should be set in the constructor

@@ -56,17 +56,22 @@ private:
 
   // Game state
   bool running_ {false};
+  bool pause_ {false};
   unsigned int frame_counter_ {0};
   GameState state_ {GameState::Intro};
   // Menu state data
   MenuState menu_state_ {MenuState::Menu};
-  MenuPlayerSelection player_selection_ {MenuPlayerSelection::SINGLE_PLAYER};
+  MenuPlayerSelection player_selection_ {MenuPlayerSelection::SinglePlayer};
+  OptionMenuSelection option_menu_select_ {OptionMenuSelection::Speed};
+  SpeedOptionSelection speed_opt_select_ {SpeedOptionSelection::Medium};
+  PointsOptionSelection points_opt_select_ {PointsOptionSelection::Fifteen};
+  OnOffSelection music_opt_select_ {OnOffSelection::On};
+
   // VolleyGame state data
   VolleyGameState volley_state_ {VolleyGameState::NewGame};
   unsigned int score_left_ {0};
   unsigned int score_right_ {0};
-  // TODO: This must come from the game settings
-  static constexpr unsigned int win_score = 5;
+  unsigned int win_score = 15;
 
   FieldSide next_serve_side_ {FieldSide::Left};
   // Slow Motion state. The Game object must manually check this to adjust the FPS
@@ -92,8 +97,10 @@ private:
   void reset_volley_game_state();
   /** Control the game's logic for the Intro state */
   void intro_state();
-  /** Control the game's logic for the Menu state */
+  /** Control the game's logic for the main Menu state */
   void menu_state();
+  /** Control the game's logic for the Options Menu state */
+  void menu_options_state();
   /** Control the game's logic for the VolleyGame state */
   void volley_state();
 
@@ -102,6 +109,10 @@ private:
    * @return The side that won the point
    */
   FieldSide update_score();
+
+  void change_game_speed(SpeedOptionSelection speed);
+  void change_win_score(PointsOptionSelection win_points);
+  void toggle_music();
 };
 
 } // namespace pika

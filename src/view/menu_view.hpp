@@ -31,7 +31,7 @@ public:
     state_ = MenuState::Menu;
     black_fade_alpha_ = 0.0;
     // TODO: Warning: This may be different from game
-    selection_ = MenuPlayerSelection::SINGLE_PLAYER;
+    selection_ = MenuPlayerSelection::SinglePlayer;
     background_offset_ = 0;
     pika_background_alpha_ = 0.0;
     copyright_alpha_ = 0.0;
@@ -67,7 +67,7 @@ public:
   }
 
   /**
-   *Change the selected game mode.
+   * Change the selected game mode.
    * Reset the selection size after the change to do the resize animation
    * @param selection the new selected game mode
    */
@@ -86,7 +86,7 @@ public:
 
 private:
   MenuState state_ {MenuState::Menu};
-  MenuPlayerSelection selection_ {MenuPlayerSelection::SINGLE_PLAYER};
+  MenuPlayerSelection selection_ {MenuPlayerSelection::SinglePlayer};
   // Background with the repeating sitting pikachus
   SDL_Texture_ptr background_texture_{nullptr, SDL_DestroyTexture};
   // Copyright message. Needs its own texture to apply an independent alpha.
@@ -251,7 +251,7 @@ private:
     // Adjust the size of the selected option
     // Take references to the Rect of the current selection
     auto &[sel_x, sel_y, sel_w, sel_h] =
-      (selection_ == MenuPlayerSelection::MULTI_PLAYER) ? p2_dst : p1_dst;
+      (selection_ == MenuPlayerSelection::MultiPlayer) ? p2_dst : p1_dst;
     const int h_width_increment = static_cast<int>(selection_size_) + 2;
     const int h_height_increment = static_cast<int>(selection_size_);
     sel_x -= h_width_increment;

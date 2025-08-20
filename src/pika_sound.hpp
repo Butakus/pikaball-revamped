@@ -159,7 +159,7 @@ public:
   }
 
   void start_music() const {
-    SDL_PropertiesID play_properties = SDL_CreateProperties();
+    const SDL_PropertiesID play_properties = SDL_CreateProperties();
     SDL_SetNumberProperty(play_properties, MIX_PROP_PLAY_LOOPS_NUMBER, -1);
     MIX_PlayTrack(music_track_, play_properties);
   }

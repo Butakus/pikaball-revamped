@@ -4,11 +4,13 @@
 namespace pika {
 
 struct MenuInput {
-  bool up;
-  bool down;
-  bool enter_left;
-  bool enter_right;
-  bool enter;  // Will be true if any of the other two are true
+  bool up = false;
+  bool down = false;
+  bool left = false;
+  bool right = false;
+  bool enter_left = false;
+  bool enter_right = false;
+  bool enter = false;  // Will be true if any of the other two are true
 };
 
 enum class DirX {
@@ -28,17 +30,6 @@ struct PlayerInput {
   DirY direction_y;
   bool power_hit;
 };
-
-// OLD version with all keys. Not used anymore
-// struct PlayerInput {
-//   bool left;
-//   bool right;
-//   bool up;
-//   bool down;
-//   bool power_hit;
-//   // Disabled. Originally only for player 1 (V key)
-//   // bool down_right;
-// };
 
 /**
  * Utility function to extract the x direction from a PlayerInput struct.

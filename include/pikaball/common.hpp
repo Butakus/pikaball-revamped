@@ -25,7 +25,27 @@ static constexpr char sound_ball_hit_filename [] = "assets/sounds/ball_hit.wav";
 static constexpr char sound_ball_ground_filename [] = "assets/sounds/ball_ground.wav";
 static constexpr char text_font_filename [] = "assets/font.ttf";
 
-static constexpr unsigned int text_font_size = 40;
+static constexpr unsigned int text_font_size = 45;
+
+// Options menu strings
+// TODO: Localization?
+namespace txt {
+
+static constexpr char str_options [] = "Opciones";
+static constexpr char str_opt_music [] = "Musica";
+static constexpr char str_opt_speed [] = "Velocidad";
+static constexpr char str_opt_points [] = "Puntos";
+static constexpr char str_on [] = "ON";
+static constexpr char str_off [] = "OFF";
+static constexpr char str_slow [] = "Lento";
+static constexpr char str_medium [] = "Medio";
+static constexpr char str_fast [] = "Rapido";
+static constexpr char str_5_pts [] = "5";
+static constexpr char str_10_pts [] = "10";
+static constexpr char str_15_pts [] = "15";
+
+
+} // namespace pika::text
 
 } // namespace pika
 

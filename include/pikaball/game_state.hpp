@@ -18,8 +18,32 @@ enum class MenuState {
 
 /** Possible game modes (selection at menu state) */
 enum class MenuPlayerSelection {
-  SINGLE_PLAYER,
-  MULTI_PLAYER,
+  SinglePlayer,
+  MultiPlayer,
+};
+
+/** Option menu selection */
+enum class OptionMenuSelection {
+  Speed = 0,
+  Points = 1,
+  Music = 2,
+};
+
+enum class SpeedOptionSelection {
+  Slow = 0,
+  Medium = 1,
+  Fast = 2,
+};
+
+enum class PointsOptionSelection {
+  Five = 0,
+  Ten = 1,
+  Fifteen = 2,
+};
+
+enum class OnOffSelection {
+  On = 0,
+  Off = 1,
 };
 
 /** VolleyGame sub-states */
