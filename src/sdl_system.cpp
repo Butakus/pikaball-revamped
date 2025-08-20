@@ -9,11 +9,16 @@ constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
 SDLSystem::SDLSystem() :
   window_(nullptr, SDL_DestroyWindow),
   renderer_(nullptr, SDL_DestroyRenderer),
-  sound_(nullptr)
+  sound_(nullptr),
+  text_font_(nullptr, TTF_CloseFont)
 {
   if (!SDL_Init(sdl_init_flags)) {
     throw std::runtime_error("Failed to init SDL");
   }
+  if (!TTF_Init()) {
+    throw std::runtime_error("Failed to init SDL_ttf");
+  }
+
   SDL_Window* temp_window;
   SDL_Renderer* temp_renderer;
   if (!SDL_CreateWindowAndRenderer(
@@ -43,6 +48,14 @@ SDLSystem::SDLSystem() :
   // Initialize sound subsystem
   sound_ = std::make_unique<PikaSound>();
 
+  // Load the TTF font
+  text_font_.reset(TTF_OpenFont(text_font_filename, text_font_size));
+  if(!text_font_)
+  {
+    SDL_Log( "Could not load TTF font! SDL_ttf error: %s\n", SDL_GetError());
+    throw std::runtime_error("Could not load TTF font");
+  }
+
   // Load sprites and build the static background
   SDL_Log("Loading sprites...");
   load_sprite_sheet();
@@ -56,6 +69,10 @@ SDLSystem::~SDLSystem() {
   }
   if (window_) {
       window_.reset();
+  }
+
+  if (text_font_) {
+    text_font_.reset();
   }
 
   // Force Sound System to free resources before calling SDL_Quit

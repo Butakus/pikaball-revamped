@@ -19,11 +19,16 @@ FetchContent_Declare(SDL_Mixer
     # Waiting for SDL3_Mixer actual release (with SDL 3.4.0)
     # GIT_TAG 4e9a308a0daa63b6bd492b0ec616f86337500898
 )
+FetchContent_Declare(SDL_ttf
+        GIT_REPOSITORY  https://github.com/libsdl-org/SDL_ttf.git
+        GIT_TAG         main
+)
 
-FetchContent_MakeAvailable(SDL3 SDL_mixer)
+FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf)
 
 add_library(vendor INTERFACE)
 target_link_libraries(vendor INTERFACE
     SDL3::SDL3
     SDL3_mixer::SDL3_mixer
+    SDL3_ttf::SDL3_ttf
 )

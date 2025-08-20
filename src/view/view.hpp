@@ -46,13 +46,6 @@ public:
   }
 
   /**
-   * Update the scene state and render the next frame.
-   * TODO: Remove?
-   * @return The next game state
-   */
-  virtual GameState update() { return GameState::Intro; }
-
-  /**
    * Start (or restart) the view, resetting the state and the frame counter.
    */
   virtual void start() {
@@ -99,10 +92,6 @@ protected:
   SDL_Renderer* renderer_ {nullptr};
   // Non-owning pointer to the sprite sheet texture. Should be set in the constructor
   SDL_Texture* sprite_sheet_ {nullptr};
-
-  // Frame counter to control inner state and transitions. Should be incremented after each update
-  // TODO: Remove
-  unsigned int frame_counter_ {0};
 
   // Full-black cover texture to do fade-in/fade-out effects
   SDL_Texture_ptr black_texture_ {nullptr, SDL_DestroyTexture};

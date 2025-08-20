@@ -6,6 +6,7 @@
 #include "view/intro_view.hpp"
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
+#include "view/options_view.hpp"
 #include "sdl_system.hpp"
 
 #include <pikaball/controller/player_controller.hpp>
@@ -44,6 +45,7 @@ private:
   std::unique_ptr<view::IntroView> intro_view_ {nullptr};
   std::unique_ptr<view::MenuView> menu_view_ {nullptr};
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
+  std::unique_ptr<view::OptionsView> options_view_ {nullptr};
 
   // Frame rate management
   unsigned int target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps

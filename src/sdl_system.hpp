@@ -1,8 +1,9 @@
 #ifndef PIKA_WINDOW_HPP
 #define PIKA_WINDOW_HPP
 
-#include "SDL3/SDL.h"
 #include <memory>
+#include "SDL3/SDL.h"
+#include "SDL3_ttf/SDL_ttf.h"
 #include "pika_sound.hpp"
 
 namespace pika {
@@ -17,6 +18,7 @@ public:
   using SDL_Window_ptr = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>;
   using SDL_Renderer_ptr = std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)>;
   using SDL_Texture_ptr = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
+  using TTF_Font_ptr = std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)>;
 
   SDLSystem();
   ~SDLSystem();
@@ -35,6 +37,11 @@ public:
    */
   [[nodiscard]] PikaSound* get_sound() const { return sound_.get(); }
 
+  /** Get a non-owning pointer to the TTF font for rendering text
+   * @return a non-owning pointer to the TTF text font
+   */
+  [[nodiscard]] TTF_Font* get_font() const { return text_font_.get(); }
+
   /** Get a non-owning pointer to the sprite sheet texture
    * @return a non-owning pointer to the SDL texture with the sprite sheet
    */
@@ -44,6 +51,7 @@ private:
   SDL_Window_ptr window_;
   SDL_Renderer_ptr renderer_;
   std::unique_ptr<PikaSound> sound_;
+  TTF_Font_ptr text_font_;
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};

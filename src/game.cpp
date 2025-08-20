@@ -14,6 +14,11 @@ Game::Game() {
     sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
   volley_view_ = std::make_unique<view::VolleyView>(
     sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
+  options_view_ = std::make_unique<view::OptionsView>(
+    sdl_sys_.get_renderer(),
+    sdl_sys_.get_sprite_sheet(),
+    sdl_sys_.get_font()
+  );
   // By default, both players are controlled by the keyboard
   // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
@@ -37,8 +42,6 @@ void Game::step() {
     // TODO: Decide where to get input from controllers. Here or after render?
     input_left_ = controller_left_->on_update(PhysicsView(*physics_));
     input_right_ = controller_right_->on_update(PhysicsView(*physics_));
-    // volley_view_->set_input(input_left_, input_right_);
-    // state_ = volley_view_->update();  // The physics object is updated inside this view
     volley_state();
 
     // Check physics state and play sounds accordingly
@@ -49,6 +52,10 @@ void Game::step() {
     target_time_per_frame_ = ns_per_second / fps;
     break;
   }
+
+  // DEBUG options
+  // options_view_->render();
+
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
 

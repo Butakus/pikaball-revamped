@@ -23,6 +23,9 @@ static constexpr char sound_pikachu_filename [] = "assets/sounds/pikachu.wav";
 static constexpr char sound_pipikachu_filename [] = "assets/sounds/pipikachu.wav";
 static constexpr char sound_ball_hit_filename [] = "assets/sounds/ball_hit.wav";
 static constexpr char sound_ball_ground_filename [] = "assets/sounds/ball_ground.wav";
+static constexpr char text_font_filename [] = "assets/font.ttf";
+
+static constexpr unsigned int text_font_size = 40;
 
 } // namespace pika
 
