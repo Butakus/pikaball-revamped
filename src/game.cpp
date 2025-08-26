@@ -6,6 +6,31 @@
 
 namespace pika {
 
+namespace keys {
+/**
+ * Default keyboard codes used for each action. Defined here to be easily
+ * changed.
+ * TODO: Future feature: Allow remapping of keys
+ */
+
+constexpr int p1_hit = SDL_SCANCODE_Z;
+constexpr int p1_hit_alt = SDL_SCANCODE_SPACE;
+constexpr int p2_hit = SDL_SCANCODE_RETURN;
+constexpr int p2_hit_alt = SDL_SCANCODE_KP_ENTER;
+
+constexpr int p1_left = SDL_SCANCODE_D;
+constexpr int p1_right = SDL_SCANCODE_G;
+constexpr int p1_up = SDL_SCANCODE_R;
+constexpr int p1_down = SDL_SCANCODE_F;
+
+constexpr int p2_left = SDL_SCANCODE_LEFT;
+constexpr int p2_right = SDL_SCANCODE_RIGHT;
+constexpr int p2_up = SDL_SCANCODE_UP;
+constexpr int p2_down = SDL_SCANCODE_DOWN;
+
+} // namespace pika::keys
+
+
 Game::Game() {
   physics_ = std::make_unique<Physics>(),
   intro_view_ = std::make_unique<view::IntroView>(
@@ -101,13 +126,14 @@ void Game::handle_input() {
     }
     if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
       switch (event.key.scancode) {
-        case SDL_SCANCODE_Z:
+      case keys::p1_hit:
+      case keys::p1_hit_alt:
           player_input_left.power_hit = true;
           menu_input_.enter_left = true;
           break;
-        case SDL_SCANCODE_RETURN:
-        case SDL_SCANCODE_KP_ENTER:
-          player_input_right.power_hit = true;
+        case keys::p2_hit:
+        case keys::p2_hit_alt:
+        player_input_right.power_hit = true;
           menu_input_.enter_right = true;
           break;
         case SDL_SCANCODE_ESCAPE:
@@ -116,20 +142,20 @@ void Game::handle_input() {
             pause_ = !pause_;
           }
           break;
-        case SDL_SCANCODE_UP:
-        case SDL_SCANCODE_R:
+        case keys::p1_up:
+        case keys::p2_up:
           menu_input_.up = true;
           break;
-        case SDL_SCANCODE_DOWN:
-        case SDL_SCANCODE_F:
+        case keys::p1_down:
+        case keys::p2_down:
           menu_input_.down = true;
           break;
-        case SDL_SCANCODE_LEFT:
-        case SDL_SCANCODE_D:
+        case keys::p1_left:
+        case keys::p2_left:
           menu_input_.left = true;
           break;
-        case SDL_SCANCODE_RIGHT:
-        case SDL_SCANCODE_G:
+        case keys::p1_right:
+        case keys::p2_right:
           menu_input_.right = true;
           break;
       default:
@@ -139,17 +165,17 @@ void Game::handle_input() {
   }
 
   // Forget about events and just grab a snapshot of the current keyboard state
-  const bool* keys = SDL_GetKeyboardState(nullptr);
+  const bool* key_state = SDL_GetKeyboardState(nullptr);
 
   // Convert keys from bool to a DirX/DirY object and set the player input directions
   player_input_left.direction_x =
-    get_input_direction_x(keys[SDL_SCANCODE_D], keys[SDL_SCANCODE_G]);
+    get_input_direction_x(key_state[keys::p1_left], key_state[keys::p1_right]);
   player_input_left.direction_y =
-    get_input_direction_y(keys[SDL_SCANCODE_R], keys[SDL_SCANCODE_F]);
+    get_input_direction_y(key_state[keys::p1_up], key_state[keys::p1_down]);
   player_input_right.direction_x =
-    get_input_direction_x(keys[SDL_SCANCODE_LEFT], keys[SDL_SCANCODE_RIGHT]);
+    get_input_direction_x(key_state[keys::p2_left], key_state[keys::p2_right]);
   player_input_right.direction_y =
-    get_input_direction_y(keys[SDL_SCANCODE_UP], keys[SDL_SCANCODE_DOWN]);
+    get_input_direction_y(key_state[keys::p2_up], key_state[keys::p2_down]);
 
   // Pass keyboard inputs to the keyboard controllers (if controllers are keyboards)
   if (const auto kb_left = dynamic_cast<KeyboardController*>(controller_left_.get())) {
