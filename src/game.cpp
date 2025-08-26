@@ -51,10 +51,8 @@ Game::Game() {
   options_view_->select_music_option(music_opt_select_);
 
   // By default, both players are controlled by the keyboard
-  // controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
   controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
-  // controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
 }
 
 void Game::step() {
@@ -276,6 +274,23 @@ void Game::menu_state() {
 
     // Process input to check if the game must start
     if (menu_input_.enter) {
+      // Create the proper player controllers according to menu selection
+      if (player_selection_ == MenuPlayerSelection::MultiPlayer) {
+        controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
+        controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+      } else if (player_selection_ == MenuPlayerSelection::SinglePlayer) {
+        if (menu_input_.enter_left) {
+          controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
+          controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
+        } else if (menu_input_.enter_right) {
+          controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
+          controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+        } else {
+          // This should never happen!!!!
+          controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
+          controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
+        }
+      }
       menu_state_ = MenuState::FadeOut;
       menu_view_->set_state(menu_state_);
       sdl_sys_.get_sound()->pikachu();
@@ -287,7 +302,7 @@ void Game::menu_state() {
       // Trigger transition to VolleyGame state
       state_ = GameState::VolleyGame;
       frame_counter_ = 0;
-      // TODO: Change controllers based on game mode selection
+      // Initialize controllers
       controller_left_->on_game_start(PhysicsView(*physics_));
       controller_right_->on_game_start(PhysicsView(*physics_));
       volley_view_->start();
