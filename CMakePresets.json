@@ -22,6 +22,7 @@
       "description": "Release build using Ninja generator",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/release",
+      "installDir": "${sourceDir}/build/release/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }

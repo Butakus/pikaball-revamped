@@ -57,9 +57,7 @@ SDLSystem::SDLSystem() :
   }
 
   // Load sprites and build the static background
-  SDL_Log("Loading sprites...");
   load_sprite_sheet();
-  SDL_Log("Done!");
 }
 
 SDLSystem::~SDLSystem() {
@@ -93,7 +91,6 @@ void SDLSystem::load_sprite_sheet() {
   // Generate the texture and save it
   sprite_sheet_.reset(SDL_CreateTextureFromSurface(renderer_.get(), sprites_surface));
   SDL_SetTextureScaleMode(sprite_sheet_.get(), SDL_SCALEMODE_NEAREST);
-  SDL_Log("Sprite sheet size: %dx%d", sprite_sheet_.get()->w, sprite_sheet_.get()->h);
   // Release the temporary surface object
   SDL_DestroySurface(sprites_surface);
 }

@@ -5,9 +5,11 @@ include(FetchContent)
 set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
 set(BUILD_SHARED_LIBS OFF)
-#set(SDL_DEPS_SHARED OFF)
-#set(SDL_WAYLAND_SHARED OFF)
-#set(SDLMIXER_DEPS_SHARED OFF)
+set(SDL_DEPS_SHARED ON)
+set(SDLMIXER_DEPS_SHARED ON)
+set(SDLMIXER_VENDORED ON)
+set(SDLMIXER_SAMPLES OFF)
+set(SDLTTF_VENDORED ON)
 # TODO: Adjust SDL compilation options to reduce binary size
 FetchContent_Declare(SDL3
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL.git

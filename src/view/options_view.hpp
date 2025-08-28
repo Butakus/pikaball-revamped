@@ -2,7 +2,6 @@
 #define PIKA_OPTIONS_VIEW_HPP
 
 #include <algorithm>
-#include <ranges>
 
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
@@ -302,7 +301,8 @@ public:
     };
     SDL_RenderTexture(renderer_, title_texture_.get(), nullptr, &title_dst);
 
-    for (const auto &option : options_ | std::views::values) {
+    // ReSharper disable once CppUseElementsView
+    for (const auto &[key, option] : options_) {
       option->render();
     }
 
