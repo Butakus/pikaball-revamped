@@ -9,7 +9,14 @@ set(KEYBOARD_CONTROLLER_LIB_NAME "${PROJECT_NAME}_kb_controller")
 set(COMPUTER_CONTROLLER_LIB_NAME "${PROJECT_NAME}_computer_controller")
 add_subdirectory(controller)
 
-add_executable(${PROJECT_NAME})
+add_executable(${PROJECT_NAME}
+    $<$<BOOL:${WIN32}>:WIN32>
+)
+
+target_link_options(${PROJECT_NAME} PRIVATE
+    $<$<BOOL:${WIN32}>:-static>
+)
+
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
     sdl_system.cpp
@@ -33,7 +40,7 @@ set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
 add_custom_command(
     TARGET ${PROJECT_NAME}
     POST_BUILD COMMAND ${CMAKE_COMMAND}
-    -E create_symlink ${link_src} ${link_dst}
+    -E copy_directory ${link_src} ${link_dst}
     COMMENT "symbolic link ${link_src} => ${link_dst}"
 )
 

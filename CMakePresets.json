@@ -14,6 +14,11 @@
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
       }
     },
     {
@@ -25,6 +30,27 @@
       "installDir": "${sourceDir}/build/release/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
+      },
+      "condition": {
+        "type": "notEquals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows Release configuration",
+      "description": "This build is only available on Windows",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-win",
+      "installDir": "${sourceDir}/build/release-win/pikaball-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
       }
     }
   ],
@@ -40,6 +66,12 @@
       "displayName": "Release Build",
       "configurePreset": "release",
       "configuration": "Release"
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Release Build",
+      "configurePreset": "windows-release",
+      "configuration": "Windows Release"
     }
   ]
 }
