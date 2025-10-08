@@ -56,8 +56,8 @@ Game::Game() {
 }
 
 void Game::step() {
-  // Get current input state from keyboard
-  handle_input();
+  // First, compile and process events
+  compile_events();
 
   switch (state_) {
   case GameState::Intro:
@@ -98,6 +98,9 @@ void Game::run() {
 
   while (running_) {
     const unsigned long start_time = SDL_GetTicksNS();
+    // Get current input state from keyboard
+    handle_input();
+    // Execute game update step and draw
     step();
     const unsigned long end_time = SDL_GetTicksNS();
 
@@ -107,59 +110,78 @@ void Game::run() {
 }
 
 void Game::handle_input() {
+  // Event data
+  SDL_Event event {};
+
+  // Check and process all new events. Not thread safe.
+  while (SDL_PollEvent(&event)) {
+    handle_event(&event);
+  }
+}
+
+void Game::handle_event(const SDL_Event * event) {
+  if (event->type == SDL_EVENT_QUIT) {
+    running_ = false;
+  } else if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat) {
+    // Possibly meaningful event. Store it and process it later
+    std::lock_guard lock(events_mutex_);
+    events_queue_.push_back(*event);
+  }
+}
+
+void Game::compile_events() {
   // Enter / power-hit keys are handled by events to avoid repetitions
   PlayerInput player_input_left {};
   PlayerInput player_input_right {};
   // Same applies to menu input
   menu_input_ = {};
 
-  // Event data
-  SDL_Event event {};
-
-  // Check and process all new events. Not thread safe.
-  while (SDL_PollEvent(&event)) {
-    if (event.type == SDL_EVENT_QUIT) {
-      running_ = false;
-      break;
-    }
-    if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
-      switch (event.key.scancode) {
-      case keys::p1_hit:
-      case keys::p1_hit_alt:
-          player_input_left.power_hit = true;
-          menu_input_.enter_left = true;
-          break;
-        case keys::p2_hit:
-        case keys::p2_hit_alt:
-        player_input_right.power_hit = true;
-          menu_input_.enter_right = true;
-          break;
-        case SDL_SCANCODE_ESCAPE:
-          // When ESC is pressed, the game is paused / unpaused
-          if (state_ != GameState::Intro) {
-            pause_ = !pause_;
-          }
-          break;
-        case keys::p1_up:
-        case keys::p2_up:
-          menu_input_.up = true;
-          break;
-        case keys::p1_down:
-        case keys::p2_down:
-          menu_input_.down = true;
-          break;
-        case keys::p1_left:
-        case keys::p2_left:
-          menu_input_.left = true;
-          break;
-        case keys::p1_right:
-        case keys::p2_right:
-          menu_input_.right = true;
-          break;
-      default:
-          break;
+  // Process all events in the queue
+  {
+    std::lock_guard lock(events_mutex_);
+    for (const auto& event : events_queue_) {
+      // Redundant check. Left in case more event types are added in the future (e.g. joystick)
+      if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
+        switch (event.key.scancode) {
+        case keys::p1_hit:
+        case keys::p1_hit_alt:
+            player_input_left.power_hit = true;
+            menu_input_.enter_left = true;
+            break;
+          case keys::p2_hit:
+          case keys::p2_hit_alt:
+          player_input_right.power_hit = true;
+            menu_input_.enter_right = true;
+            break;
+          case SDL_SCANCODE_ESCAPE:
+            // When ESC is pressed, the game is paused / unpaused
+            if (state_ != GameState::Intro) {
+              pause_ = !pause_;
+            }
+            break;
+          case keys::p1_up:
+          case keys::p2_up:
+            menu_input_.up = true;
+            break;
+          case keys::p1_down:
+          case keys::p2_down:
+            menu_input_.down = true;
+            break;
+          case keys::p1_left:
+          case keys::p2_left:
+            menu_input_.left = true;
+            break;
+          case keys::p1_right:
+          case keys::p2_right:
+            menu_input_.right = true;
+            break;
+        default:
+            break;
+        }
       }
     }
+    // Clear the event queue for the next update
+    events_queue_.clear();
   }
 
   // Forget about events and just grab a snapshot of the current keyboard state

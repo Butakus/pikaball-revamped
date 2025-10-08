@@ -35,6 +35,15 @@ public:
    */
   void run();
 
+  /**
+   * Handle a single event from the callback queue.
+   * Control-related events are not instantly processed,
+   * but stored in a queue and handled during the step update.
+   * @param event Pointer to SDL_Event
+   */
+  void handle_event(const SDL_Event * event);
+
+  [[nodiscard]] unsigned long get_frame_time() const {return target_time_per_frame_;}
 private:
   SDLSystem sdl_sys_;
 
@@ -77,6 +86,9 @@ private:
   // Slow Motion state. The Game object must manually check this to adjust the FPS
   bool slow_motion_ {false};
 
+  // A mutex to block the event handler while compiling / processing events
+  std::mutex events_mutex_;
+  std::vector<SDL_Event> events_queue_;
 
   // Inputs
   MenuInput menu_input_ {};
@@ -86,8 +98,14 @@ private:
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
 
-  /** Handle keyboard input and update input structs */
+  /** Handle keyboard input */
   void handle_input();
+
+  /**
+   * Process and compiles all events previously handled by handle_event
+   * Afterwards, resets the event queue.
+   */
+  void compile_events();
 
   /** Handle player and ball sounds */
   void handle_sound() const;

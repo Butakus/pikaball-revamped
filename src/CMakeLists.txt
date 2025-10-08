@@ -9,9 +9,7 @@ set(KEYBOARD_CONTROLLER_LIB_NAME "${PROJECT_NAME}_kb_controller")
 set(COMPUTER_CONTROLLER_LIB_NAME "${PROJECT_NAME}_computer_controller")
 add_subdirectory(controller)
 
-add_executable(${PROJECT_NAME}
-    $<$<BOOL:${WIN32}>:WIN32>
-)
+add_executable(${PROJECT_NAME} WIN32)
 
 target_link_options(${PROJECT_NAME} PRIVATE
     $<$<BOOL:${WIN32}>:-static>
