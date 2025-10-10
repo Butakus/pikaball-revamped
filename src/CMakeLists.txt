@@ -35,12 +35,23 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 # Link assets to build directory
 set(link_src "${CMAKE_SOURCE_DIR}/assets")
 set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD COMMAND ${CMAKE_COMMAND}
-    -E copy_directory ${link_src} ${link_dst}
-    COMMENT "symbolic link ${link_src} => ${link_dst}"
-)
+if(WIN32)
+    # Windows: use copy (symlinks often require admin privileges)
+    add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${link_src}" "${link_dst}"
+            COMMENT "Copying assets directory (Windows): ${link_src} -> ${link_dst}"
+    )
+else()
+    # Unix-like: use symbolic link
+    add_custom_command(
+            TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink
+            "${link_src}" "${link_dst}"
+            COMMENT "Creating symlink to assets directory: ${link_src} -> ${link_dst}"
+    )
+endif()
 
 # Install targets
 install(TARGETS ${PROJECT_NAME}

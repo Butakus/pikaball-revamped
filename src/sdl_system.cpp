@@ -82,8 +82,9 @@ SDLSystem::~SDLSystem() {
 }
 
 void SDLSystem::load_sprite_sheet() {
-  // Load BMP from file, and throw if error
-  SDL_Surface* sprites_surface = SDL_LoadBMP(sprite_sheet_filename);
+  // Load PNG from file, and throw if error
+  SDL_Surface* sprites_surface = SDL_LoadPNG(sprite_sheet_filename);
+
   if (sprites_surface == nullptr) {
     SDL_Log( "Unable to load image %s! SDL Error: %s\n", sprite_sheet_filename, SDL_GetError());
     throw std::runtime_error("Failed to load sprite sheet!");

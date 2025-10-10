@@ -14,7 +14,7 @@ static constexpr char window_name [] = "PikaBall MLP Revamped";
 static constexpr unsigned long ns_per_second = 1000000000;
 
 // Game assets
-static constexpr char sprite_sheet_filename [] = "assets/images/sprite_sheet_new.bmp";
+static constexpr char sprite_sheet_filename [] = "assets/images/sprite_sheet_new.png";
 static constexpr char music_background_filename [] = "assets/sounds/bgm.mp3";
 static constexpr char sound_pi_filename [] = "assets/sounds/pi.wav";
 static constexpr char sound_pika_filename [] = "assets/sounds/pika.wav";

@@ -8,237 +8,7 @@
 
 namespace pika::sprite {
 
-constexpr SDL_FRect ball_0 {
-  .x = 88,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_1 {
-  .x = 130,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_2 {
-  .x = 172,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_3 {
-  .x = 214,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_4 {
-  .x = 256,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-// Ball animation
-constexpr std::array ball_animation {
-  ball_0,
-  ball_1,
-  ball_2,
-  ball_3,
-  ball_4,
-};
-
-constexpr SDL_FRect ball_hyper {
-  .x = 298,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_punch {
-  .x = 340,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr SDL_FRect ball_trail {
-  .x = 382,
-  .y = 158,
-  .w = 40,
-  .h = 40
-};
-
-constexpr std::array ball_trail_animation {
-  ball_hyper,
-  ball_trail,
-};
-
-constexpr SDL_FRect msg_game_end {
-  .x = 124,
-  .y = 64,
-  .w = 96,
-  .h = 24
-};
-
-constexpr SDL_FRect msg_ready {
-  .x = 222,
-  .y = 64,
-  .w = 80,
-  .h = 24
-};
-
-constexpr SDL_FRect msg_copyright {
-  .x = 2,
-  .y = 20,
-  .w = 360,
-  .h = 20
-};
-
-// Fight!! message, or "MLP POWAH!!"
-constexpr SDL_FRect msg_fight {
-  .x = 92,
-  .y = 723,
-  .w = 160,
-  .h = 160
-};
-
-constexpr SDL_FRect msg_game_start {
-  .x = 304,
-  .y = 64,
-  .w = 96,
-  .h = 24
-};
-
-constexpr SDL_FRect msg_sachisoft {
-  .x = 386,
-  .y = 611,
-  .w = 88,
-  .h = 110
-};
-
-constexpr SDL_FRect msg_pikachu_volleyball {
-  .x = 2,
-  .y = 530,
-  .w = 276,
-  .h = 79
-};
-
-constexpr SDL_FRect msg_pokemon_tournament {
-  .x = 150,
-  .y = 90,
-  .w = 200,
-  .h = 32
-};
-
-constexpr SDL_FRect msg_player_1 {
-  .x = 2,
-  .y = 42,
-  .w = 120,
-  .h = 20
-};
-
-constexpr SDL_FRect msg_player_2 {
-  .x = 124,
-  .y = 42,
-  .w = 120,
-  .h = 20
-};
-
-constexpr SDL_FRect msg_init_mark_mlp {
-  .x = 2,
-  .y = 723,
-  .w = 88,
-  .h = 110
-};
-
-constexpr SDL_FRect number_0 {
-  .x = 204,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_1 {
-  .x = 238,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_2 {
-  .x = 272,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_3 {
-  .x = 306,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_4 {
-  .x = 340,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_5 {
-  .x = 374,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_6 {
-  .x = 408,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_7 {
-  .x = 442,
-  .y = 124,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_8 {
-  .x = 2,
-  .y = 158,
-  .w = 32,
-  .h = 32
-};
-
-constexpr SDL_FRect number_9 {
-  .x = 36,
-  .y = 158,
-  .w = 32,
-  .h = 32
-};
-
-// Array of number sprites for an easier lookup
-constexpr std::array numbers {
-  number_0,
-  number_1,
-  number_2,
-  number_3,
-  number_4,
-  number_5,
-  number_6,
-  number_7,
-  number_8,
-  number_9,
-};
+/** Background **/
 
 constexpr SDL_FRect objects_black {
   .x = 2,
@@ -247,11 +17,25 @@ constexpr SDL_FRect objects_black {
   .h = 8
 };
 
-constexpr SDL_FRect objects_cloud {
-  .x = 100,
-  .y = 90,
-  .w = 48,
-  .h = 24
+constexpr SDL_FRect objects_net_pillar {
+  .x = 12,
+  .y = 2,
+  .w = 8,
+  .h = 8
+};
+
+constexpr SDL_FRect objects_net_pillar_top {
+  .x = 22,
+  .y = 2,
+  .w = 8,
+  .h = 8
+};
+
+constexpr SDL_FRect objects_shadow {
+  .x = 32,
+  .y = 2,
+  .w = 32,
+  .h = 8
 };
 
 constexpr SDL_FRect objects_ground_line {
@@ -289,34 +73,6 @@ constexpr SDL_FRect objects_ground_yellow {
   .h = 16
 };
 
-constexpr SDL_FRect objects_mountain {
-  .x = 2,
-  .y = 200,
-  .w = 432,
-  .h = 64
-};
-
-constexpr SDL_FRect objects_net_pillar {
-  .x = 12,
-  .y = 2,
-  .w = 8,
-  .h = 8
-};
-
-constexpr SDL_FRect objects_net_pillar_top {
-  .x = 22,
-  .y = 2,
-  .w = 8,
-  .h = 8
-};
-
-constexpr SDL_FRect objects_shadow {
-  .x = 32,
-  .y = 2,
-  .w = 32,
-  .h = 8
-};
-
 constexpr SDL_FRect objects_sky_blue {
   .x = 156,
   .y = 2,
@@ -324,11 +80,104 @@ constexpr SDL_FRect objects_sky_blue {
   .h = 16
 };
 
+constexpr SDL_FRect objects_cloud {
+  .x = 174,
+  .y = 2,
+  .w = 48,
+  .h = 24
+};
+
 constexpr SDL_FRect objects_wave {
-  .x = 70,
-  .y = 158,
+  .x = 224,
+  .y = 2,
   .w = 16,
   .h = 32
+};
+
+constexpr SDL_FRect objects_mountain {
+  .x = 2,
+  .y = 36,
+  .w = 432,
+  .h = 64
+};
+
+constexpr SDL_FRect sitting_pikachu {
+  .x = 2,
+  .y = 102,
+  .w = 104,
+  .h = 104
+};
+
+/** Animations **/
+
+constexpr SDL_FRect ball_0 {
+  .x = 2,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_1 {
+  .x = 44,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_2 {
+  .x = 86,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_3 {
+  .x = 128,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_4 {
+  .x = 170,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+// Ball animation
+constexpr std::array ball_animation {
+  ball_0,
+  ball_1,
+  ball_2,
+  ball_3,
+  ball_4,
+};
+
+constexpr SDL_FRect ball_hyper {
+  .x = 212,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_punch {
+  .x = 254,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr SDL_FRect ball_trail {
+  .x = 296,
+  .y = 224,
+  .w = 40,
+  .h = 40
+};
+
+constexpr std::array ball_trail_animation {
+  ball_hyper,
+  ball_trail,
 };
 
 constexpr SDL_FRect pikachu_normal_0 {
@@ -528,7 +377,6 @@ constexpr SDL_FRect pikachu_loser_4 {
   .h = 64
 };
 
-
 // Pikachu player sprite animations
 constexpr std::array pikachu_normal_animation {
   pikachu_normal_0,
@@ -588,11 +436,171 @@ constexpr std::array pikachu_loser_animation {
   pikachu_loser_4,
 };
 
-constexpr SDL_FRect sitting_pikachu {
-  .x = 280,
+
+/** Menu and UI items **/
+
+constexpr SDL_FRect number_0 {
+  .x = 108,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_1 {
+  .x = 142,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_2 {
+  .x = 176,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_3 {
+  .x = 210,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_4 {
+  .x = 244,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_5 {
+  .x = 278,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_6 {
+  .x = 312,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_7 {
+  .x = 346,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_8 {
+  .x = 380,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+constexpr SDL_FRect number_9 {
+  .x = 414,
+  .y = 102,
+  .w = 32,
+  .h = 32
+};
+
+// Array of number sprites for an easier lookup
+constexpr std::array numbers {
+  number_0,
+  number_1,
+  number_2,
+  number_3,
+  number_4,
+  number_5,
+  number_6,
+  number_7,
+  number_8,
+  number_9,
+};
+
+constexpr SDL_FRect msg_player_1 {
+  .x = 108,
+  .y = 136,
+  .w = 120,
+  .h = 20
+};
+
+constexpr SDL_FRect msg_player_2 {
+  .x = 108,
+  .y = 158,
+  .w = 120,
+  .h = 20
+};
+
+
+/** Messages **/
+constexpr SDL_FRect msg_pikachu_volleyball {
+  .x = 2,
+  .y = 530,
+  .w = 276,
+  .h = 79
+};
+
+constexpr SDL_FRect msg_pokemon_tournament {
+  .x = 2,
   .y = 611,
-  .w = 104,
-  .h = 104
+  .w = 200,
+  .h = 32
+};
+
+constexpr SDL_FRect msg_game_start {
+  .x = 280,
+  .y = 530,
+  .w = 96,
+  .h = 24
+};
+
+constexpr SDL_FRect msg_ready {
+  .x = 378,
+  .y = 530,
+  .w = 80,
+  .h = 24
+};
+
+constexpr SDL_FRect msg_game_end {
+  .x = 280,
+  .y = 556,
+  .w = 96,
+  .h = 24
+};
+
+constexpr SDL_FRect msg_init_mark_mlp {
+  .x = 2,
+  .y = 645,
+  .w = 88,
+  .h = 110
+};
+
+constexpr SDL_FRect msg_sachisoft {
+  .x = 92,
+  .y = 645,
+  .w = 88,
+  .h = 110
+};
+
+// Fight!! message, or "MLP POWAH!!"
+constexpr SDL_FRect msg_fight {
+  .x = 182,
+  .y = 645,
+  .w = 160,
+  .h = 160
+};
+
+constexpr SDL_FRect msg_copyright {
+  .x = 2,
+  .y = 807,
+  .w = 360,
+  .h = 20
 };
 
 } // end namespace pika::sprite
