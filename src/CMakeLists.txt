@@ -19,6 +19,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
     sdl_system.cpp
     game.cpp
+    $<$<PLATFORM_ID:Windows>:${CMAKE_SOURCE_DIR}/assets/pikaball-revamped.rc>
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/include
