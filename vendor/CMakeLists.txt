@@ -26,11 +26,19 @@ FetchContent_Declare(SDL_Mixer
     # GIT_TAG 4e9a308a0daa63b6bd492b0ec616f86337500898
 )
 FetchContent_Declare(SDL_ttf
-        GIT_REPOSITORY  https://github.com/libsdl-org/SDL_ttf.git
-        GIT_TAG         main
+    GIT_REPOSITORY  https://github.com/libsdl-org/SDL_ttf.git
+    GIT_TAG         main
 )
 
-FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf)
+# Grab embed sources to embed binray data into the executable
+# Disable tests in embed
+set(BYPASS_TESTS ON "Disable embed tests")
+FetchContent_Declare(embed
+    GIT_REPOSITORY https://github.com/MKlimenko/embed.git
+    GIT_TAG        master
+)
+
+FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf embed)
 
 add_library(vendor INTERFACE)
 target_link_libraries(vendor INTERFACE
