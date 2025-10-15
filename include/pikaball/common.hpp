@@ -13,19 +13,6 @@ static constexpr char window_name [] = "PikaBall MLP Revamped";
 
 static constexpr unsigned long ns_per_second = 1000000000;
 
-// Game assets
-static constexpr char sprite_sheet_filename [] = "assets/images/sprite_sheet_new.png";
-static constexpr char music_background_filename [] = "assets/sounds/bgm.mp3";
-static constexpr char sound_pi_filename [] = "assets/sounds/pi.wav";
-static constexpr char sound_pika_filename [] = "assets/sounds/pika.wav";
-static constexpr char sound_chu_filename [] = "assets/sounds/chu.wav";
-static constexpr char sound_pikachu_filename [] = "assets/sounds/pikachu.wav";
-static constexpr char sound_pipikachu_filename [] = "assets/sounds/pipikachu.wav";
-static constexpr char sound_ball_hit_filename [] = "assets/sounds/ball_hit.wav";
-static constexpr char sound_ball_ground_filename [] = "assets/sounds/ball_ground.wav";
-static constexpr char text_font_filename [] = "assets/font.ttf";
-
-static constexpr unsigned int text_font_size = 45;
 
 // Options menu strings
 // TODO: Localization?
@@ -45,7 +32,7 @@ static constexpr char str_10_pts [] = "10";
 static constexpr char str_15_pts [] = "15";
 
 
-} // namespace pika::text
+} // namespace pika::txt
 
 } // namespace pika
 

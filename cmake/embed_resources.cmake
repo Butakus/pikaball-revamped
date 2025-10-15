@@ -16,7 +16,7 @@
 
 function(embed_resources TARGET_NAME)
     set(options)
-    set(oneValueArgs OUTPUT_DIR NAMESPACE)
+    set(oneValueArgs OUTPUT_DIR)
     set(multiValueArgs INPUTS)
     cmake_parse_arguments(EMBED "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -45,15 +45,15 @@ function(embed_resources TARGET_NAME)
 
     # Command to generate headers
     set(GENERATED_HEADERS
-        ${EMBED_OUTPUT_DIR}/resource_holder.hpp
-        ${EMBED_OUTPUT_DIR}/resource.hpp
-        ${EMBED_OUTPUT_DIR}/span.hpp
+        ${EMBED_OUTPUT_DIR}/embed/resource_holder.hpp
+        ${EMBED_OUTPUT_DIR}/embed/resource.hpp
+        ${EMBED_OUTPUT_DIR}/embed/span.hpp
     )
 
     add_custom_command(
         OUTPUT ${GENERATED_HEADERS}
         # COMMAND ${EMBED_TOOL} ${EMBED_INPUTS} -o ${EMBED_OUTPUT_DIR}
-        COMMAND ${EMBED_TOOL} ${EMBED_REL_INPUTS} -o ${EMBED_OUTPUT_DIR}
+        COMMAND ${EMBED_TOOL} ${EMBED_REL_INPUTS} -o ${EMBED_OUTPUT_DIR}/embed
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         DEPENDS ${EMBED_INPUTS} embed
         COMMENT "Embedding resources for target '${TARGET_NAME}'"

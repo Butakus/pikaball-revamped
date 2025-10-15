@@ -4,7 +4,7 @@
 #include "SDL3/SDL_audio.h"
 #include "SDL3_mixer/SDL_mixer.h"
 
-#include <pikaball/common.hpp>
+#include <pikaball/resources.hpp>
 #include <pikaball/physics/physics_common.hpp>  // For FieldSide
 
 namespace pika {
@@ -201,7 +201,12 @@ private:
   MIX_Audio* music_background_ {nullptr};
 
   [[nodiscard]] MIX_Audio* load_audio(const char* filename) const {
-    MIX_Audio* chunk = MIX_LoadAudio(mixer_, filename, true);
+    MIX_Audio* chunk = MIX_LoadAudio_IO(
+      mixer_,
+      load_resource(filename),
+      true,
+      true
+    );
     if (chunk == nullptr) {
       SDL_Log("Unable to load sound! Filename: %s - SDL_mixer error: %s\n", filename, SDL_GetError());
       throw std::runtime_error("Failed to open audio file");

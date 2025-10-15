@@ -38,6 +38,15 @@ include(${CMAKE_SOURCE_DIR}/cmake/embed_resources.cmake)
 embed_resources(${PROJECT_NAME}
     INPUTS
     ${CMAKE_SOURCE_DIR}/assets/hello.txt
+    ${CMAKE_SOURCE_DIR}/assets/images/sprite_sheet_new.png
+    ${CMAKE_SOURCE_DIR}/assets/sounds/ball_ground.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/ball_hit.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/chu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pi.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pika.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pikachu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pipikachu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/bgm.mp3
 )
 
 # Link assets to build directory

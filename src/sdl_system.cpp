@@ -1,5 +1,5 @@
 #include "sdl_system.hpp"
-#include "pikaball/common.hpp"
+#include "pikaball/resources.hpp"
 
 namespace pika {
 
@@ -82,8 +82,8 @@ SDLSystem::~SDLSystem() {
 }
 
 void SDLSystem::load_sprite_sheet() {
-  // Load PNG from file, and throw if error
-  SDL_Surface* sprites_surface = SDL_LoadPNG(sprite_sheet_filename);
+  // Load PNG from embedded data or from files. Throw if error.
+  SDL_Surface* sprites_surface = SDL_LoadPNG_IO(load_resource(sprite_sheet_filename), true);
 
   if (sprites_surface == nullptr) {
     SDL_Log( "Unable to load image %s! SDL Error: %s\n", sprite_sheet_filename, SDL_GetError());
