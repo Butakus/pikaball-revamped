@@ -30,15 +30,7 @@ FetchContent_Declare(SDL_ttf
     GIT_TAG         main
 )
 
-# Grab embed sources to embed binray data into the executable
-# Disable tests in embed
-set(BYPASS_TESTS ON "Disable embed tests")
-FetchContent_Declare(embed
-    GIT_REPOSITORY https://github.com/MKlimenko/embed.git
-    GIT_TAG        master
-)
-
-FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf embed)
+FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf)
 
 add_library(vendor INTERFACE)
 target_link_libraries(vendor INTERFACE
