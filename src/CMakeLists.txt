@@ -68,6 +68,12 @@ b_embed(${PROJECT_NAME}
     ../assets/font.ttf
 )
 
+# Test custom pika embed
+include(${CMAKE_SOURCE_DIR}/cmake/pika_embed.cmake)
+pika_embed(${PROJECT_NAME}
+        ../assets/hello.txt
+)
+
 # Link assets to build directory
 set(link_src "${CMAKE_SOURCE_DIR}/assets")
 set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
