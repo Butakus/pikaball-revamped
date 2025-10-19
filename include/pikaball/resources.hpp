@@ -1,6 +1,7 @@
 #ifndef PIKA_RESOURCES_HPP
 #define PIKA_RESOURCES_HPP
-#include <array>
+#include <map>
+#include "battery/embed.hpp"
 
 namespace pika {
 
@@ -19,65 +20,19 @@ static constexpr char text_font_filename [] = "assets/font.ttf";
 static constexpr unsigned int text_font_size = 45;
 
 namespace embed {
-namespace data {
 
-/** Load binary data directly into the code using C23 #embed directive */
-
-static constexpr unsigned char sprite_sheet[] = {
-  #embed "../../assets/images/sprite_sheet_new.png"
+static const std::map<std::string, b::EmbedInternal::EmbeddedFile> resource_map {
+  { "assets/images/sprite_sheet_new.png", b::embed<"../assets/images/sprite_sheet_new.png">()},
+  { "assets/sounds/bgm.mp3", b::embed<"../assets/sounds/bgm.mp3">()},
+  { "assets/sounds/pi.wav", b::embed<"../assets/sounds/pi.wav">()},
+  { "assets/sounds/pika.wav", b::embed<"../assets/sounds/pika.wav">()},
+  { "assets/sounds/chu.wav", b::embed<"../assets/sounds/chu.wav">()},
+  { "assets/sounds/pikachu.wav", b::embed<"../assets/sounds/pikachu.wav">()},
+  { "assets/sounds/pipikachu.wav", b::embed<"../assets/sounds/pipikachu.wav">()},
+  { "assets/sounds/ball_hit.wav", b::embed<"../assets/sounds/ball_hit.wav">()},
+  { "assets/sounds/ball_ground.wav", b::embed<"../assets/sounds/ball_ground.wav">()},
+  { "assets/font.ttf", b::embed<"../assets/font.ttf">()},
 };
-static constexpr unsigned char music_background [] = {
-  #embed "../../assets/sounds/bgm.mp3"
-};
-static constexpr unsigned char sound_pi [] = {
-  #embed "../../assets/sounds/pi.wav"
-};
-static constexpr unsigned char sound_pika [] = {
-  #embed "../../assets/sounds/pika.wav"
-};
-static constexpr unsigned char sound_chu [] = {
-  #embed "../../assets/sounds/chu.wav"
-};
-static constexpr unsigned char sound_pikachu [] = {
-  #embed "../../assets/sounds/pikachu.wav"
-};
-static constexpr unsigned char sound_pipikachu [] = {
-  #embed "../../assets/sounds/pipikachu.wav"
-};
-static constexpr unsigned char sound_ball_hit [] = {
-  #embed "../../assets/sounds/ball_hit.wav"
-};
-static constexpr unsigned char sound_ball_ground [] = {
-  #embed "../../assets/sounds/ball_ground.wav"
-};
-static constexpr unsigned char text_font [] = {
-  #embed "../../assets/font.ttf"
-};
-
-
-} // namespace data
-
-/**
- * A utility class to store the data with a filename and its size in bytes
- */
-struct Resource {
-  const char * filename;
-  const unsigned char * data;
-  size_t size;
-};
-
-static constexpr std::array<Resource, 10> resource_list {{
-  { sprite_sheet_filename, data::sprite_sheet, sizeof(data::sprite_sheet) },
-  { music_background_filename, data::music_background, sizeof(data::music_background) },
-  { sound_pi_filename, data::sound_pi, sizeof(data::sound_pi) },
-  { sound_pika_filename, data::sound_pika, sizeof(data::sound_pika) },
-  { sound_chu_filename, data::sound_chu, sizeof(data::sound_chu) },
-  { sound_pikachu_filename, data::sound_pikachu, sizeof(data::sound_pikachu) },
-  { sound_pipikachu_filename, data::sound_pipikachu, sizeof(data::sound_pipikachu) },
-  { sound_ball_hit_filename, data::sound_ball_hit, sizeof(data::sound_ball_hit) },
-  { sound_ball_ground_filename, data::sound_ball_ground, sizeof(data::sound_ball_ground) },
-  { text_font_filename, data::text_font, sizeof(data::text_font) },
-}};
 
 } // namespace pika::embed
 
@@ -93,13 +48,12 @@ static constexpr std::array<Resource, 10> resource_list {{
  */
 inline SDL_IOStream* load_resource(const char* filename) {
   SDL_IOStream* resource_data = nullptr;
-  for (const auto &[res_filename, data, size] : embed::resource_list) {
-    if (strcmp(filename, res_filename) == 0) {
-      SDL_Log("Loading embedded %s | %zu bytes", filename, size);
-      resource_data = SDL_IOFromConstMem(data, size);
-      break;
-    }
+  if (embed::resource_map.contains(filename)) {
+    const auto embed_data = embed::resource_map.at(filename);
+    SDL_Log("Loading embedded %s | %zu bytes", filename, embed_data.size());
+    resource_data = SDL_IOFromConstMem(embed_data.data(), embed_data.size());
   }
+
   if (resource_data == nullptr) {
     SDL_Log("Could not load resource %s from embedded data. Loading from file...", filename);
     resource_data = SDL_IOFromFile(filename, "r");

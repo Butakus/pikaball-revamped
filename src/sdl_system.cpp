@@ -49,7 +49,7 @@ SDLSystem::SDLSystem() :
   sound_ = std::make_unique<PikaSound>();
 
   // Load the TTF font
-  text_font_.reset(TTF_OpenFont(text_font_filename, text_font_size));
+  text_font_.reset(TTF_OpenFontIO(load_resource(text_font_filename), true, text_font_size));
   if(!text_font_)
   {
     SDL_Log( "Could not load TTF font! SDL_ttf error: %s\n", SDL_GetError());

@@ -30,7 +30,13 @@ FetchContent_Declare(SDL_ttf
     GIT_TAG         main
 )
 
-FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf)
+set(B_PRODUCTION_MODE ON)
+set(B_EMBED_BUILD_EXAMPLES OFF)
+FetchContent_Declare(embed
+        GIT_REPOSITORY  https://github.com/batterycenter/embed.git
+        GIT_TAG         v1.2.19
+)
+FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf embed)
 
 add_library(vendor INTERFACE)
 target_link_libraries(vendor INTERFACE

@@ -35,6 +35,39 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23 c_std_23)
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:-Wall -Wpedantic>
 )
+
+# Embed resources into binary using battery::embed
+b_embed(${PROJECT_NAME}
+    ../assets/images/sprite_sheet_new.png
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/bgm.mp3
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/pi.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/pika.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/chu.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/pikachu.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/pipikachu.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/ball_hit.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/sounds/ball_ground.wav
+)
+b_embed(${PROJECT_NAME}
+    ../assets/font.ttf
+)
+
 # Link assets to build directory
 set(link_src "${CMAKE_SOURCE_DIR}/assets")
 set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
