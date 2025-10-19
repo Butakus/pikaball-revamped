@@ -36,42 +36,19 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:-Wall -Wpedantic>
 )
 
-# Embed resources into binary using battery::embed
-b_embed(${PROJECT_NAME}
-    ../assets/images/sprite_sheet_new.png
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/bgm.mp3
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/pi.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/pika.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/chu.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/pikachu.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/pipikachu.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/ball_hit.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/sounds/ball_ground.wav
-)
-b_embed(${PROJECT_NAME}
-    ../assets/font.ttf
-)
-
-# Test custom pika embed
+# Embed resources into binary using custom version of battery::embed
 include(${CMAKE_SOURCE_DIR}/cmake/pika_embed.cmake)
 pika_embed(${PROJECT_NAME}
-        ../assets/hello.txt
+    ${CMAKE_SOURCE_DIR}/assets/images/sprite_sheet_new.png
+    ${CMAKE_SOURCE_DIR}/assets/sounds/bgm.mp3
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pi.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pika.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/chu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pikachu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/pipikachu.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/ball_hit.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/ball_ground.wav
+    ${CMAKE_SOURCE_DIR}/assets/font.ttf
 )
 
 # Link assets to build directory

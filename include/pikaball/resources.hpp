@@ -1,7 +1,8 @@
 #ifndef PIKA_RESOURCES_HPP
 #define PIKA_RESOURCES_HPP
-#include <map>
-#include "battery/embed.hpp"
+
+#include <array>
+#include "battery/pika_embed.hpp"
 
 namespace pika {
 
@@ -21,17 +22,19 @@ static constexpr unsigned int text_font_size = 45;
 
 namespace embed {
 
-static const std::map<std::string, b::EmbedInternal::EmbeddedFile> resource_map {
-  { "assets/images/sprite_sheet_new.png", b::embed<"../assets/images/sprite_sheet_new.png">()},
-  { "assets/sounds/bgm.mp3", b::embed<"../assets/sounds/bgm.mp3">()},
-  { "assets/sounds/pi.wav", b::embed<"../assets/sounds/pi.wav">()},
-  { "assets/sounds/pika.wav", b::embed<"../assets/sounds/pika.wav">()},
-  { "assets/sounds/chu.wav", b::embed<"../assets/sounds/chu.wav">()},
-  { "assets/sounds/pikachu.wav", b::embed<"../assets/sounds/pikachu.wav">()},
-  { "assets/sounds/pipikachu.wav", b::embed<"../assets/sounds/pipikachu.wav">()},
-  { "assets/sounds/ball_hit.wav", b::embed<"../assets/sounds/ball_hit.wav">()},
-  { "assets/sounds/ball_ground.wav", b::embed<"../assets/sounds/ball_ground.wav">()},
-  { "assets/font.ttf", b::embed<"../assets/font.ttf">()},
+static const std::array<pika::b::EmbedInternal::EmbeddedFile, 10> resource_list {
+  {
+    { pika::b::embed<"assets/images/sprite_sheet_new.png">() },
+    { pika::b::embed<"assets/sounds/bgm.mp3">() },
+    { pika::b::embed<"assets/sounds/pi.wav">() },
+    { pika::b::embed<"assets/sounds/pika.wav">() },
+    { pika::b::embed<"assets/sounds/chu.wav">() },
+    { pika::b::embed<"assets/sounds/pikachu.wav">() },
+    { pika::b::embed<"assets/sounds/pipikachu.wav">() },
+    { pika::b::embed<"assets/sounds/ball_hit.wav">() },
+    { pika::b::embed<"assets/sounds/ball_ground.wav">() },
+    { pika::b::embed<"assets/font.ttf">() },
+  }
 };
 
 } // namespace pika::embed
@@ -48,10 +51,12 @@ static const std::map<std::string, b::EmbedInternal::EmbeddedFile> resource_map 
  */
 inline SDL_IOStream* load_resource(const char* filename) {
   SDL_IOStream* resource_data = nullptr;
-  if (embed::resource_map.contains(filename)) {
-    const auto embed_data = embed::resource_map.at(filename);
-    SDL_Log("Loading embedded %s | %zu bytes", filename, embed_data.size());
-    resource_data = SDL_IOFromConstMem(embed_data.data(), embed_data.size());
+  for (const auto & res : embed::resource_list) {
+    if (res.filename() == filename) {
+      SDL_Log("Loading embedded %s | %zu bytes", filename, res.size());
+      resource_data = SDL_IOFromConstMem(res.data(), res.size());
+      break;
+    }
   }
 
   if (resource_data == nullptr) {

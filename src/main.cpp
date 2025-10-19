@@ -3,7 +3,7 @@
 #include <SDL3/SDL_init.h>
 
 #include "game.hpp"
-#include "battery/pk_embed.hpp"
+
 // int main(int argc, char **argv) {
 //     pika::Game game;
 //     game.run();
@@ -13,7 +13,6 @@
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
     // Create a Game object that will be passed back to each callback:
     *appstate = new pika::Game;
-    SDL_Log("%s", pika_emb::embed<"../assets/hello.txt">().data());
     return SDL_APP_CONTINUE;
 }
 
