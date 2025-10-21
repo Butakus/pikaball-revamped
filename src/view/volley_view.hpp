@@ -6,7 +6,6 @@
 #include "wave.hpp"
 #include "ball_view.hpp"
 #include "player_view.hpp"
-#include "pikaball/input.hpp"
 #include "pikaball/physics/physics.hpp"
 
 namespace pika::view {
@@ -279,11 +278,12 @@ private:
       return;
     }
     clouds_.update();
-    SDL_FRect f_dst;
     for (const auto& cloud : clouds_.get_clouds()) {
-      SDL_RectToFRect(&cloud, &f_dst);
+      const SDL_FRect dst = cloud.get_rect();
+      const SDL_FRect* cloud_sprite =
+        cloud.is_special() ? &sprite::objects_cloud_extra : &sprite::objects_cloud;
       SDL_RenderTexture(
-        renderer_, sprite_sheet_, &sprite::objects_cloud, &f_dst);
+        renderer_, sprite_sheet_, cloud_sprite, &dst);
     }
   }
 
