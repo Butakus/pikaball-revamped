@@ -80,18 +80,25 @@ constexpr SDL_FRect objects_sky_blue {
   .h = 16
 };
 
-constexpr SDL_FRect objects_cloud {
+constexpr SDL_FRect objects_wave {
   .x = 174,
+  .y = 2,
+  .w = 16,
+  .h = 32
+};
+
+constexpr SDL_FRect objects_cloud {
+  .x = 192,
   .y = 2,
   .w = 48,
   .h = 24
 };
 
-constexpr SDL_FRect objects_wave {
-  .x = 224,
+constexpr SDL_FRect objects_cloud_extra {
+  .x = 242,
   .y = 2,
-  .w = 16,
-  .h = 32
+  .w = 48,
+  .h = 24
 };
 
 constexpr SDL_FRect objects_mountain {
@@ -599,6 +606,13 @@ constexpr SDL_FRect msg_fight {
 constexpr SDL_FRect msg_copyright {
   .x = 2,
   .y = 807,
+  .w = 360,
+  .h = 20
+};
+
+constexpr SDL_FRect msg_copyright_extra {
+  .x = 2,
+  .y = 829,
   .w = 360,
   .h = 20
 };

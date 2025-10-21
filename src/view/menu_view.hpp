@@ -169,7 +169,7 @@ private:
       .x = screen_h_width - sprite::msg_copyright.w / 2,
       .y = 264,
       .w = sprite::msg_copyright.w,
-      .h = sprite::msg_copyright.h,
+      .h = 2 * sprite::msg_copyright.h,
     };
     SDL_RenderTexture(
       renderer_, copyright_texture_.get(), nullptr, &dst_rect);
@@ -324,15 +324,20 @@ private:
       SDL_PIXELFORMAT_ARGB8888,
       SDL_TEXTUREACCESS_TARGET,
       sprite::msg_copyright.w,
-      sprite::msg_copyright.h
+      2 * sprite::msg_copyright.h
     ));
     // Set the texture scaling mode to nearest interpolation
     SDL_SetTextureScaleMode(copyright_texture_.get(), SDL_SCALEMODE_NEAREST);
 
     // Copy the texture from the sheet
     SDL_SetRenderTarget(renderer_, copyright_texture_.get());
-    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_copyright, nullptr);
-
+    f_dst.x = 0;
+    f_dst.y = 0;
+    f_dst.w = sprite::msg_copyright.w;
+    f_dst.h = sprite::msg_copyright.h;
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_copyright, &f_dst);
+    f_dst.y = sprite::msg_copyright.h - 4;
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::msg_copyright_extra, &f_dst);
 
     // Set the render target back to the main window
     SDL_SetRenderTarget(renderer_, nullptr);
