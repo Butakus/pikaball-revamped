@@ -52,25 +52,25 @@ pika_embed(${PROJECT_NAME}
 )
 
 # Link assets to build directory
-set(link_src "${CMAKE_SOURCE_DIR}/assets")
-set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
-if(WIN32)
-    # Windows: use copy (symlinks often require admin privileges)
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${link_src}" "${link_dst}"
-            COMMENT "Copying assets directory (Windows): ${link_src} -> ${link_dst}"
-    )
-else()
-    # Unix-like: use symbolic link
-    add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E create_symlink
-            "${link_src}" "${link_dst}"
-            COMMENT "Creating symlink to assets directory: ${link_src} -> ${link_dst}"
-    )
-endif()
+#set(link_src "${CMAKE_SOURCE_DIR}/assets")
+#set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
+#if(WIN32)
+#    # Windows: use copy (symlinks often require admin privileges)
+#    add_custom_command(
+#            TARGET ${PROJECT_NAME} POST_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E copy_directory
+#            "${link_src}" "${link_dst}"
+#            COMMENT "Copying assets directory (Windows): ${link_src} -> ${link_dst}"
+#    )
+#else()
+#    # Unix-like: use symbolic link
+#    add_custom_command(
+#            TARGET ${PROJECT_NAME} POST_BUILD
+#            COMMAND ${CMAKE_COMMAND} -E create_symlink
+#            "${link_src}" "${link_dst}"
+#            COMMENT "Creating symlink to assets directory: ${link_src} -> ${link_dst}"
+#    )
+#endif()
 
 # Install targets
 install(TARGETS ${PROJECT_NAME}
@@ -82,4 +82,4 @@ install(TARGETS ${PROJECT_NAME}
 #    ${COMPUTER_CONTROLLER_LIB_NAME}
 #    DESTINATION lib/${PROJECT_NAME}
 #)
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${CMAKE_INSTALL_PREFIX})
+#install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${CMAKE_INSTALL_PREFIX})

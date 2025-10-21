@@ -156,7 +156,6 @@ function(_embed_generate_all_hpps)
     foreach (TARGET ${EMBED_TARGETS})
         _embed_generate_hpp(${TARGET})
     endforeach()
-    message(STATUS "Generating pika::b::embed() HPP files ... Done")
 endfunction(_embed_generate_all_hpps)
 
 function(_embed_generate_hpp TARGET)
@@ -207,8 +206,6 @@ function(embed_generate_configure)
     get_filename_component(_out_dir "${EGC_OUTFILE}" DIRECTORY)
     file(MAKE_DIRECTORY "${_out_dir}")
 
-    message(STATUS "_out_dir '${_out_dir}'")
-
     # Read file bytes as hex and compute filesize
     file(READ "${EGC_ABS_PATH}" GENERATED_BYTE_ARRAY HEX)
     string(LENGTH "${GENERATED_BYTE_ARRAY}" _len)
@@ -253,16 +250,13 @@ function(pika_embed TARGET)
         # Derive a filename to record in the header and to base the identifier on.
         # Prefer a path relative to the source dir when possible, otherwise fall back to the basename.
         file(RELATIVE_PATH _REL_PATH "${CMAKE_SOURCE_DIR}" "${FILENAME}")
-        message(STATUS "RELATIVE_PATH '${_REL_PATH}'")
 
         # Make the identifier from the target id + recorded filename
         string(TOLOWER "${TARGET_ID}_${_REL_PATH}" IDENTIFIER)
         string(REGEX REPLACE "[^a-zA-Z0-9_]" "_" IDENTIFIER "${IDENTIFIER}")
         embed_validate_identifier("${IDENTIFIER}")
-        message(STATUS "Validated IDENTIFIER '${IDENTIFIER}'")
 
         set(CPP_FILE "${EMBED_BINARY_DIR}/autogen/${TARGET_ID}/src/pika_${IDENTIFIER}.cpp")
-        message(STATUS "CPP_FILE '${CPP_FILE}'")
 
         # If identifier already in use
         list(FIND EMBED_IDENTIFIERS ${IDENTIFIER} EMBED_USED_IDENTIFIERS_INDEX)
@@ -274,9 +268,6 @@ function(pika_embed TARGET)
         set(EMBED_IDENTIFIERS ${EMBED_IDENTIFIERS} ${IDENTIFIER} CACHE INTERNAL "list of all identifiers used by the embed library")
         set(EMBED_FILENAMES ${EMBED_FILENAMES} ${_REL_PATH} CACHE INTERNAL "list of all filenames used by the embed library")
         set(EMBED_TARGETS ${EMBED_TARGETS} ${TARGET} CACHE INTERNAL "list of all targets used by the embed library")
-        message(STATUS "EMBED_IDENTIFIERS '${EMBED_IDENTIFIERS}'")
-        message(STATUS "EMBED_FILENAMES '${EMBED_FILENAMES}'")
-        message(STATUS "EMBED_TARGETS '${EMBED_TARGETS}'")
 
         # Generate the source file now during configure for this resource
         embed_generate_configure(
@@ -289,7 +280,6 @@ function(pika_embed TARGET)
 
         list(APPEND GENERATED_CPPS "${CPP_FILE}")
     endforeach()
-    message(STATUS "GENERATED_CPPS '${GENERATED_CPPS}'")
 
     # Generate header files
     _embed_generate_all_hpps()
