@@ -58,7 +58,7 @@ void Player::update(const PlayerInput& input) {
     break;
   }
 
-  const unsigned int next_x = x_ + velocity_x;
+  const int next_x = x_ + velocity_x;
   x_ = next_x;
 
   // Limit player position to world boundaries
@@ -86,7 +86,7 @@ void Player::update(const PlayerInput& input) {
   }
 
   // Gravity
-  const unsigned int next_y = y_ + velocity_y_;
+  const int next_y = y_ + velocity_y_;
   y_ = next_y;
   if (next_y < player_ground_y) {
     velocity_y_ += 1;
@@ -114,7 +114,6 @@ void Player::update(const PlayerInput& input) {
       anim_frame_number_ = 0;
       state_ = PlayerState::PowerHit;
 
-      // TODO: Sound
       // maybe-sound function (playerpointer + 0x90 + 0x18)? omitted
       // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
       // refer to a detailed comment above about this function
@@ -129,7 +128,6 @@ void Player::update(const PlayerInput& input) {
       diving_direction_ = input.direction_x;
       velocity_y_ = -5;
 
-      // TODO: Sound
       // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
       // refer to a detailed comment above about this function
       // maybe-sound code function (playerpointer + 0x90 + 0x10)? omitted
@@ -140,7 +138,7 @@ void Player::update(const PlayerInput& input) {
 
   // Animations
   if (state_ == PlayerState::Jumping) {
-  anim_frame_number_ = (anim_frame_number_ + 1) % 3;
+    anim_frame_number_ = (anim_frame_number_ + 1) % 3;
   }
   else if (state_ == PlayerState::PowerHit) {
     if (anim_frame_delay_ < 1) {
@@ -158,8 +156,7 @@ void Player::update(const PlayerInput& input) {
     anim_frame_delay_++;
     if (anim_frame_delay_ > 3) {
       anim_frame_delay_ = 0;
-      if (const int next_frame_number =
-              static_cast<int>(anim_frame_number_) + anim_arm_direction_;
+      if (const int next_frame_number = anim_frame_number_ + anim_arm_direction_;
           next_frame_number < 0 || next_frame_number > 4) {
         anim_arm_direction_ = -anim_arm_direction_;
       }
@@ -173,7 +170,6 @@ void Player::update(const PlayerInput& input) {
       if (is_winner_) {
         state_ = PlayerState::Winner;
 
-        // TODO: Sound
         // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
         // refer to a detailed comment above about this function
         // maybe-sound code function (0x98 + 0x10) omitted
@@ -186,7 +182,7 @@ void Player::update(const PlayerInput& input) {
       anim_frame_delay_ = 0;
       anim_frame_number_ = 0;
     }
-    // TODO
+
     // FUN_004025e0
     // Process game end frames (winner / loser animations)
     // processGameEndFrameFor(player);

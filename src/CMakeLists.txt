@@ -35,6 +35,9 @@ target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23 c_std_23)
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:-Wall -Wpedantic>
 )
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        $<$<CONFIG:Debug>:-DPIKA_DEBUG>
+)
 
 # Embed resources into binary using custom version of battery::embed
 include(${CMAKE_SOURCE_DIR}/cmake/pika_embed.cmake)
@@ -51,27 +54,6 @@ pika_embed(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/assets/font.ttf
 )
 
-# Link assets to build directory
-#set(link_src "${CMAKE_SOURCE_DIR}/assets")
-#set(link_dst "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets")
-#if(WIN32)
-#    # Windows: use copy (symlinks often require admin privileges)
-#    add_custom_command(
-#            TARGET ${PROJECT_NAME} POST_BUILD
-#            COMMAND ${CMAKE_COMMAND} -E copy_directory
-#            "${link_src}" "${link_dst}"
-#            COMMENT "Copying assets directory (Windows): ${link_src} -> ${link_dst}"
-#    )
-#else()
-#    # Unix-like: use symbolic link
-#    add_custom_command(
-#            TARGET ${PROJECT_NAME} POST_BUILD
-#            COMMAND ${CMAKE_COMMAND} -E create_symlink
-#            "${link_src}" "${link_dst}"
-#            COMMENT "Creating symlink to assets directory: ${link_src} -> ${link_dst}"
-#    )
-#endif()
-
 # Install targets
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CMAKE_INSTALL_PREFIX}
@@ -82,4 +64,3 @@ install(TARGETS ${PROJECT_NAME}
 #    ${COMPUTER_CONTROLLER_LIB_NAME}
 #    DESTINATION lib/${PROJECT_NAME}
 #)
-#install(DIRECTORY "${CMAKE_SOURCE_DIR}/assets" DESTINATION ${CMAKE_INSTALL_PREFIX})

@@ -31,10 +31,10 @@ private:
   Player other_player_ {FieldSide::Right};
 
   // Integer value to compute distances differently if the player is on the right side
-  const unsigned int is_player_right_;
+  const int is_player_right_;
   // Left and right bounds for our field side
-  const unsigned int left_bound_;
-  const unsigned int right_bound_;
+  const int left_bound_;
+  const int right_bound_;
 
   /**
    * It flips randomly to 0 or 1 on each update (FUN_00402360)

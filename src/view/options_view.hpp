@@ -17,8 +17,7 @@ namespace pika::view {
   const SDL_Color & text_color = {255, 255, 255})
 {
   // Load the text into a temporary surface
-  SDL_Surface* text_surface =
-    TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
+  SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
   if (text_surface == nullptr) {
     SDL_Log("Unable to load text! SDL Error: %s\n", SDL_GetError());
     throw std::runtime_error("Failed to load text!");
@@ -32,6 +31,13 @@ namespace pika::view {
   return text_texture;
 }
 
+/**
+ * An abstract class to represent an option item with multiple values.
+ *
+ * This class is responsible for rendering a label (option name) along with
+ * dynamically changing option values.
+ * It provides the interface for selecting options and rendering the option menu UI.
+ */
 class OptionItem {
 public:
   virtual ~OptionItem() = default;
@@ -61,7 +67,7 @@ public:
     // Initialize name render position
     constexpr int name_h = 20;
     const int name_w = name_texture_->w * name_h / 40;
-    const int name_x = static_cast<int>(screen_h_width - name_w / 2);
+    const int name_x = screen_h_width - name_w / 2;
     name_dst_.x = static_cast<float>(name_x);
     name_dst_.y = static_cast<float>(y_position_);
     name_dst_.w = static_cast<float>(name_w);
@@ -69,7 +75,7 @@ public:
   }
 
   /** * Select the next / previous option values. */
-  virtual void select_option(int option) = 0;
+  virtual void select_opt_value(int option) = 0;
 
   /**
    * Render the OptionItem values.
@@ -136,31 +142,33 @@ public:
     TTF_Font* text_font,
     const std::string &name,
     const int y_position,
-    const std::initializer_list<std::string> options
+    const std::initializer_list<std::string> option_values
   )
   : OptionItem(renderer, text_font, name, y_position),
-    options_(options)
+    opt_values_(option_values)
   {
-    for (const auto& option : options_) {
-      opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, option));
+    for (const auto& opt_value : opt_values_) {
+      opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, opt_value));
       opt_select_textures_.emplace_back(
-        load_text_texture(renderer_, text_font_, option, {255, 0, 0})
+        load_text_texture(renderer_, text_font_, opt_value, {255, 0, 0})
       );
     }
   }
 
   /**
    * Add a new option value to the list
-   * @param option the option value to be added
+   * @param option_value the option value to be added
    */
-  void add_option(const std::string & option) {
-    options_.emplace_back(option);
-    opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, option));
-    opt_select_textures_.emplace_back(load_text_texture(renderer_, text_font_, option, {255, 0, 0}));
+  void add_option(const std::string & option_value) {
+    opt_values_.emplace_back(option_value);
+    opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, option_value));
+    opt_select_textures_.emplace_back(
+      load_text_texture(renderer_, text_font_, option_value, {255, 0, 0}))
+    ;
   }
 
-  void select_option(const int option) override {
-    selected_ = std::clamp(option, 0, static_cast<int>(options_.size() - 1));
+  void select_opt_value(const int opt_value) override {
+    selected_ = std::clamp(opt_value, 0, static_cast<int>(opt_values_.size() - 1));
   }
 
   void render_values() override {
@@ -168,18 +176,18 @@ public:
     constexpr int opt_h = 15;
     constexpr float scale_factor = opt_h / 40.f;
     // Text textures are scaled to opt_h (from 40 pixels of initial height)
-    size_t total_width = extra_space * (options_.size() - 1);
-    for (int i = 0; i < options_.size(); i++) {
+    int total_width = extra_space * static_cast<int>(opt_values_.size() - 1);
+    for (unsigned int i = 0; i < opt_values_.size(); i++) {
       const auto opt_w = static_cast<float>(opt_textures_[i]->w);
-      total_width += static_cast<size_t>(opt_w * scale_factor);
+      total_width += static_cast<int>(opt_w * scale_factor);
     }
 
-    // Start rendering here, and advance this cursor after rendering options
-    int cur_render_x = static_cast<int>(screen_h_width - total_width / 2);
+    // Start rendering here and advance this cursor after rendering options
+    int cur_render_x = screen_h_width - total_width / 2;
 
-    for (int i = 0; i < options_.size(); i++) {
+    for (unsigned int i = 0; i < opt_values_.size(); i++) {
       SDL_Texture* text_texture = nullptr;
-      if (i == selected_) {
+      if (static_cast<int>(i) == selected_) {
         // Render the red text for this option
         text_texture = opt_select_textures_[i].get();
       } else {
@@ -201,7 +209,7 @@ public:
   }
 
 private:
-  std::vector<std::string> options_;
+  std::vector<std::string> opt_values_;
   std::vector<SDL_Texture_ptr> opt_textures_;
   std::vector<SDL_Texture_ptr> opt_select_textures_;
 };
@@ -268,16 +276,16 @@ public:
     selection_ = selection;
   }
 
-  void select_speed_option(const SpeedOptionSelection selection) {
-    options_[OptionMenuSelection::Speed]->select_option(static_cast<int>(selection));
+  void select_speed(const SpeedOptionSelection selection) {
+    options_[OptionMenuSelection::Speed]->select_opt_value(static_cast<int>(selection));
   }
 
-  void select_points_option(const PointsOptionSelection selection) {
-    options_[OptionMenuSelection::Points]->select_option(static_cast<int>(selection));
+  void select_points(const PointsOptionSelection selection) {
+    options_[OptionMenuSelection::Points]->select_opt_value(static_cast<int>(selection));
   }
 
-  void select_music_option(const OnOffSelection selection) {
-    options_[OptionMenuSelection::Music]->select_option(static_cast<int>(selection));
+  void select_music(const OnOffSelection selection) {
+    options_[OptionMenuSelection::Music]->select_opt_value(static_cast<int>(selection));
   }
 
   /** Render the options text */

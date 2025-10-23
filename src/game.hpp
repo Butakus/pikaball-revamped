@@ -60,7 +60,7 @@ private:
   unsigned int target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
   // Speed for slow motion effect (fixed to 5 FPS)
   constexpr static unsigned int slow_motion_fps_ {5};
-  // Time in nanoseconds per frame. This variable will be changed when slow  motion is applied
+  // Time in nanoseconds per frame. This variable will be changed when slow motion is applied
   unsigned long target_time_per_frame_ {ns_per_second / target_fps_};
 
   // Game state
@@ -78,9 +78,9 @@ private:
 
   // VolleyGame state data
   VolleyGameState volley_state_ {VolleyGameState::NewGame};
-  unsigned int score_left_ {0};
-  unsigned int score_right_ {0};
-  unsigned int win_score = 15;
+  int score_left_ {0};
+  int score_right_ {0};
+  int win_score = 15;
 
   FieldSide next_serve_side_ {FieldSide::Left};
   // Slow Motion state. The Game object must manually check this to adjust the FPS

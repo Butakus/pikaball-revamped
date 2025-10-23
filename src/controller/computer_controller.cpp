@@ -22,7 +22,7 @@ void ComputerController::on_round_start(const PhysicsView &physics) {
  * @param ball The ball
  * @return The x coordinate of expected landing point
  */
-unsigned int estimate_ball_hit_landing(const PlayerInput& input, const Ball& ball) {
+int estimate_ball_hit_landing(const PlayerInput& input, const Ball& ball) {
   // First, estimate the velocity after the power hit.
   // This code is the same from the Ball physics
   // Base velocity is halved if no direction is pressed when power hitting
@@ -59,9 +59,9 @@ bool ComputerController::decide_input_power_hit(const PhysicsView& physics_view,
         .direction_y = static_cast<DirY>(flip_dir_y ? - dir_y : dir_y),
       };
       // With the test input, check where would the ball land
-      const unsigned int land_x = estimate_ball_hit_landing(check_input, physics_view.ball);
+      const int land_x = estimate_ball_hit_landing(check_input, physics_view.ball);
       // Distance between the other player and the ball's landing point
-      const int player_dist = static_cast<int>(land_x) - static_cast<int>(other_player_.x());
+      const int player_dist = land_x - other_player_.x();
       /* The player will power hit if these conditions are met:
        * 1. The ball will land on the other side
        * 2. The ball will not land on the other player's position
@@ -90,13 +90,13 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
     player_ = physics_view.player_left;
     other_player_ = physics_view.player_right;
   }
-  const unsigned int ball_land_x = ball_.expected_landing_x();
-  const unsigned int ball_distance_x =
-    std::abs(static_cast<int>(ball_.x()) - static_cast<int>(player_.x()));
-  const unsigned int ball_distance_y =
-    std::abs(static_cast<int>(ball_.y()) - static_cast<int>(player_.y()));
+  const int ball_land_x = ball_.expected_landing_x();
+  const int ball_distance_x =
+    std::abs(ball_.x() - player_.x());
+  const int ball_distance_y =
+    std::abs(ball_.y() - player_.y());
   // Target position for the player to move
-  unsigned int target_x = ball_land_x;
+  int target_x = ball_land_x;
 
   /* Try to stay in the middle of the side if these conditions are met:
    *  1. The idle position is set to the middle (value 0). This is set randomly.
@@ -113,7 +113,7 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
   }
 
   // If player is far from the target and is not bold enough... Go towards the target
-  const int target_x_dist = std::abs(static_cast<int>(target_x) - static_cast<int>(player_.x()));
+  const int target_x_dist = std::abs(target_x - player_.x());
   if (target_x_dist > boldness_ + 8) {
     if (player_.x() < target_x) {
       input.direction_x = DirX::Right;
@@ -151,14 +151,13 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
      * 4. Ball is close to the ground (lower than 174)
      * 5. Ball is going down
      */
-    const unsigned int ball_land_distance =
-      std::abs(static_cast<int>(ball_land_x) - static_cast<int>(player_.x()));
+    const int ball_land_distance = std::abs(ball_land_x - player_.x());
     if (ball_land_x > left_bound_ && ball_land_x < right_bound_ &&
         ball_.x() > left_bound_ && ball_.x() < right_bound_ &&
         ball_land_distance > boldness_ * 5 + player_size &&
         ball_.y() > 174 && ball_.velocity_y() > 0) {
       input.power_hit = true;
-      // Deviation from OG game: This should be the landing x.
+      // NOTE: Deviation from OG game - This should be the landing x.
       // if (player_.x() < ball_.x()) {
       if (player_.x() < ball_land_x) {
         input.direction_x = DirX::Right;
@@ -170,9 +169,9 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
   }
   else if (player_.state() == PlayerState::Jumping || player_.state() == PlayerState::PowerHit) {
     // If the player is jumping or power hitting...
-    // Deviation from OG game: Increase ball distance from 8 to 16 to approach
-    // if (ball_distance_x > 8) {
-    if (ball_distance_x > 16) {
+    // NOTE: Possible deviation from OG game: Increase ball distance from 8 to 16 to approach
+    if (ball_distance_x > 8) {
+    // if (ball_distance_x > 16) {
       // If the ball is far, move towards it
       if (player_.x() < ball_.x()) {
         input.direction_x = DirX::Right;
@@ -184,8 +183,7 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
       // If the ball is close, we can power hit. Check it and update input direction.
       if (decide_input_power_hit(physics_view, input)) {
         input.power_hit = true;
-        const int player_dist =
-          std::abs(static_cast<int>(other_player_.x()) - static_cast<int>(player_.x()));
+        const int player_dist = std::abs(other_player_.x() - player_.x());
         if (player_dist < 80 && input.direction_y != DirY::Up) {
           // If the other player is too close, send the ball up to avoid blocking
           input.direction_y = DirY::Up;

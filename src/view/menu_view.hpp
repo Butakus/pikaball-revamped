@@ -136,7 +136,7 @@ private:
     constexpr int sprite_width = static_cast<int>(sprite::msg_fight.w);
     constexpr int sprite_height = static_cast<int>(sprite::msg_fight.h);
 
-    // The sprite grows for the first 30 frames, then it resizes based on the
+    // The sprite grows for the first 30 frames, then it resizes based on the frame counter
     const int size = frame_counter < 30 ? static_cast<int>(frame_counter)
                                         : fight_msg_sizes[(frame_counter + 1) % 9];
     const int h_width = size * sprite_width / 30 / 2;

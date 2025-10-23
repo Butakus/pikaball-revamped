@@ -88,8 +88,8 @@ public:
 
 private:
   // Ball coordinates and velocities
-  unsigned int x_ {56};  // 0x30, initialized to 56 (left) or 376 (right)
-  unsigned int y_ {0};   // 0x34
+  int x_ {56};  // 0x30, initialized to 56 (left) or 376 (right)
+  int y_ {0};   // 0x34
   int velocity_x_ {0};   // 0x38
   // y velocity is positive when going down (gravity)
   int velocity_y_ {1};   // 0x3C
@@ -98,16 +98,16 @@ private:
    * During the period where it continues to be 5, hyper ball glitch occur.
    * Possible values: 0, 1, 2, 3, 4 or 5
    */
-  unsigned int rotation_ {0};             // 0x44
-  unsigned int fine_rotation_ {0};        // 0x48
+  int rotation_ {0};             // 0x44
+  int fine_rotation_ {0};        // 0x48
   // Coordinates and size of the punch effect
-  unsigned int punch_effect_x_ {0};       // 0x50
-  unsigned int punch_effect_y_ {0};       // 0x54
+  int punch_effect_x_ {0};       // 0x50
+  int punch_effect_y_ {0};       // 0x54
   // Previous ball coordinates for trailing effect for power hit
   std::array<int, 2> trailing_x_ {0};  // 0x58, 0x5C
   std::array<int, 2> trailing_y_ {0};  // 0x60, 0x64
-  unsigned int punch_effect_radius_ {0};  // 0x4C
-  unsigned int expected_landing_x_ {0};   // 0x40
+  int punch_effect_radius_ {0};  // 0x4C
+  int expected_landing_x_ {0};   // 0x40
   bool power_hit_ {false};                // 0x68
 
   // Current sound state for the ball

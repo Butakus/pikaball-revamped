@@ -46,9 +46,9 @@ Game::Game() {
   );
   // Initialize default option values
   options_view_->select_option(option_menu_select_);
-  options_view_->select_speed_option(speed_opt_select_);
-  options_view_->select_points_option(points_opt_select_);
-  options_view_->select_music_option(music_opt_select_);
+  options_view_->select_speed(speed_opt_select_);
+  options_view_->select_points(points_opt_select_);
+  options_view_->select_music(music_opt_select_);
 
   // By default, both players are controlled by the keyboard
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
@@ -415,9 +415,9 @@ void Game::menu_options_state() {
   }
 
   options_view_->select_option(option_menu_select_);
-  options_view_->select_speed_option(speed_opt_select_);
-  options_view_->select_points_option(points_opt_select_);
-  options_view_->select_music_option(music_opt_select_);
+  options_view_->select_speed(speed_opt_select_);
+  options_view_->select_points(points_opt_select_);
+  options_view_->select_music(music_opt_select_);
 
   options_view_->render();
 }

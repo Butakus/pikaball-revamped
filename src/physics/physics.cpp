@@ -21,7 +21,7 @@ void Physics::restart() {
 
 bool Physics::update(const PlayerInput& input_left,
                      const PlayerInput& input_right) {
-  // Update ball position and calculate estimated landing point
+  // Update ball position and calculate the estimated landing point
   const bool ball_touching_ground = ball_.update();
   ball_.calculate_landing_point();
 

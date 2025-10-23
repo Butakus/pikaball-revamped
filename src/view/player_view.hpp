@@ -48,8 +48,8 @@ public:
       }
     }
 
-    const int x = static_cast<int>(player.x() - player_width / 2);
-    const int y = static_cast<int>(player.y() - player_height / 2);
+    const int x = player.x() - player_width / 2;
+    const int y = player.y() - player_height / 2;
     const SDL_FRect player_dst {
       .x = static_cast<float>(x),
       .y = static_cast<float>(y),

@@ -218,7 +218,7 @@ public:
    * @param left Score for left player
    * @param right Score for right player
    */
-  void set_score(const unsigned int left, const unsigned int right) {
+  void set_score(const int left, const int right) {
     score_left_ = left;
     score_right_ = right;
   }
@@ -226,8 +226,8 @@ public:
 private:
   VolleyGameState volley_game_state_ {VolleyGameState::NewGame};
 
-  unsigned int score_left_ {0};
-  unsigned int score_right_ {0};
+  int score_left_ {0};
+  int score_right_ {0};
 
   // View objects
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
@@ -402,23 +402,19 @@ private:
     };
 
     // Draw left score
-    const unsigned int units_left = score_left_ % 10;
-    SDL_RenderTexture(
-      renderer_, sprite_sheet_, &sprite::numbers[units_left], &dst_left_units);
+    const int units_left = score_left_ % 10;
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::numbers[units_left], &dst_left_units);
     if (score_left_ >= 10) {
-      const unsigned int tens_left = score_left_ / 10 % 10;
-      SDL_RenderTexture(
-        renderer_, sprite_sheet_, &sprite::numbers[tens_left], &dst_left_tens);
+      const int tens_left = score_left_ / 10 % 10;
+      SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::numbers[tens_left], &dst_left_tens);
     }
 
     // Draw right score
-    const unsigned int units_right = score_right_ % 10;
-    SDL_RenderTexture(
-      renderer_, sprite_sheet_, &sprite::numbers[units_right], &dst_right_units);
+    const int units_right = score_right_ % 10;
+    SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::numbers[units_right], &dst_right_units);
     if (score_right_ >= 10) {
-      const unsigned int tens_right = score_right_ / 10 % 10;
-      SDL_RenderTexture(
-        renderer_, sprite_sheet_, &sprite::numbers[tens_right], &dst_right_tens);
+      const int tens_right = score_right_ / 10 % 10;
+      SDL_RenderTexture(renderer_, sprite_sheet_, &sprite::numbers[tens_right], &dst_right_tens);
     }
   }
 

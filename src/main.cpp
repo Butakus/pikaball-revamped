@@ -4,13 +4,14 @@
 
 #include "game.hpp"
 
-// int main(int argc, char **argv) {
-//     pika::Game game;
-//     game.run();
-//     return 0;
-// }
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
+    // Setup logger verbosity
+    #ifdef PIKA_DEBUG
+    SDL_SetLogPriorities(SDL_LOG_PRIORITY_DEBUG);
+    #else
+    SDL_SetLogPriorities(SDL_LOG_PRIORITY_WARN);
+    #endif
     // Create a Game object that will be passed back to each callback:
     *appstate = new pika::Game;
     return SDL_APP_CONTINUE;
@@ -30,7 +31,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     return SDL_APP_CONTINUE;
 }
 
-// ReSharper disable once CppParameterMayBeConstPtrOrRef
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
     if(event) {

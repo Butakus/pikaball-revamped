@@ -31,12 +31,12 @@ bool Ball::update() {
   // But it is proper to process here.
   trailing_x_[1] = trailing_x_[0];
   trailing_y_[1] = trailing_y_[0];
-  trailing_x_[0] = static_cast<int>(x_);
-  trailing_y_[0] = static_cast<int>(y_);
+  trailing_x_[0] = x_;
+  trailing_y_[0] = y_;
   // Update ball radius effect (it will decrease with every update call
   decrease_punch_effect_radius();
 
-  int next_fine_rotation = static_cast<int>(fine_rotation_) + velocity_x_ / 2;
+  int next_fine_rotation = fine_rotation_ + velocity_x_ / 2;
   // If next_fine_rotation === 50, it skips next if statement finely.
   // Then fine_rotation_ = 50, and then rotation_ = 5 (which designates hyper ball sprite!).
   // In this way, hyper ball glitch occur!
@@ -56,7 +56,7 @@ bool Ball::update() {
 }
 
 bool Ball::update_position() {
-  const unsigned int next_x = x_ + velocity_x_;
+  const int next_x = x_ + velocity_x_;
   /*
     If the center of ball would get out of left world bound or right world bound, bounce back.
 
@@ -73,7 +73,7 @@ bool Ball::update_position() {
     velocity_x_ = - velocity_x_;
   }
 
-  int next_y = static_cast<int>(y_) + velocity_y_;
+  int next_y = y_ + velocity_y_;
   // Check if the ball touches the ceiling
   if (next_y < 0) {
     velocity_y_ = 1;
@@ -101,7 +101,7 @@ bool Ball::update_position() {
     }
   }
 
-  next_y = static_cast<int>(y_) + velocity_y_;
+  next_y = y_ + velocity_y_;
   // Check if the ball touches the ground
   bool ground_hit = false;
   if (next_y > ball_ground_y) {
@@ -133,8 +133,8 @@ bool Ball::update_position() {
 }
 
 bool Ball::collision_with_player(const Player& player) const {
-  const int diff_x = static_cast<int>(x_) - static_cast<int>(player.x());
-  const int diff_y = static_cast<int>(y_) - static_cast<int>(player.y());
+  const int diff_x = x_ - player.x();
+  const int diff_y = y_ - player.y();
   return std::abs(diff_x) <= player_h_size && std::abs(diff_y) <= player_h_size;
 }
 
@@ -163,7 +163,6 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
     velocity_y_ = 2 * std::abs(velocity_y_) * static_cast<int>(input.direction_y);
     punch_effect_radius_ = ball_radius;
 
-    // TODO: Sound
     // maybe-stereo-sound function FUN_00408470 (0x90) omitted:
     // refer to a detailed comment above about this function
     // maybe-soundcode function (ballpointer + 0x24 + 0x10) omitted:
@@ -177,7 +176,7 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
   else {
     // Player is on the ground and ball hits the player
     // The x velocity depends on the distance to the center of the player
-    const int diff_x = static_cast<int>(x_) - static_cast<int>(player.x());
+    const int diff_x = x_ - player.x();
     const int abs_distance = std::abs(diff_x);
     if (x_ < player.x()) {
       velocity_x_ = - (abs_distance / 3);

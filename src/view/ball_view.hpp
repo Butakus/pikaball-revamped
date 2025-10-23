@@ -21,8 +21,8 @@ public:
   void draw_ball(const Ball& ball) const {
     constexpr int ball_width = static_cast<int>(sprite::ball_hyper.w);
     constexpr int ball_height = static_cast<int>(sprite::ball_hyper.h);
-    const int x = static_cast<int>(ball.x()) - ball_width / 2;
-    const int y = static_cast<int>(ball.y()) - ball_height / 2;
+    const int x = ball.x() - ball_width / 2;
+    const int y = ball.y() - ball_height / 2;
 
     // Get the current animation frame
     SDL_FRect src_rect = sprite::ball_hyper;
@@ -41,9 +41,9 @@ public:
 
     // For punch effect, refer to FUN_00402ee0
     if (ball.punch_effect_radius() > 0) {
-      const int punch_h_size = static_cast<int>(ball.punch_effect_radius());
-      const int px = static_cast<int>(ball.punch_effect_x()) - punch_h_size;
-      const int py = static_cast<int>(ball.punch_effect_y()) - punch_h_size;
+      const int punch_h_size = ball.punch_effect_radius();
+      const int px = ball.punch_effect_x() - punch_h_size;
+      const int py = ball.punch_effect_y() - punch_h_size;
       const SDL_FRect punch_dst {
         .x = static_cast<float>(px),
         .y = static_cast<float>(py),

@@ -80,13 +80,13 @@ public:
 
 private:
   // Player coordinates
-  unsigned int x_ {36};               // 0xA8, initialized to 36 (left) or 396 (right)
-  unsigned int y_ {player_ground_y};  // 0xAC
+  int x_ {36};               // 0xA8, initialized to 36 (left) or 396 (right)
+  int y_ {player_ground_y};  // 0xAC
   // y velocity is positive when going down (gravity)
   int velocity_y_ {0};                // 0xB0
 
   // Current animation frame number
-  unsigned int anim_frame_number_ {0};  // 0xC4
+  int anim_frame_number_ {0};  // 0xC4
   // Arm swinging direction in the normal mode animation
   int anim_arm_direction_ {1};  // 0xC8
   // Delay before switching to the next frame in the animation sequence.
