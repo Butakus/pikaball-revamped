@@ -179,7 +179,7 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
         input.direction_x = DirX::Left;
       }
     }
-    if (ball_distance_x < 48 && ball_distance_y < 48) {
+    if (ball_distance_x < 48 && ball_distance_y < 64) {
       // If the ball is close, we can power hit. Check it and update input direction.
       if (decide_input_power_hit(physics_view, input)) {
         input.power_hit = true;
