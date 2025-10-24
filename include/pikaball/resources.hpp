@@ -7,7 +7,7 @@
 namespace pika {
 
 // Game assets: Filenames are also used as resource keys
-static constexpr char sprite_sheet_filename [] = "assets/images/sprite_sheet_new.png";
+static constexpr char sprite_sheet_filename [] = "assets/images/sprite_sheet.png";
 static constexpr char music_background_filename [] = "assets/sounds/bgm.mp3";
 static constexpr char sound_pi_filename [] = "assets/sounds/pi.wav";
 static constexpr char sound_pika_filename [] = "assets/sounds/pika.wav";
@@ -24,7 +24,7 @@ namespace embed {
 
 static const std::array<pika::b::EmbedInternal::EmbeddedFile, 10> resource_list {
   {
-    { pika::b::embed<"assets/images/sprite_sheet_new.png">() },
+    { pika::b::embed<"assets/images/sprite_sheet.png">() },
     { pika::b::embed<"assets/sounds/bgm.mp3">() },
     { pika::b::embed<"assets/sounds/pi.wav">() },
     { pika::b::embed<"assets/sounds/pika.wav">() },

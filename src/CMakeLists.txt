@@ -12,7 +12,7 @@ add_subdirectory(controller)
 add_executable(${PROJECT_NAME} WIN32)
 
 target_link_options(${PROJECT_NAME} PRIVATE
-    $<$<BOOL:${WIN32}>:-static>
+    $<$<PLATFORM_ID:Windows>:-static>
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -42,7 +42,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 # Embed resources into binary using custom version of battery::embed
 include(${CMAKE_SOURCE_DIR}/cmake/pika_embed.cmake)
 pika_embed(${PROJECT_NAME}
-    ${CMAKE_SOURCE_DIR}/assets/images/sprite_sheet_new.png
+    ${CMAKE_SOURCE_DIR}/assets/images/sprite_sheet.png
     ${CMAKE_SOURCE_DIR}/assets/sounds/bgm.mp3
     ${CMAKE_SOURCE_DIR}/assets/sounds/pi.wav
     ${CMAKE_SOURCE_DIR}/assets/sounds/pika.wav
