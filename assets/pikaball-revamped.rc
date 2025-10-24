@@ -1,8 +1,8 @@
 IDI_APPICON ICON "images/IDI_PIKAICON.ico"
 
 1 VERSIONINFO
- FILEVERSION 0,1,0,0
- PRODUCTVERSION 0,1,0,0
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEOS 0x4L
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
@@ -13,9 +13,9 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "2009 \xCFnertinc co."
             VALUE "FileDescription", "Pikachu Volley Revamped"
-            VALUE "FileVersion", "0.1.0"
+            VALUE "FileVersion", "1.0.0"
             VALUE "ProductName", "Pikachu Volley Edici\xF3n Especial MurciaLanParty - Revamped"
-            VALUE "ProductVersion", "0.1.0"
+            VALUE "ProductVersion", "1.0.0"
             VALUE "OriginalFilename", "pikaball_revamped.exe"
             VALUE "LegalCopyright", "2009 MurciaLanParty / 2025 Butakus"
             VALUE "Comments", "Pikachu Volley MurciaLanParty - Revamped"

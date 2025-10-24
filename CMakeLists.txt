@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(pikaball_revamped)
+project(pikaball_revamped VERSION 1.0.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
