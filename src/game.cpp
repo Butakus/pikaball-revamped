@@ -44,6 +44,11 @@ Game::Game() {
     sdl_sys_.get_sprite_sheet(),
     sdl_sys_.get_font()
   );
+  fps_view_ = std::make_unique<view::FPSView>(
+    sdl_sys_.get_renderer(),
+    sdl_sys_.get_sprite_sheet(),
+    sdl_sys_.get_font()
+  );
   // Initialize default option values
   options_view_->select_option(option_menu_select_);
   options_view_->select_speed(speed_opt_select_);
@@ -53,6 +58,9 @@ Game::Game() {
   // By default, both players are controlled by the keyboard
   controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
   controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
+
+  // Initialize frame time and FPS
+  last_frame_timestamp_ = SDL_GetTicksNS();
 }
 
 void Game::step() {
@@ -82,8 +90,12 @@ void Game::step() {
     target_time_per_frame_ = ns_per_second / fps;
     break;
   }
-  // Always enter the menu state. If the game is not paused it will return immediately.
+
+  // Always enter the menu state. If the game is not paused, it will return immediately.
   menu_options_state();
+
+  // Estimate and display FPS
+  display_fps();
 
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
@@ -506,6 +518,18 @@ void Game::volley_state() {
       physics_->update(input_left_, input_right_);
     break;
   }
+}
+
+void Game::display_fps() {
+  // First, estimate the current FPS
+  const unsigned long cur_frame_timestamp = SDL_GetTicksNS();
+  const unsigned long frame_time = cur_frame_timestamp - last_frame_timestamp_;
+  current_fps_ = 1000000000.0f / static_cast<float>(frame_time);
+  last_frame_timestamp_ = cur_frame_timestamp;
+  // SDL_Log("FPS: %.1f", current_fps_);
+
+  // TODO: Bind to a key and check if FPS should be displayed
+  fps_view_->render(current_fps_);
 }
 
 FieldSide Game::update_score() {

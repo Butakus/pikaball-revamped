@@ -7,6 +7,7 @@
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
 #include "view/options_view.hpp"
+#include "view/fps_view.hpp"
 #include "sdl_system.hpp"
 
 #include <pikaball/controller/player_controller.hpp>
@@ -55,6 +56,7 @@ private:
   std::unique_ptr<view::MenuView> menu_view_ {nullptr};
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
   std::unique_ptr<view::OptionsView> options_view_ {nullptr};
+  std::unique_ptr<view::FPSView> fps_view_ {nullptr};
 
   // Frame rate management
   unsigned int target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
@@ -62,6 +64,10 @@ private:
   constexpr static unsigned int slow_motion_fps_ {5};
   // Time in nanoseconds per frame. This variable will be changed when slow motion is applied
   unsigned long target_time_per_frame_ {ns_per_second / target_fps_};
+  // Timestamp in nanoseconds of the last frame (to compute FPS)
+  unsigned long last_frame_timestamp_ {0};
+  // FPS estimation
+  float current_fps_ {0.0};
 
   // Game state
   bool running_ {false};
@@ -121,6 +127,8 @@ private:
   void menu_options_state();
   /** Control the game's logic for the VolleyGame state */
   void volley_state();
+  /** Display the FPS */
+  void display_fps();
 
   /** Update the score based on the position of the ball punch effect.
    *
