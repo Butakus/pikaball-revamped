@@ -72,6 +72,7 @@ private:
   // Game state
   bool running_ {false};
   bool pause_ {false};
+  bool enable_fps_ {false};  // Flag to display FPS
   unsigned int frame_counter_ {0};
   GameState state_ {GameState::Intro};
   // Menu state data

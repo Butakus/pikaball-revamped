@@ -23,17 +23,17 @@ constexpr static SDL_FRect background_dst {
 // FPS value (digits) position
 constexpr static SDL_FRect fps_dst {
   .x = background_dst.x + 2,
-  .y = background_dst.y + 2,
+  .y = background_dst.y,
   .w = 32,
-  .h = background_dst.h - 2,
+  .h = background_dst.h,
 };
 
 // FPS letters ("FPS") position
 constexpr static SDL_FRect fps_txt_dst {
   .x = fps_dst.x + fps_dst.w + 3,
-  .y = background_dst.y + 2,
+  .y = background_dst.y,
   .w = 22,
-  .h = background_dst.h - 2,
+  .h = background_dst.h,
 };
 
 public:

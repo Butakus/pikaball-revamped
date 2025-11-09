@@ -28,6 +28,9 @@ constexpr int p2_right = SDL_SCANCODE_RIGHT;
 constexpr int p2_up = SDL_SCANCODE_UP;
 constexpr int p2_down = SDL_SCANCODE_DOWN;
 
+constexpr int menu_toggle = SDL_SCANCODE_ESCAPE;
+constexpr int fps_toggle = SDL_SCANCODE_F3;
+
 } // namespace pika::keys
 
 
@@ -155,8 +158,17 @@ void Game::compile_events() {
       // Redundant check. Left in case more event types are added in the future (e.g. joystick)
       if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat) {
         switch (event.key.scancode) {
-        case keys::p1_hit:
-        case keys::p1_hit_alt:
+          case keys::menu_toggle:
+            // When ESC is pressed, the game is paused / unpaused
+            if (state_ != GameState::Intro) {
+              pause_ = !pause_;
+            }
+            break;
+          case keys::fps_toggle:
+            enable_fps_ = !enable_fps_;
+            break;
+          case keys::p1_hit:
+          case keys::p1_hit_alt:
             player_input_left.power_hit = true;
             menu_input_.enter_left = true;
             break;
@@ -164,12 +176,6 @@ void Game::compile_events() {
           case keys::p2_hit_alt:
           player_input_right.power_hit = true;
             menu_input_.enter_right = true;
-            break;
-          case SDL_SCANCODE_ESCAPE:
-            // When ESC is pressed, the game is paused / unpaused
-            if (state_ != GameState::Intro) {
-              pause_ = !pause_;
-            }
             break;
           case keys::p1_up:
           case keys::p2_up:
@@ -187,7 +193,7 @@ void Game::compile_events() {
           case keys::p2_right:
             menu_input_.right = true;
             break;
-        default:
+          default:
             break;
         }
       }
@@ -528,8 +534,10 @@ void Game::display_fps() {
   last_frame_timestamp_ = cur_frame_timestamp;
   // SDL_Log("FPS: %.1f", current_fps_);
 
-  // TODO: Bind to a key and check if FPS should be displayed
-  fps_view_->render(current_fps_);
+  // Only display if enabled
+  if (enable_fps_) {
+    fps_view_->render(current_fps_);
+  }
 }
 
 FieldSide Game::update_score() {

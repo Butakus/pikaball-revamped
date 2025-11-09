@@ -48,10 +48,6 @@ You can launch the game by clicking on the icon, or by running this in the termi
 
 ## Controls
 
-The game follows the same controls as the original game, with two small differences:
-- The **Esc** key pauses the game and opens a menu to change the game options (speed, points, and music).
-- The left player (P1) can use the keys **Z** or **Space Bar** as the hit button (originally only **Z**).
-
 **Left player controls:**
 - Movement: **RDFG** keys
 - Hit: **Z** or **Space Bar**
@@ -60,7 +56,12 @@ The game follows the same controls as the original game, with two small differen
 - Movement: Arrow keys
 - Hit: **Enter** or **Numpad Enter**
 
-Joystick support is planned for a future version.
+**Other:**
+- Both left and right player controls can be used to navigate the menus.
+- The **Esc** key pauses the game and opens a menu to change the game options (speed, points, and music).
+- The **F3** key toggles a small panel that displays current FPS.
+
+*Joystick support is planned for a future version*.
 
 ## Build
 If you want to build the game yourself, follow the instructions below.
