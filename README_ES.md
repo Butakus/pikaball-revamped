@@ -1,4 +1,8 @@
 # Pikachu Volley - Revamped Edition
+[English](./README.md) | **Español (Spanish)**
+
+---
+
 Una reimplementación moderna en C++ del clásico juego *Pikachu Volleyball* usando SDL3.
 
 Este es el sucesor espiritual del "Pikachu Volley - Murcia LAN Party special edition".
@@ -73,7 +77,7 @@ flatpak run io.github.butakus.pikaball
 
 ## Compilación (Build)
 
-Si deseas compilar el juego desde fuente, sigue las instrucciones que aparecen a continuación.
+Si quieres compilar el juego desde fuente, sigue las instrucciones que aparecen a continuación.
 
 El proyecto utiliza *presets* de CMake para facilitar la configuración y compilación en diferentes plataformas.
 Todas las dependencias (SDL3, SDL3_mixer, etc.) están incluidas (*vendored*) y se compilarán automáticamente.

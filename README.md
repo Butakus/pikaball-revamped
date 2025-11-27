@@ -1,4 +1,8 @@
 # Pikachu Volley - Revamped Edition
+**English** | [Español (Spanish)](./README_ES.md)
+
+---
+
 A modern C++ reimplementation of the classic Pikachu Volleyball game using SDL3.
 
 This is the spiritual successor of the "Pikachu Volley - Murcia LAN Party special edition".
