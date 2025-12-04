@@ -16,13 +16,14 @@ static constexpr char sound_pikachu_filename [] = "assets/sounds/pikachu.wav";
 static constexpr char sound_pipikachu_filename [] = "assets/sounds/pipikachu.wav";
 static constexpr char sound_ball_hit_filename [] = "assets/sounds/ball_hit.wav";
 static constexpr char sound_ball_ground_filename [] = "assets/sounds/ball_ground.wav";
+static constexpr char sound_trex_filename [] = "assets/sounds/trex.ogg";
 static constexpr char text_font_filename [] = "assets/font.ttf";
 
 static constexpr unsigned int text_font_size = 45;
 
 namespace embed {
 
-static const std::array<pika::b::EmbedInternal::EmbeddedFile, 10> resource_list {
+static const std::array<pika::b::EmbedInternal::EmbeddedFile, 11> resource_list {
   {
     { pika::b::embed<"assets/images/sprite_sheet.png">() },
     { pika::b::embed<"assets/sounds/bgm.mp3">() },
@@ -33,6 +34,7 @@ static const std::array<pika::b::EmbedInternal::EmbeddedFile, 10> resource_list 
     { pika::b::embed<"assets/sounds/pipikachu.wav">() },
     { pika::b::embed<"assets/sounds/ball_hit.wav">() },
     { pika::b::embed<"assets/sounds/ball_ground.wav">() },
+    { pika::b::embed<"assets/sounds/trex.ogg">() },
     { pika::b::embed<"assets/font.ttf">() },
   }
 };

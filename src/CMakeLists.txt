@@ -51,6 +51,7 @@ pika_embed(${PROJECT_NAME}
     ${CMAKE_SOURCE_DIR}/assets/sounds/pipikachu.wav
     ${CMAKE_SOURCE_DIR}/assets/sounds/ball_hit.wav
     ${CMAKE_SOURCE_DIR}/assets/sounds/ball_ground.wav
+    ${CMAKE_SOURCE_DIR}/assets/sounds/trex.ogg
     ${CMAKE_SOURCE_DIR}/assets/font.ttf
 )
 

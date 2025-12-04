@@ -282,6 +282,12 @@ void Game::special_intro_state() {
   // Render the view and update frame counter
   special_intro_view_->render(frame_counter_);
   frame_counter_++;
+
+  // Check if it's time to play the trex
+  if (frame_counter_ == 30) {
+    sdl_sys_.get_sound()->trex();
+  }
+
   // Check if the state must change
   if (frame_counter_ >= view::SpecialIntroView::max_frames || menu_input_.enter) {
     // Setup stuff for next state

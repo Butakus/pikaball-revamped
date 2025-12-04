@@ -60,6 +60,7 @@ public:
     sound_pipikachu_ = load_audio(sound_pipikachu_filename);
     sound_ball_hit_ = load_audio(sound_ball_hit_filename);
     sound_ball_ground_ = load_audio(sound_ball_ground_filename);
+    sound_trex_ = load_audio(sound_trex_filename);
     music_background_ = load_audio(music_background_filename);
 
     // Initialize tracks
@@ -158,6 +159,11 @@ public:
     MIX_PlayTrack(ball_track_, {});
   }
 
+  /** Play the special trex sound */
+  void trex() const {
+    MIX_SetTrackAudio(general_track_, sound_trex_);
+    MIX_PlayTrack(general_track_, {});
+  }
   void start_music() const {
     const SDL_PropertiesID play_properties = SDL_CreateProperties();
     SDL_SetNumberProperty(play_properties, MIX_PROP_PLAY_LOOPS_NUMBER, -1);
@@ -198,6 +204,7 @@ private:
   MIX_Audio* sound_pipikachu_ {nullptr};
   MIX_Audio* sound_ball_hit_ {nullptr};
   MIX_Audio* sound_ball_ground_ {nullptr};
+  MIX_Audio* sound_trex_ {nullptr};
   MIX_Audio* music_background_ {nullptr};
 
   [[nodiscard]] MIX_Audio* load_audio(const char* filename) const {

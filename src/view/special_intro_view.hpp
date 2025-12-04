@@ -12,7 +12,7 @@ class SpecialIntroView final : public View {
 
 public:
 // Total number of frames to render the intro
-constexpr static unsigned int max_frames = 300;
+constexpr static unsigned int max_frames = 175;
 
 private:
 // Fixed sprite positions
