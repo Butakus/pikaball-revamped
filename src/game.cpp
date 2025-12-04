@@ -38,6 +38,8 @@ Game::Game() {
   physics_ = std::make_unique<Physics>(),
   intro_view_ = std::make_unique<view::IntroView>(
     sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
+  special_intro_view_ = std::make_unique<view::SpecialIntroView>(
+    sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
   menu_view_ = std::make_unique<view::MenuView>(
     sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
   volley_view_ = std::make_unique<view::VolleyView>(
@@ -73,6 +75,9 @@ void Game::step() {
   switch (state_) {
   case GameState::Intro:
     intro_state();
+    break;
+  case GameState::SpecialIntro:
+    special_intro_state();
     break;
   case GameState::Menu:
     menu_state();
@@ -266,6 +271,19 @@ void Game::intro_state() {
   frame_counter_++;
   // Check if the state must change
   if (frame_counter_ >= view::IntroView::max_frames || menu_input_.enter) {
+    // Setup stuff for next state
+    state_ = GameState::SpecialIntro;
+    frame_counter_ = 0;
+    special_intro_view_->start();
+  }
+}
+
+void Game::special_intro_state() {
+  // Render the view and update frame counter
+  special_intro_view_->render(frame_counter_);
+  frame_counter_++;
+  // Check if the state must change
+  if (frame_counter_ >= view::SpecialIntroView::max_frames || menu_input_.enter) {
     // Setup stuff for next state
     state_ = GameState::Menu;
     menu_state_ = MenuState::Menu;

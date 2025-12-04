@@ -6,6 +6,7 @@ namespace pika {
 /** Main game (outer) states */
 enum class GameState {
   Intro,
+  SpecialIntro,
   Menu,
   VolleyGame,
 };

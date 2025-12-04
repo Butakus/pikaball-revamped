@@ -595,6 +595,20 @@ constexpr SDL_FRect msg_sachisoft {
   .h = 110
 };
 
+constexpr SDL_FRect msg_special_mlp {
+  .x = 188,
+  .y = 851,
+  .w = 256,
+  .h = 106
+};
+
+constexpr SDL_FRect msg_special_dino {
+  .x = 2,
+  .y = 851,
+  .w = 184,
+  .h = 178
+};
+
 // Fight!! message, or "MLP POWAH!!"
 constexpr SDL_FRect msg_fight {
   .x = 182,

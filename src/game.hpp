@@ -4,6 +4,7 @@
 #include "pikaball/game_state.hpp"
 #include "pikaball/input.hpp"
 #include "view/intro_view.hpp"
+#include "view/special_intro_view.hpp"
 #include "view/menu_view.hpp"
 #include "view/volley_view.hpp"
 #include "view/options_view.hpp"
@@ -53,6 +54,7 @@ private:
 
   // Views
   std::unique_ptr<view::IntroView> intro_view_ {nullptr};
+  std::unique_ptr<view::SpecialIntroView> special_intro_view_ {nullptr};
   std::unique_ptr<view::MenuView> menu_view_ {nullptr};
   std::unique_ptr<view::VolleyView> volley_view_ {nullptr};
   std::unique_ptr<view::OptionsView> options_view_ {nullptr};
@@ -122,6 +124,8 @@ private:
   void reset_volley_game_state();
   /** Control the game's logic for the Intro state */
   void intro_state();
+  /** Control the game's logic for the Special Intro state */
+  void special_intro_state();
   /** Control the game's logic for the main Menu state */
   void menu_state();
   /** Control the game's logic for the Options Menu state */
