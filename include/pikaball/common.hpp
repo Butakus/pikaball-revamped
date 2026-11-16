@@ -1,6 +1,8 @@
 #ifndef PIKA_COMMON_HPP
 #define PIKA_COMMON_HPP
 
+#include <cstdint>
+
 namespace pika {
 
 // Screen dimensions
@@ -11,7 +13,7 @@ static constexpr int screen_h_width = screen_width / 2;
 static constexpr int screen_h_height = screen_height / 2;
 static constexpr char window_name [] = "PikaBall MLP Revamped";
 
-static constexpr unsigned long ns_per_second = 1000000000;
+static constexpr std::uint64_t ns_per_second = 1000000000;
 
 
 // Options menu strings

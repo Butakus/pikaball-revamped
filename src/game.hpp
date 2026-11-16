@@ -46,7 +46,7 @@ public:
    */
   void handle_event(const SDL_Event * event);
 
-  [[nodiscard]] unsigned long get_frame_time() const {return target_time_per_frame_;}
+  [[nodiscard]] std::uint64_t get_frame_duration() const {return target_frame_duration_;}
 private:
   SDLSystem sdl_sys_;
 
@@ -64,10 +64,10 @@ private:
   unsigned int target_fps_ {25}; // Possible speeds are 20 / 25 / 30 fps
   // Speed for slow motion effect (fixed to 5 FPS)
   constexpr static unsigned int slow_motion_fps_ {5};
-  // Time in nanoseconds per frame. This variable will be changed when slow motion is applied
-  unsigned long target_time_per_frame_ {ns_per_second / target_fps_};
+  // Duration of a frame in nanoseconds. This variable will be changed when slow motion is applied
+  std::uint64_t target_frame_duration_ {ns_per_second / target_fps_};
   // Timestamp in nanoseconds of the last frame (to compute FPS)
-  unsigned long last_frame_timestamp_ {0};
+  std::uint64_t last_frame_timestamp_ {0};
   // FPS estimation
   float current_fps_ {0.0};
 

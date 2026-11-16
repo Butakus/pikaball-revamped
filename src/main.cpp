@@ -2,6 +2,8 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_init.h>
 
+#include <cstdint>
+
 #include "game.hpp"
 
 
@@ -18,15 +20,17 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
 }
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    const unsigned long start_time = SDL_GetTicksNS();
+    const std::uint64_t start_time = SDL_GetTicksNS();
     pika::Game& game = *static_cast<pika::Game *>(appstate);
     // Execute game update step and draw
     game.step();
-    const unsigned long end_time = SDL_GetTicksNS();
+    const std::uint64_t elapsed = SDL_GetTicksNS() - start_time;
 
-    const unsigned long sleep_time = game.get_frame_time() - (end_time - start_time);
-    if (sleep_time > 0) {
-        SDL_DelayPrecise(sleep_time);
+    // Sleep for the rest of the frame.
+    // Skip the sleep if the frame took longer than its duration.
+    const std::uint64_t frame_duration = game.get_frame_duration();
+    if (elapsed < frame_duration) {
+        SDL_DelayPrecise(frame_duration - elapsed);
     }
     return SDL_APP_CONTINUE;
 }

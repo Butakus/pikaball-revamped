@@ -90,7 +90,7 @@ void Game::step() {
 
     // Check if the view needs slow motion and change the FPS
     const unsigned int fps = slow_motion_ ? slow_motion_fps_ : target_fps_;
-    target_time_per_frame_ = ns_per_second / fps;
+    target_frame_duration_ = ns_per_second / fps;
     break;
   }
 
@@ -112,15 +112,17 @@ void Game::run() {
   intro_view_->start();
 
   while (running_) {
-    const unsigned long start_time = SDL_GetTicksNS();
+    const std::uint64_t start_time = SDL_GetTicksNS();
     // Get current input state from keyboard
     handle_input();
     // Execute game update step and draw
     step();
-    const unsigned long end_time = SDL_GetTicksNS();
+    const std::uint64_t elapsed = SDL_GetTicksNS() - start_time;
 
-    const unsigned long sleep_time = target_time_per_frame_ - (end_time - start_time);
-    SDL_DelayPrecise(sleep_time);
+    // Compare before subtracting to avoid unsigned underflow on slow frames
+    if (elapsed < target_frame_duration_) {
+      SDL_DelayPrecise(target_frame_duration_ - elapsed);
+    }
   }
 }
 
@@ -528,8 +530,8 @@ void Game::volley_state() {
 
 void Game::display_fps() {
   // First, estimate the current FPS
-  const unsigned long cur_frame_timestamp = SDL_GetTicksNS();
-  const unsigned long frame_time = cur_frame_timestamp - last_frame_timestamp_;
+  const std::uint64_t cur_frame_timestamp = SDL_GetTicksNS();
+  const std::uint64_t frame_time = cur_frame_timestamp - last_frame_timestamp_;
   current_fps_ = 1000000000.0f / static_cast<float>(frame_time);
   last_frame_timestamp_ = cur_frame_timestamp;
   // SDL_Log("FPS: %.1f", current_fps_);
@@ -562,7 +564,7 @@ void Game::change_game_speed(const SpeedOptionSelection speed) {
       target_fps_ = 30;
       break;
   }
-  target_time_per_frame_ = ns_per_second / target_fps_;
+  target_frame_duration_ = ns_per_second / target_fps_;
 }
 void Game::change_win_score(const PointsOptionSelection win_points) {
   points_opt_select_ = win_points;
