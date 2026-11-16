@@ -6,6 +6,7 @@
 #include "wave.hpp"
 #include "ball_view.hpp"
 #include "player_view.hpp"
+#include "pikaball/game_state.hpp"
 #include "pikaball/physics/physics.hpp"
 
 namespace pika::view {

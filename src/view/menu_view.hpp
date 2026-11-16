@@ -2,6 +2,7 @@
 #define PIKA_MENU_VIEW_HPP
 
 #include "view.hpp"
+#include <pikaball/game_state.hpp>
 #include <pikaball/sprites.hpp>
 
 namespace pika::view {

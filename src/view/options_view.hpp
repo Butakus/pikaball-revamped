@@ -2,9 +2,15 @@
 #define PIKA_OPTIONS_VIEW_HPP
 
 #include <algorithm>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
+#include "pikaball/game_state.hpp"
+#include "pikaball/sdl_error.hpp"
 #include "pikaball/sprites.hpp"
 #include "view.hpp"
 
@@ -19,8 +25,7 @@ namespace pika::view {
   // Load the text into a temporary surface
   SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
   if (text_surface == nullptr) {
-    SDL_Log("Unable to load text! SDL Error: %s\n", SDL_GetError());
-    throw std::runtime_error("Failed to load text!");
+    throw sdl_error("Failed to render text '" + text + "'");
   }
   // Generate the texture and save it
   View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};

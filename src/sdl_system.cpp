@@ -1,5 +1,6 @@
 #include "sdl_system.hpp"
 #include "pikaball/resources.hpp"
+#include "pikaball/sdl_error.hpp"
 
 namespace pika {
 
@@ -13,10 +14,10 @@ SDLSystem::SDLSystem() :
   text_font_(nullptr, TTF_CloseFont)
 {
   if (!SDL_Init(sdl_init_flags)) {
-    throw std::runtime_error("Failed to init SDL");
+    throw sdl_error("Failed to init SDL");
   }
   if (!TTF_Init()) {
-    throw std::runtime_error("Failed to init SDL_ttf");
+    throw sdl_error("Failed to init SDL_ttf");
   }
 
   SDL_Window* temp_window;
@@ -29,7 +30,7 @@ SDLSystem::SDLSystem() :
         &temp_window,
         &temp_renderer)
   ) {
-    throw std::runtime_error("Failed to create window/renderer");
+    throw sdl_error("Failed to create window/renderer");
   }
   window_.reset(temp_window);
   renderer_.reset(temp_renderer);
@@ -52,8 +53,7 @@ SDLSystem::SDLSystem() :
   text_font_.reset(TTF_OpenFontIO(load_resource(text_font_filename), true, text_font_size));
   if(!text_font_)
   {
-    SDL_Log( "Could not load TTF font! SDL_ttf error: %s\n", SDL_GetError());
-    throw std::runtime_error("Could not load TTF font");
+    throw sdl_error(std::string("Failed to load TTF font '") + text_font_filename + "'");
   }
 
   // Load sprites and build the static background
@@ -88,8 +88,7 @@ void SDLSystem::load_sprite_sheet() {
     SDL_LoadPNG_IO(load_resource(sprite_sheet_filename), true);
 
   if (sprites_surface == nullptr) {
-    SDL_Log( "Unable to load image %s! SDL Error: %s\n", sprite_sheet_filename, SDL_GetError());
-    throw std::runtime_error("Failed to load sprite sheet!");
+    throw sdl_error(std::string("Failed to load sprite sheet '") + sprite_sheet_filename + "'");
   }
   // Generate the texture and save it
   sprite_sheet_.reset(SDL_CreateTextureFromSurface(renderer_.get(), sprites_surface));

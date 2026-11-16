@@ -5,6 +5,7 @@
 #include "SDL3_mixer/SDL_mixer.h"
 
 #include <pikaball/resources.hpp>
+#include <pikaball/sdl_error.hpp>
 #include <pikaball/physics/physics_common.hpp>  // For FieldSide
 
 namespace pika {
@@ -41,15 +42,13 @@ public:
     // Open default audio device
     audio_dev_id_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &audio_spec_);
     if(audio_dev_id_ == 0) {
-      SDL_Log("Unable to open audio! SDL error: %s\n", SDL_GetError());
-      throw std::runtime_error("Failed to open audio device");
+      throw sdl_error("Failed to open audio device");
     }
     // Initialize SDL_mixer
     mixer_ = MIX_CreateMixerDevice(audio_dev_id_, &audio_spec_);
     if(!mixer_)
     {
-      SDL_Log( "SDL_mixer could not initialize! SDL_mixer error: %s\n", SDL_GetError());
-      throw std::runtime_error("SDL_mixer could not initialize");
+      throw sdl_error("Failed to initialize SDL_mixer");
     }
 
     // Load sounds
@@ -208,8 +207,7 @@ private:
       true
     );
     if (chunk == nullptr) {
-      SDL_Log("Unable to load sound! Filename: %s - SDL_mixer error: %s\n", filename, SDL_GetError());
-      throw std::runtime_error("Failed to open audio file");
+      throw sdl_error(std::string("Failed to load sound '") + filename + "'");
     }
     return chunk;
   }
@@ -217,8 +215,7 @@ private:
   [[nodiscard]] MIX_Track* createTrack() const {
     MIX_Track* track = MIX_CreateTrack(mixer_);
     if (track == nullptr) {
-      SDL_Log("Unable to create audio track! SDL_mixer error: %s\n", SDL_GetError());
-      throw std::runtime_error("Failed to create audio track");
+      throw sdl_error("Failed to create audio track");
     }
     return track;
   }

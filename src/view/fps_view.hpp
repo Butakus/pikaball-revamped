@@ -5,6 +5,7 @@
 
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
+#include "pikaball/sdl_error.hpp"
 #include "view.hpp"
 
 namespace pika::view {
@@ -51,8 +52,12 @@ public:
   }
 
 
-  /** Render the FPS text */
-  void render(const float fps) const {
+  /**
+   * Render the FPS text.
+   * Called every frame, so it must not throw: if the FPS value cannot be rendered,
+   * the value is skipped and a warning is logged once.
+   */
+  void render(const float fps) {
     if (renderer_ == nullptr || sprite_sheet_ == nullptr) {
       return;
     }
@@ -63,8 +68,14 @@ public:
 
     // Render FPS value
     const std::string fps_str = std::format("{:.1f}", fps);
-    const auto fps_texture = FPSView::load_text_texture(renderer_, text_font_, fps_str);
-    SDL_RenderTexture(renderer_, fps_texture.get(), nullptr, &fps_dst);
+    const auto fps_texture = FPSView::render_text_texture(renderer_, text_font_, fps_str);
+    if (fps_texture) {
+      SDL_RenderTexture(renderer_, fps_texture.get(), nullptr, &fps_dst);
+    }
+    else if (!fps_text_error_logged_) {
+      SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to render FPS value: %s", SDL_GetError());
+      fps_text_error_logged_ = true;
+    }
 
     // Render the FPS letters
     SDL_RenderTexture(renderer_, fps_txt_texture_.get(), nullptr, &fps_txt_dst);
@@ -76,6 +87,8 @@ private:
   SDL_Texture_ptr fps_txt_texture_ {nullptr, SDL_DestroyTexture};
   // Pointer to text font
   TTF_Font* text_font_ {nullptr};
+  // Set after the first failure to render the FPS value, to avoid logging it every frame
+  bool fps_text_error_logged_ {false};
 
   void preload_textures() {
     if (renderer_ == nullptr) {
@@ -106,24 +119,44 @@ private:
   }
 
 
+  /**
+   * Render a text into a new texture. Does not throw: safe to call every frame.
+   * @return The texture, or an empty pointer on failure (details in SDL_GetError())
+   */
+  [[nodiscard]] static SDL_Texture_ptr render_text_texture(
+    SDL_Renderer* renderer,
+    TTF_Font* text_font,
+    const std::string & text,
+    const SDL_Color & text_color = {255, 255, 255})
+  {
+    View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};
+    // Load the text into a temporary surface
+    SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
+    if (text_surface == nullptr) {
+      return text_texture;
+    }
+    // Generate the texture
+    text_texture.reset(SDL_CreateTextureFromSurface(renderer, text_surface));
+    // Release the temporary surface object
+    SDL_DestroySurface(text_surface);
+
+    return text_texture;
+  }
+
+  /**
+   * Render a text into a new texture, for textures created at startup.
+   * @throw std::runtime_error if the text cannot be rendered
+   */
   [[nodiscard]] static SDL_Texture_ptr load_text_texture(
     SDL_Renderer* renderer,
     TTF_Font* text_font,
     const std::string & text,
     const SDL_Color & text_color = {255, 255, 255})
   {
-    // Load the text into a temporary surface
-    SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
-    if (text_surface == nullptr) {
-      SDL_Log("Unable to load text! SDL Error: %s\n", SDL_GetError());
-      throw std::runtime_error("Failed to load text!");
+    auto text_texture = render_text_texture(renderer, text_font, text, text_color);
+    if (!text_texture) {
+      throw sdl_error("Failed to render text '" + text + "'");
     }
-    // Generate the texture and save it
-    View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};
-    text_texture.reset(SDL_CreateTextureFromSurface(renderer, text_surface));
-    // Release the temporary surface object
-    SDL_DestroySurface(text_surface);
-
     return text_texture;
   }
 

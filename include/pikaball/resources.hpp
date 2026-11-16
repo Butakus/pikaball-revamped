@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <string>
 #include "SDL3/SDL.h"
+#include "pikaball/sdl_error.hpp"
 
 #ifdef PIKA_EMBED_ASSETS
 #include <array>
@@ -97,8 +98,7 @@ inline SDL_IOStream* load_resource(const char* filename) {
     SDL_Log("Loading resource from file: %s", resource_path.c_str());
     resource_data = SDL_IOFromFile(resource_path.c_str(), "r");
     if (resource_data == nullptr) {
-      SDL_Log("Unable to load resource %s (%s)! SDL Error: %s\n", filename, resource_path.c_str(), SDL_GetError());
-      throw std::runtime_error("Failed to load resource!");
+      throw sdl_error(std::string("Failed to load resource '") + filename + "'");
     }
   }
 
