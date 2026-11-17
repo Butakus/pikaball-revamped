@@ -82,9 +82,9 @@ jobs:
         path: |
           build/_deps/*-src
           !build/_deps/**/.git
-        # The key changes when vendor/CMakeLists.txt changes (e.g. a new version tag).
+        # The key changes when vendor/CMakeLists.txt or tests/CMakeLists.txt (doctest) change (e.g. a new version tag).
         # Bump the "v" number to drop old caches if the cached content changes.
-        key: deps-v2-${{ runner.os }}-${{ hashFiles('vendor/CMakeLists.txt') }}
+        key: deps-v2-${{ runner.os }}-${{ hashFiles('vendor/CMakeLists.txt', 'tests/CMakeLists.txt') }}
 
     - name: Set up ccache
       uses: hendrikmuhs/ccache-action@v1.2
@@ -115,11 +115,10 @@ jobs:
       shell: bash
       run: cmake --build '${{ steps.strings.outputs.build-output-dir }}'
 
-    # - name: Test
-      # working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      # run: ctest --build-config ${{ matrix.build_type }}
+    - name: Test
+      # Run the unit tests (each doctest TEST_CASE is a CTest test)
+      shell: bash
+      run: ctest --test-dir '${{ steps.strings.outputs.build-output-dir }}' --output-on-failure
 
     - name: Install non-embedded release files
       if: ${{ runner.os == 'Windows' && matrix.build_type == 'Release' && matrix.c_compiler == 'gcc' && matrix.pika_embed_assets == 'OFF' }}
