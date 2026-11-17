@@ -35,16 +35,6 @@ constexpr PlayerInput dive(const DirX direction) {
 
 } // namespace input
 
-/**
- * Call object.update(input) n times (Player or Ball-like objects).
- */
-template <typename T>
-void step(T& object, const PlayerInput& input, const int n) {
-  for (int i = 0; i < n; ++i) {
-    object.update(input);
-  }
-}
-
 } // namespace pika::test
 
 #endif // PIKA_TESTS_HELPERS_HPP

@@ -16,6 +16,8 @@ include(${doctest_SOURCE_DIR}/scripts/cmake/doctest.cmake)
 add_executable(pikaball_tests
     main.cpp
     test_physics.cpp
+    test_player.cpp
+    test_ball.cpp
 )
 target_include_directories(pikaball_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pikaball_tests PRIVATE
