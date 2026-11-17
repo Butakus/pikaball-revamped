@@ -84,6 +84,9 @@ public:
   {}
   ~PhysicsView() = default;
 
+  /** Two views are equal if the ball and both players are equal */
+  bool operator==(const PhysicsView&) const = default;
+
   const Ball ball;
   const Player player_left;
   const Player player_right;

@@ -46,6 +46,9 @@ public:
   Player(Player&&) = delete;
   Player& operator=(Player&&) = delete;
 
+  /** Two players are equal if all their state is equal */
+  bool operator==(const Player&) const = default;
+
   /** Initialize the player for a new game (reset state) */
   void initialize_game();
 

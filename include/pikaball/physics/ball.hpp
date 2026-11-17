@@ -26,6 +26,9 @@ public:
   Ball(Ball&&) = delete;
   Ball& operator=(Ball&&) = delete;
 
+  /** Two balls are equal if all their state is equal */
+  bool operator==(const Ball&) const = default;
+
   /**
    * Initialize the ball for a new round (reset state)
    * @param field_side the side of the field where the ball will be placed.
