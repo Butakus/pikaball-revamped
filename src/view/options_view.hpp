@@ -2,11 +2,11 @@
 #define PIKA_OPTIONS_VIEW_HPP
 
 #include <algorithm>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "SDL3/SDL_assert.h"
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
 #include "pikaball/game_state.hpp"
@@ -248,7 +248,7 @@ public:
     speed_options->add_option(txt::str_slow);
     speed_options->add_option(txt::str_medium);
     speed_options->add_option(txt::str_fast);
-    options_[OptionMenuSelection::Speed] = std::move(speed_options);
+    speed_option_ = std::move(speed_options);
 
     auto points_options = std::make_unique<OptionItemList>(
       renderer_, text_font_, txt::str_opt_points, background_dst.y + 140
@@ -256,14 +256,14 @@ public:
     points_options->add_option(txt::str_5_pts);
     points_options->add_option(txt::str_10_pts);
     points_options->add_option(txt::str_15_pts);
-    options_[OptionMenuSelection::Points] = std::move(points_options);
+    points_option_ = std::move(points_options);
 
     auto music_options = std::make_unique<OptionItemList>(
       renderer_, text_font_, txt::str_opt_music, background_dst.y + 205
     );
     music_options->add_option(txt::str_on);
     music_options->add_option(txt::str_off);
-    options_[OptionMenuSelection::Music] = std::move(music_options);
+    music_option_ = std::move(music_options);
 
     start();
   }
@@ -282,15 +282,15 @@ public:
   }
 
   void select_speed(const SpeedOptionSelection selection) {
-    options_[OptionMenuSelection::Speed]->select_opt_value(static_cast<int>(selection));
+    speed_option_->select_opt_value(static_cast<int>(selection));
   }
 
   void select_points(const PointsOptionSelection selection) {
-    options_[OptionMenuSelection::Points]->select_opt_value(static_cast<int>(selection));
+    points_option_->select_opt_value(static_cast<int>(selection));
   }
 
   void select_music(const OnOffSelection selection) {
-    options_[OptionMenuSelection::Music]->select_opt_value(static_cast<int>(selection));
+    music_option_->select_opt_value(static_cast<int>(selection));
   }
 
   /** Render the options text */
@@ -314,13 +314,12 @@ public:
     };
     SDL_RenderTexture(renderer_, title_texture_.get(), nullptr, &title_dst);
 
-    // ReSharper disable once CppUseElementsView
-    for (const auto &[key, option] : options_) {
-      option->render();
-    }
+    speed_option_->render();
+    points_option_->render();
+    music_option_->render();
 
     // Render pokeball at the selected option item
-    const SDL_FRect& selected_option_dst = options_.at(selection_)->get_position();
+    const SDL_FRect& selected_option_dst = option(selection_).get_position();
     constexpr float opt_ball_w = 20;
     constexpr float opt_ball_h = 20;
     const SDL_FRect opt_ball_dst {
@@ -340,8 +339,22 @@ private:
   // Title text textures
   SDL_Texture_ptr title_texture_ {nullptr, SDL_DestroyTexture};
   // Option items
-  std::map<OptionMenuSelection, std::unique_ptr<OptionItem>> options_;
+  std::unique_ptr<OptionItem> speed_option_;
+  std::unique_ptr<OptionItem> points_option_;
+  std::unique_ptr<OptionItem> music_option_;
   OptionMenuSelection selection_ = OptionMenuSelection::Speed;
+
+  /** Get the option item for a menu selection */
+  [[nodiscard]] OptionItem& option(const OptionMenuSelection selection) const {
+    switch (selection) {
+      case OptionMenuSelection::Speed:  return *speed_option_;
+      case OptionMenuSelection::Points: return *points_option_;
+      case OptionMenuSelection::Music:  return *music_option_;
+    }
+    // Only reachable with an invalid enum value: degrade instead of undefined behaviour
+    SDL_assert(false && "Unknown OptionMenuSelection in OptionsView");
+    return *speed_option_;
+  }
 
   void preload_textures() {
     if (renderer_ == nullptr) {

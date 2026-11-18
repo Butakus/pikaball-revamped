@@ -1,23 +1,32 @@
 #ifndef PIKA_PLAYER_VIEW_HPP
 #define PIKA_PLAYER_VIEW_HPP
 
-#include <map>
+#include <algorithm>
+#include <array>
+#include <cstddef>
 
+#include <SDL3/SDL_assert.h>
 #include <SDL3/SDL_render.h>
 #include <pikaball/physics/player.hpp>
 #include <pikaball/sprites.hpp>
 
 namespace pika::view {
 
-static const std::map<PlayerState, std::array<SDL_FRect, 5>> player_animations = {
-  {PlayerState::Normal, sprite::pikachu_normal_animation},
-  {PlayerState::Jumping, sprite::pikachu_jump_animation},
-  {PlayerState::PowerHit, sprite::pikachu_hit_animation},
-  {PlayerState::Diving, sprite::pikachu_dive_animation},
-  {PlayerState::AfterDiving, sprite::pikachu_after_diving_animation},  // Actually only one
-  {PlayerState::Winner, sprite::pikachu_winner_animation},
-  {PlayerState::Loser, sprite::pikachu_loser_animation}
-};
+/** Get the animation frames for a player state */
+[[nodiscard]] inline const std::array<SDL_FRect, 5>& player_animation(const PlayerState state) {
+  switch (state) {
+    case PlayerState::Normal:      return sprite::pikachu_normal_animation;
+    case PlayerState::Jumping:     return sprite::pikachu_jump_animation;
+    case PlayerState::PowerHit:    return sprite::pikachu_hit_animation;
+    case PlayerState::Diving:      return sprite::pikachu_dive_animation;
+    case PlayerState::AfterDiving: return sprite::pikachu_after_diving_animation;
+    case PlayerState::Winner:      return sprite::pikachu_winner_animation;
+    case PlayerState::Loser:       return sprite::pikachu_loser_animation;
+  }
+  // Only reachable with an invalid enum value: degrade instead of undefined behaviour
+  SDL_assert(false && "Unknown PlayerState in PlayerView");
+  return sprite::pikachu_normal_animation;
+}
 
 class PlayerView {
 public:
@@ -32,7 +41,11 @@ public:
    */
   void draw_player(const Player& player) const {
     const PlayerState state = player.state();
-    const SDL_FRect src_sprite = player_animations.at(state)[player.anim_frame_number()];
+    const auto& anim_frames = player_animation(state);
+    // Debug: stop at the bug (SDL_assert). Release: clamp instead of reading out of bounds.
+    const auto frame = static_cast<std::size_t>(player.anim_frame_number());
+    SDL_assert(frame < anim_frames.size());
+    const SDL_FRect& src_sprite = anim_frames[std::min(frame, anim_frames.size() - 1)];
     const int player_width = static_cast<int>(src_sprite.w);
     const int player_height = static_cast<int>(src_sprite.h);
 
