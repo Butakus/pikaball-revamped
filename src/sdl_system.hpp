@@ -48,16 +48,25 @@ public:
   [[nodiscard]] SDL_Texture* get_sprite_sheet() const { return sprite_sheet_.get(); }
 
 private:
-  SDL_Window_ptr window_;
-  SDL_Renderer_ptr renderer_;
-  std::unique_ptr<PikaSound> sound_;
-  TTF_Font_ptr text_font_;
+  SDL_Window_ptr window_ {nullptr, SDL_DestroyWindow};
+  SDL_Renderer_ptr renderer_ {nullptr, SDL_DestroyRenderer};
+  std::unique_ptr<PikaSound> sound_ {nullptr};
+  TTF_Font_ptr text_font_ {nullptr, TTF_CloseFont};
 
   // Objects
   SDL_Texture_ptr sprite_sheet_ {nullptr, SDL_DestroyTexture};
 
+  /**
+   * Create everything after SDL_Init (must be called after SDL_Init).
+   * Throws on failure.
+   */
+  void init();
+
   /** Load a new sprite sheet from disk and create a texture */
   void load_sprite_sheet();
+
+  /** Release all resources in reverse creation order, then quit SDL_ttf and SDL. */
+  void shutdown() noexcept;
 };
 
 } // namespace pika

@@ -7,15 +7,24 @@ namespace pika {
 constexpr uint32_t sdl_init_flags = SDL_INIT_VIDEO | SDL_INIT_AUDIO;
 constexpr uint64_t sdl_window_flags = SDL_WINDOW_RESIZABLE;
 
-SDLSystem::SDLSystem() :
-  window_(nullptr, SDL_DestroyWindow),
-  renderer_(nullptr, SDL_DestroyRenderer),
-  sound_(nullptr),
-  text_font_(nullptr, TTF_CloseFont)
-{
+SDLSystem::SDLSystem() {
   if (!SDL_Init(sdl_init_flags)) {
     throw sdl_error("Failed to init SDL");
   }
+  // The destructor doesn't run if the constructor throws, so clean up manually
+  try {
+    init();
+  } catch (...) {
+    shutdown();
+    throw;
+  }
+}
+
+SDLSystem::~SDLSystem() {
+  shutdown();
+}
+
+void SDLSystem::init() {
   if (!TTF_Init()) {
     throw sdl_error("Failed to init SDL_ttf");
   }
@@ -60,27 +69,6 @@ SDLSystem::SDLSystem() :
   load_sprite_sheet();
 }
 
-SDLSystem::~SDLSystem() {
-  // Force free the window resources before calling SDL_Quit
-  if (renderer_) {
-      renderer_.reset();
-  }
-  if (window_) {
-      window_.reset();
-  }
-
-  if (text_font_) {
-    text_font_.reset();
-  }
-
-  // Force Sound System to free resources before calling SDL_Quit
-  if (sound_) {
-      sound_.reset();
-  }
-
-  SDL_Quit();
-}
-
 void SDLSystem::load_sprite_sheet() {
   // Load PNG from embedded data or from files. Throw if error.
   // SDL_Surface* sprites_surface = SDL_LoadPNG_IO(load_resource(sprite_sheet_filename), true);
@@ -95,6 +83,17 @@ void SDLSystem::load_sprite_sheet() {
   SDL_SetTextureScaleMode(sprite_sheet_.get(), SDL_SCALEMODE_NEAREST);
   // Release the temporary surface object
   SDL_DestroySurface(sprites_surface);
+}
+
+void SDLSystem::shutdown() noexcept {
+  // Reverse creation order
+  sprite_sheet_.reset();
+  text_font_.reset();
+  sound_.reset();
+  renderer_.reset();
+  window_.reset();
+  TTF_Quit();
+  SDL_Quit();
 }
 
 } // namespace pika
