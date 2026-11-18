@@ -77,7 +77,7 @@ namespace pika::b {
             {}
 
             [[nodiscard]] std::string str() const {
-                return m_data.data();
+                return std::string(m_data);
             }
 
             [[nodiscard]] const char* data() const {
@@ -287,7 +287,6 @@ function(pika_embed TARGET)
     # Add the generated files to the target (all at once)
     target_include_directories(${TARGET} PUBLIC ${EMBED_BINARY_DIR}/autogen/${TARGET_ID}/include)
     target_sources(${TARGET} PRIVATE ${GENERATED_CPPS} ${EMBED_HPP})
-    target_compile_definitions(${TARGET} PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 
     if (MSVC)
         # Expose original files and autogen sources in IDE

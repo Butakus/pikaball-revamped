@@ -51,8 +51,7 @@ void SDLSystem::init() {
     screen_height,
     SDL_LOGICAL_PRESENTATION_STRETCH
   )) {
-    SDL_Log("Unable to set a fixed logical scale for the renderer! SDL Error: %s\n", SDL_GetError());
-    // TODO: Throw?? We actually need this for the physics engine
+    throw sdl_error("Failed to set the renderer logical presentation");
   }
 
   // Initialize sound subsystem

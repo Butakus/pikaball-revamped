@@ -96,7 +96,7 @@ inline SDL_IOStream* load_resource(const char* filename) {
   if (resource_data == nullptr) {
     const std::string resource_path = build_resource_path(filename);
     SDL_Log("Loading resource from file: %s", resource_path.c_str());
-    resource_data = SDL_IOFromFile(resource_path.c_str(), "r");
+    resource_data = SDL_IOFromFile(resource_path.c_str(), "rb");
     if (resource_data == nullptr) {
       throw sdl_error(std::string("Failed to load resource '") + filename + "'");
     }

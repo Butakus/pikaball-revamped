@@ -2,6 +2,7 @@
 #define PIKA_FPS_VIEW_HPP
 
 #include <format>
+#include <string>
 
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
@@ -67,14 +68,9 @@ public:
     SDL_RenderTexture(renderer_, background_texture_.get(), nullptr, &background_dst);
 
     // Render FPS value
-    const std::string fps_str = std::format("{:.1f}", fps);
-    const auto fps_texture = FPSView::render_text_texture(renderer_, text_font_, fps_str);
-    if (fps_texture) {
-      SDL_RenderTexture(renderer_, fps_texture.get(), nullptr, &fps_dst);
-    }
-    else if (!fps_text_error_logged_) {
-      SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to render FPS value: %s", SDL_GetError());
-      fps_text_error_logged_ = true;
+    update_fps_texture(std::format("{:.1f}", fps));
+    if (fps_texture_) {
+      SDL_RenderTexture(renderer_, fps_texture_.get(), nullptr, &fps_dst);
     }
 
     // Render the FPS letters
@@ -85,10 +81,27 @@ private:
   // Background black cover
   SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   SDL_Texture_ptr fps_txt_texture_ {nullptr, SDL_DestroyTexture};
+  // Cached texture of the FPS value, and the text it was rendered from
+  SDL_Texture_ptr fps_texture_ {nullptr, SDL_DestroyTexture};
+  std::string fps_str_;
   // Pointer to text font
   TTF_Font* text_font_ {nullptr};
   // Set after the first failure to render the FPS value, to avoid logging it every frame
   bool fps_text_error_logged_ {false};
+
+  /** Re-render the FPS value texture if the text changed. */
+  void update_fps_texture(const std::string& fps_str) {
+    // Only re-create the text texture when the displayed value changes
+    if (fps_str == fps_str_) {
+      return;
+    }
+    fps_str_ = fps_str;
+    fps_texture_ = FPSView::render_text_texture(renderer_, text_font_, fps_str_);
+    if (!fps_texture_ && !fps_text_error_logged_) {
+      SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to render FPS value: %s", SDL_GetError());
+      fps_text_error_logged_ = true;
+    }
+  }
 
   void preload_textures() {
     if (renderer_ == nullptr) {
