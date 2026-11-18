@@ -101,8 +101,6 @@ private:
 
   // Inputs
   MenuInput menu_input_ {};
-  PlayerInput input_left_ {};
-  PlayerInput input_right_ {};
   // Player controllers
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
@@ -130,6 +128,11 @@ private:
   void menu_options_state();
   /** Control the game's logic for the VolleyGame state */
   void volley_state();
+  /**
+   * Query both controllers and advance the physics one step.
+   * @return true if the ball touched the ground (same as Physics::update)
+   */
+  bool step_physics();
   /** Display the FPS */
   void display_fps();
 

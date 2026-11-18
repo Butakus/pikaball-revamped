@@ -78,18 +78,14 @@ void Game::step() {
     menu_state();
     break;
   case GameState::VolleyGame:
-    // Send the current input state to the view
-    // TODO: Decide where to get input from controllers. Here or after render?
-    // TODO: If game is paused, controllers should not be queried
-    input_left_ = controller_left_->on_update(PhysicsView(*physics_));
-    input_right_ = controller_right_->on_update(PhysicsView(*physics_));
     volley_state();
 
     // Check physics state and play sounds accordingly
     handle_sound();
 
     // Check if the view needs slow motion and change the FPS
-    const unsigned int fps = slow_motion_ ? slow_motion_fps_ : target_fps_;
+    // Slow motion is ignored while paused, so the options menu runs at normal speed.
+    const unsigned int fps = (slow_motion_ && !pause_) ? slow_motion_fps_ : target_fps_;
     target_frame_duration_ = ns_per_second / fps;
     break;
   }
@@ -474,7 +470,7 @@ void Game::volley_state() {
     break;
     case VolleyGameState::PlayRound:
       // Update physics and check if the ball is touching the ground
-      if (physics_->update(input_left_, input_right_)) {
+      if (step_physics()) {
         // End of the round
         next_serve_side_ = update_score();
         volley_view_->set_score(score_left_, score_right_);
@@ -500,7 +496,7 @@ void Game::volley_state() {
       // Slow motion will be active for the first 6 frames after the point
       slow_motion_ = frame_counter_ <= 6;
       // We keep updating the physics, but without checking the ball
-      physics_->update(input_left_, input_right_);
+      step_physics();
       if (frame_counter_ >= view::VolleyView::end_round_frames) {
         // Start the next round
         frame_counter_ = 0;
@@ -523,9 +519,15 @@ void Game::volley_state() {
         return;
       }
       // Keep updating physics in the end state, without checking the ball touching ground.
-      physics_->update(input_left_, input_right_);
+      step_physics();
     break;
   }
+}
+
+bool Game::step_physics() {
+  const PlayerInput input_left = controller_left_->on_update(PhysicsView(*physics_));
+  const PlayerInput input_right = controller_right_->on_update(PhysicsView(*physics_));
+  return physics_->update(input_left, input_right);
 }
 
 void Game::display_fps() {
