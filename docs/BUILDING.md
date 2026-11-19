@@ -10,6 +10,9 @@ This document contains the detailed build instructions for the project.
   - Linux: GCC 13+ or Clang 16+
   - Windows: MinGW-w64 with GCC 13+
 
+MSVC is not supported: embedded assets are compiled as very large string literals, beyond MSVC's limits,
+and Windows builds link statically with MinGW's `-static` flag. CMake prints a warning if MSVC is detected.
+
 ## Build presets
 
 The project uses CMake presets for the most common workflows:
@@ -52,6 +55,17 @@ The project uses CMake presets for the most common workflows:
 
 The resulting binaries are placed under the build directories created by the presets.
 
+### Compiler warnings
+
+The project's own code is compiled with `-Wall -Wextra -Wpedantic` (dependencies such as SDL are not affected).
+To treat these warnings as errors, configure with `-DPIKA_WERROR=ON`.
+The CI Debug builds use this option, so new warnings make CI fail:
+
+```bash
+cmake --preset debug -DPIKA_WERROR=ON
+cmake --build --preset debug
+```
+
 ## Windows build (MinGW)
 
 1. Install the required tools:
@@ -80,6 +94,7 @@ The resulting binaries are placed under the build directories created by the pre
 The project supports two ways to include assets:
 
 - Embedded mode: assets are compiled into the binary. Just like in the original game, it allows to easily move around the executable.
+  Changing an embedded asset re-runs the CMake configure step automatically on the next build.
 - Non-embedded mode (default): assets are installed in a directory next to the executable. This option is better if you want to play around and change some of the assets!
 
 You can toggle the mode with:

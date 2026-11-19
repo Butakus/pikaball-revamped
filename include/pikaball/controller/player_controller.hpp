@@ -34,14 +34,14 @@ public:
    * It can be overridden if the controller wants to do any setup before the game starts.
    * @param physics The current state of the game physics (Ball and players).
    */
-  virtual void on_game_start(const PhysicsView& physics) {}
+  virtual void on_game_start([[maybe_unused]] const PhysicsView& physics) {}
 
   /**
    * This function will be called when a new round start.
    * It can be overridden if the controller wants to do any setup before the round starts.
    * @param physics The current state of the game physics (Ball and players).
    */
-  virtual void on_round_start(const PhysicsView& physics) {}
+  virtual void on_round_start([[maybe_unused]] const PhysicsView& physics) {}
 
 protected:
   FieldSide field_side_;

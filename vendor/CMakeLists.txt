@@ -16,11 +16,13 @@ FetchContent_Declare(SDL3
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL.git
     GIT_TAG         release-3.4.12
     GIT_SHALLOW     TRUE
+    SYSTEM  # Headers are system includes: project warning flags (and -Werror) don't apply to them
 )
 FetchContent_Declare(SDL_mixer
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL_mixer.git
     GIT_TAG         release-3.2.4
     GIT_SHALLOW     TRUE
+    SYSTEM  # Headers are system includes: project warning flags (and -Werror) don't apply to them
     # The vendored codec libraries (external/ submodules) are only used with SDLMIXER_VENDORED, which is OFF
     GIT_SUBMODULES  ""
 )
@@ -28,6 +30,7 @@ FetchContent_Declare(SDL_ttf
     GIT_REPOSITORY  https://github.com/libsdl-org/SDL_ttf.git
     GIT_TAG         release-3.2.2
     GIT_SHALLOW     TRUE
+    SYSTEM  # Headers are system includes: project warning flags (and -Werror) don't apply to them
 )
 
 FetchContent_MakeAvailable(SDL3 SDL_mixer SDL_ttf)

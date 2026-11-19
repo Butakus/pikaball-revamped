@@ -11,18 +11,22 @@ add_subdirectory(controller)
 
 add_executable(${PROJECT_NAME} WIN32)
 
-target_link_options(${PROJECT_NAME} PRIVATE
-    $<$<PLATFORM_ID:Windows>:-static>
-)
+# Static runtime on Windows (MinGW), so the .exe runs without extra DLLs. MSVC is not supported.
+if (WIN32 AND NOT MSVC)
+    target_link_options(${PROJECT_NAME} PRIVATE -static)
+endif()
+
+# Windows resources (icon + version info). The version comes from project(VERSION).
+configure_file(${PROJECT_SOURCE_DIR}/cmake/pikaball-revamped.rc.in ${PROJECT_BINARY_DIR}/pikaball-revamped.rc @ONLY)
 
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
     sdl_system.cpp
     game.cpp
-    $<$<PLATFORM_ID:Windows>:${CMAKE_SOURCE_DIR}/assets/pikaball-revamped.rc>
+    $<$<PLATFORM_ID:Windows>:${PROJECT_BINARY_DIR}/pikaball-revamped.rc>
 )
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE
     vendor  # Link to vendored SDL (and other libs if any)
@@ -31,10 +35,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${KEYBOARD_CONTROLLER_LIB_NAME}
     ${COMPUTER_CONTROLLER_LIB_NAME}
 )
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23 c_std_23)
-target_compile_options(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Debug>:-Wall -Wpedantic>
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE pika_warnings)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Debug>:-DPIKA_DEBUG>
 )
@@ -43,18 +45,18 @@ if (PIKA_EMBED_ASSETS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE PIKA_EMBED_ASSETS)
 
     # Embed resources into binary using custom version of battery::embed
-    include(${CMAKE_SOURCE_DIR}/cmake/pika_embed.cmake)
+    include(${PROJECT_SOURCE_DIR}/cmake/pika_embed.cmake)
     pika_embed(${PROJECT_NAME}
-        ${CMAKE_SOURCE_DIR}/assets/images/sprite_sheet.png
-        ${CMAKE_SOURCE_DIR}/assets/sounds/bgm.mp3
-        ${CMAKE_SOURCE_DIR}/assets/sounds/pi.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/pika.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/chu.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/pikachu.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/pipikachu.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/ball_hit.wav
-        ${CMAKE_SOURCE_DIR}/assets/sounds/ball_ground.wav
-        ${CMAKE_SOURCE_DIR}/assets/font.ttf
+        ${PROJECT_SOURCE_DIR}/assets/images/sprite_sheet.png
+        ${PROJECT_SOURCE_DIR}/assets/sounds/bgm.mp3
+        ${PROJECT_SOURCE_DIR}/assets/sounds/pi.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/pika.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/chu.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/pikachu.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/pipikachu.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/ball_hit.wav
+        ${PROJECT_SOURCE_DIR}/assets/sounds/ball_ground.wav
+        ${PROJECT_SOURCE_DIR}/assets/font.ttf
     )
 endif()
 
@@ -68,7 +70,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 if (NOT PIKA_EMBED_ASSETS)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets/
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets/
             DESTINATION ${PIKA_ASSETS_INSTALL_DIR}
     )
 endif()

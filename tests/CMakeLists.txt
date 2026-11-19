@@ -7,6 +7,7 @@ FetchContent_Declare(doctest
     GIT_REPOSITORY  https://github.com/doctest/doctest.git
     GIT_TAG         v2.5.3
     GIT_SHALLOW     TRUE
+    SYSTEM  # Headers are system includes: project warning flags (and -Werror) don't apply to them
 )
 FetchContent_MakeAvailable(doctest)
 # Provides doctest_discover_tests()
@@ -23,11 +24,9 @@ target_include_directories(pikaball_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pikaball_tests PRIVATE
     ${PROJECT_NAME}_physics
     doctest::doctest
+    pika_warnings
 )
-target_compile_features(pikaball_tests PRIVATE cxx_std_20)
-target_compile_options(pikaball_tests PRIVATE
-    $<$<CONFIG:Debug>:-Wall -Wpedantic>
-)
+target_compile_features(pikaball_tests PRIVATE cxx_std_23)
 
 # Register each TEST_CASE as its own CTest test
 doctest_discover_tests(pikaball_tests)

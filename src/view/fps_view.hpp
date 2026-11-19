@@ -119,7 +119,7 @@ private:
     SDL_Renderer* renderer,
     TTF_Font* text_font,
     const std::string & text,
-    const SDL_Color & text_color = {255, 255, 255})
+    const SDL_Color & text_color = {255, 255, 255, 255})
   {
     View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};
     // Load the text into a temporary surface
@@ -143,7 +143,7 @@ private:
     SDL_Renderer* renderer,
     TTF_Font* text_font,
     const std::string & text,
-    const SDL_Color & text_color = {255, 255, 255})
+    const SDL_Color & text_color = {255, 255, 255, 255})
   {
     auto text_texture = render_text_texture(renderer, text_font, text, text_color);
     if (!text_texture) {

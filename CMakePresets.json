@@ -7,88 +7,83 @@
   },
   "configurePresets": [
     {
-      "name": "debug",
-      "displayName": "Debug Config",
-      "description": "Debug build using Ninja generator",
+      "name": "base",
+      "hidden": true,
+      "description": "Common settings: Ninja generator, build and install dirs named after the preset",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/debug",
-      "installDir": "${sourceDir}/build/debug/pikaball-release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "PIKA_EMBED_ASSETS": "OFF"
-      },
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/${presetName}/pikaball-release"
+    },
+    {
+      "name": "not-windows",
+      "hidden": true,
       "condition": {
         "type": "notEquals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": ["base", "not-windows"],
+      "displayName": "Debug Config",
+      "description": "Debug build using Ninja generator",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "PIKA_EMBED_ASSETS": "OFF"
       }
     },
     {
       "name": "release",
+      "inherits": ["base", "not-windows"],
       "displayName": "Release Config",
       "description": "Release build using Ninja generator",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/release",
-      "installDir": "${sourceDir}/build/release/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "PIKA_EMBED_ASSETS": "OFF"
-      },
-      "condition": {
-        "type": "notEquals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
       "name": "release-embedded",
+      "inherits": ["base", "not-windows"],
       "displayName": "Release Embedded Config",
       "description": "Release build with assets embedded in the executable",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/release-embedded",
-      "installDir": "${sourceDir}/build/release-embedded/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "PIKA_EMBED_ASSETS": "ON"
-      },
-      "condition": {
-        "type": "notEquals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
       "name": "windows-release",
-      "displayName": "Windows Release configuration",
-      "description": "This build is only available on Windows",
-      "generator": "Ninja",
+      "inherits": ["base", "windows"],
+      "displayName": "Windows Release Config",
+      "description": "Windows release build (MinGW)",
       "binaryDir": "${sourceDir}/build/release-win",
       "installDir": "${sourceDir}/build/release-win/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "PIKA_EMBED_ASSETS": "OFF"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
       "name": "windows-release-embedded",
-      "displayName": "Windows Release Embedded configuration",
-      "description": "Windows release build with assets embedded",
-      "generator": "Ninja",
+      "inherits": ["base", "windows"],
+      "displayName": "Windows Release Embedded Config",
+      "description": "Windows release build (MinGW) with assets embedded in the executable",
       "binaryDir": "${sourceDir}/build/release-win-embedded",
       "installDir": "${sourceDir}/build/release-win-embedded/pikaball-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "PIKA_EMBED_ASSETS": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     }
   ],
@@ -96,32 +91,27 @@
     {
       "name": "debug",
       "displayName": "Debug Build",
-      "configurePreset": "debug",
-      "configuration": "Debug"
+      "configurePreset": "debug"
     },
     {
       "name": "release",
       "displayName": "Release Build",
-      "configurePreset": "release",
-      "configuration": "Release"
+      "configurePreset": "release"
     },
     {
       "name": "release-embedded",
       "displayName": "Release Embedded Build",
-      "configurePreset": "release-embedded",
-      "configuration": "Release"
+      "configurePreset": "release-embedded"
     },
     {
       "name": "windows-release",
-      "displayName": "Release Build",
-      "configurePreset": "windows-release",
-      "configuration": "Windows Release"
+      "displayName": "Windows Release Build",
+      "configurePreset": "windows-release"
     },
     {
       "name": "windows-release-embedded",
       "displayName": "Windows Release Embedded Build",
-      "configurePreset": "windows-release-embedded",
-      "configuration": "Windows Release Embedded"
+      "configurePreset": "windows-release-embedded"
     }
   ]
 }

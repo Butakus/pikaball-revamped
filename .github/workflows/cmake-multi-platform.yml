@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
 
       # Release builds: <Linux: GCC, Clang> and <Windows: MinGW GCC>, each with and without embedded assets.
-      # Debug builds: <Linux: GCC, Clang> without embedded assets, to check that Debug-only code (PIKA_DEBUG) compiles.
+      # Debug builds: <Linux: GCC, Clang> without embedded assets, with warnings as errors.
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
@@ -96,9 +96,11 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       # With cached dependency sources, FETCHCONTENT_FULLY_DISCONNECTED skips all git operations.
       # Precompiled headers are disabled because ccache can't cache files compiled with them (most of SDL).
+      # Debug jobs treat warnings in the project's own code as errors (PIKA_WERROR), so CI fails on new warnings.
       shell: bash
       run: >
         cmake -G Ninja -B '${{ steps.strings.outputs.build-output-dir }}'
+        -DPIKA_WERROR=${{ matrix.build_type == 'Debug' && 'ON' || 'OFF' }}
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_C_COMPILER_LAUNCHER=ccache

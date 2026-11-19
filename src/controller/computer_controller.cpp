@@ -10,7 +10,7 @@ ComputerController::ComputerController(const FieldSide &side) :
  right_bound_((is_player_right_ + 1) * ground_h_width)
 {}
 
-void ComputerController::on_round_start(const PhysicsView &physics) {
+void ComputerController::on_round_start([[maybe_unused]] const PhysicsView& physics) {
   // At the start of each round, reset the boldness to a random value
   boldness_ = rand_int() % 5;
 }

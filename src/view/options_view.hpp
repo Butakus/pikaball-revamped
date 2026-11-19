@@ -20,7 +20,7 @@ namespace pika::view {
   SDL_Renderer* renderer,
   TTF_Font* text_font,
   const std::string & text,
-  const SDL_Color & text_color = {255, 255, 255})
+  const SDL_Color & text_color = {255, 255, 255, 255})
 {
   // Load the text into a temporary surface
   SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
@@ -155,7 +155,7 @@ public:
     for (const auto& opt_value : opt_values_) {
       opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, opt_value));
       opt_select_textures_.emplace_back(
-        load_text_texture(renderer_, text_font_, opt_value, {255, 0, 0})
+        load_text_texture(renderer_, text_font_, opt_value, {255, 0, 0, 255})
       );
     }
   }
@@ -168,7 +168,7 @@ public:
     opt_values_.emplace_back(option_value);
     opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, option_value));
     opt_select_textures_.emplace_back(
-      load_text_texture(renderer_, text_font_, option_value, {255, 0, 0}))
+      load_text_texture(renderer_, text_font_, option_value, {255, 0, 0, 255}))
     ;
   }
 

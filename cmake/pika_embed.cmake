@@ -249,7 +249,10 @@ function(pika_embed TARGET)
 
         # Derive a filename to record in the header and to base the identifier on.
         # Prefer a path relative to the source dir when possible, otherwise fall back to the basename.
-        file(RELATIVE_PATH _REL_PATH "${CMAKE_SOURCE_DIR}" "${FILENAME}")
+        file(RELATIVE_PATH _REL_PATH "${PROJECT_SOURCE_DIR}" "${FILENAME}")
+
+        # The file is embedded at configure time
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FILENAME}")
 
         # Make the identifier from the target id + recorded filename
         string(TOLOWER "${TARGET_ID}_${_REL_PATH}" IDENTIFIER)

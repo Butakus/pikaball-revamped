@@ -45,7 +45,9 @@ SDL_AppResult run_guarded(const char* context, Callback&& callback) {
 } // namespace
 
 
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv) {
+SDL_AppResult SDL_AppInit(void **appstate,
+                          [[maybe_unused]] int argc,
+                          [[maybe_unused]] char **argv) {
     // Setup logger verbosity
     #ifdef PIKA_DEBUG
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_DEBUG);
