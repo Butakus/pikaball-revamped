@@ -300,8 +300,7 @@ public:
     }
 
     // Render background
-    SDL_SetTextureAlphaModFloat(background_texture_.get(), 0.92);
-    SDL_RenderTexture(renderer_, background_texture_.get(), nullptr, &background_dst);
+    render_black_rect(0.92f, &background_dst);
 
     // Render title
     constexpr float title_h = 25;
@@ -332,8 +331,6 @@ public:
   }
 
 private:
-  // Background black cover
-  SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   // Pointer to text font
   TTF_Font* text_font_ {nullptr};
   // Title text textures
@@ -360,24 +357,6 @@ private:
     if (renderer_ == nullptr) {
       return;
     }
-
-    // Create a small black surface for the menu background
-    background_texture_.reset(SDL_CreateTexture(
-      renderer_,
-      SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_TARGET,
-      background_dst.w,
-      background_dst.h
-    ));
-    // Set the texture scaling mode to nearest interpolation
-    SDL_SetTextureScaleMode(background_texture_.get(), SDL_SCALEMODE_NEAREST);
-    // Clear the black texture with a black background
-    SDL_SetRenderTarget(renderer_, background_texture_.get());
-    SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(renderer_);
-
-    // Set the render target back to the main window
-    SDL_SetRenderTarget(renderer_, nullptr);
 
     // Load text textures
     title_texture_ = load_text_texture(renderer_, text_font_, txt::str_options);

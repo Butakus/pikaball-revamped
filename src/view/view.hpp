@@ -1,6 +1,7 @@
 #ifndef PIKA_VIEW_HPP
 #define PIKA_VIEW_HPP
 
+#include <algorithm>
 #include <memory>
 #include <SDL3/SDL_render.h>
 #include <pikaball/common.hpp>
@@ -27,25 +28,7 @@ public:
   explicit View(SDL_Renderer* renderer, SDL_Texture* sprite_sheet) :
     renderer_(renderer),
     sprite_sheet_(sprite_sheet)
-  {
-    // Create black texture
-    black_texture_.reset(SDL_CreateTexture(
-      renderer_,
-      SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_TARGET,
-      screen_width,
-      screen_height
-    ));
-    // Set the texture scaling mode to nearest interpolation
-    SDL_SetTextureScaleMode(black_texture_.get(), SDL_SCALEMODE_NEAREST);
-    // Clear the black texture with a black background
-    SDL_SetRenderTarget(renderer_, black_texture_.get());
-    SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(renderer_);
-
-    // Set the render target back to the main window
-    SDL_SetRenderTarget(renderer_, nullptr);
-  }
+  {}
 
   /**
    * Start (or restart) the view, resetting the state and the frame counter.
@@ -54,10 +37,9 @@ public:
     black_fade_alpha_ = 1.0;
   }
 
-  /** Render the black rectangle over surface with the current alpha */
+  /** Render the black cover over the whole screen with the current fade alpha */
   void render_fade_in_out() const {
-    SDL_SetTextureAlphaModFloat(black_texture_.get(), black_fade_alpha_);
-    SDL_RenderTexture(renderer_, black_texture_.get(), nullptr, nullptr);
+    render_black_rect(black_fade_alpha_);
   }
 
   /**
@@ -93,10 +75,23 @@ protected:
   // Non-owning pointer to the sprite sheet texture. Should be set in the constructor
   SDL_Texture* sprite_sheet_ {nullptr};
 
-  // Full-black cover texture to do fade-in/fade-out effects
-  SDL_Texture_ptr black_texture_ {nullptr, SDL_DestroyTexture};
-  // The alpha channel is default initialized to one because tha fade-in effect usually goes first
+  // Alpha of the black cover used for fade-in/fade-out effects.
+  // Default initialized to one because the fade-in effect usually goes first
   float black_fade_alpha_ {1.0f};
+
+  /**
+   * Draw a semi-transparent black rectangle (fades and menu backgrounds).
+   * @param alpha Opacity in [0.0, 1.0]. Nothing is drawn if it is zero.
+   * @param rect The area to cover, or nullptr for the whole screen.
+   */
+  void render_black_rect(const float alpha, const SDL_FRect* rect = nullptr) const {
+    if (alpha <= 0.0f) {
+      return;
+    }
+    SDL_SetRenderDrawBlendMode(renderer_, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColorFloat(renderer_, 0.0f, 0.0f, 0.0f, alpha);
+    SDL_RenderFillRect(renderer_, rect);
+  }
 };
 
 } // namespace pika::view

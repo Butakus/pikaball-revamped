@@ -64,8 +64,7 @@ public:
     }
 
     // Render background with 50% opacity
-    SDL_SetTextureAlphaModFloat(background_texture_.get(), 0.50);
-    SDL_RenderTexture(renderer_, background_texture_.get(), nullptr, &background_dst);
+    render_black_rect(0.50f, &background_dst);
 
     // Render FPS value
     update_fps_texture(std::format("{:.1f}", fps));
@@ -78,8 +77,6 @@ public:
   }
 
 private:
-  // Background black cover
-  SDL_Texture_ptr background_texture_ {nullptr, SDL_DestroyTexture};
   SDL_Texture_ptr fps_txt_texture_ {nullptr, SDL_DestroyTexture};
   // Cached texture of the FPS value, and the text it was rendered from
   SDL_Texture_ptr fps_texture_ {nullptr, SDL_DestroyTexture};
@@ -107,24 +104,6 @@ private:
     if (renderer_ == nullptr) {
       return;
     }
-
-    // Create a small black surface for the menu background
-    background_texture_.reset(SDL_CreateTexture(
-      renderer_,
-      SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_TARGET,
-      background_dst.w,
-      background_dst.h
-    ));
-    // Set the texture scaling mode to nearest interpolation
-    SDL_SetTextureScaleMode(background_texture_.get(), SDL_SCALEMODE_NEAREST);
-    // Clear the black texture with a black background
-    SDL_SetRenderTarget(renderer_, background_texture_.get());
-    SDL_SetRenderDrawColor(renderer_, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(renderer_);
-
-    // Set the render target back to the main window
-    SDL_SetRenderTarget(renderer_, nullptr);
 
     // Load text textures
     fps_txt_texture_ = FPSView::load_text_texture(renderer_, text_font_, "FPS");
