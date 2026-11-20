@@ -213,13 +213,9 @@ void Game::compile_events() {
   player_input_right.direction_y =
     get_input_direction_y(key_state[keys::p2_up], key_state[keys::p2_down]);
 
-  // Pass keyboard inputs to the keyboard controllers (if controllers are keyboards)
-  if (const auto kb_left = dynamic_cast<KeyboardController*>(controller_left_.get())) {
-    kb_left->set_input(player_input_left);
-  }
-  if (const auto kb_right = dynamic_cast<KeyboardController*>(controller_right_.get())) {
-    kb_right->set_input(player_input_right);
-  }
+  // Pass keyboard inputs to the keyboard controllers
+  controller_left_->on_local_input(player_input_left);
+  controller_right_->on_local_input(player_input_right);
 
   menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
 }

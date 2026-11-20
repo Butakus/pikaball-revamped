@@ -5,7 +5,7 @@ namespace pika {
 KeyboardController::KeyboardController(const FieldSide &side) : PlayerController(side) {}
 
 
-void KeyboardController::set_input(const PlayerInput &input) {
+void KeyboardController::on_local_input(const PlayerInput &input) {
   input_ = input;
 }
 

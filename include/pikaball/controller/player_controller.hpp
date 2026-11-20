@@ -43,6 +43,14 @@ public:
    */
   virtual void on_round_start([[maybe_unused]] const PhysicsView& physics) {}
 
+  /**
+   * This function will be called at each frame
+   * with the input from this machine's devices (e.g. keyboard/joystick) for this controller's side.
+   * It can be overridden by controllers that play with local input. Other controllers can ignore it.
+   * @param input The local input for this controller's side.
+   */
+  virtual void on_local_input([[maybe_unused]] const PlayerInput& input) {}
+
 protected:
   FieldSide field_side_;
 };

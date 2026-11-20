@@ -18,11 +18,11 @@ public:
   [[nodiscard]] PlayerInput on_update(const PhysicsView&) override;
 
   /**
-   * Set the current user input from main SDL event handler.
-   * This input will then just be forwarded when update is called.
-   * @param input The PlayerInput state set by the event handler.
+   * Store the current local input (from the game's keyboard handling).
+   * This input will then just be forwarded when on_update is called.
+   * @param input The local player input for this controller's side.
    */
-  void set_input(const PlayerInput& input);
+  void on_local_input(const PlayerInput& input) override;
 
 private:
   PlayerInput input_ {};
