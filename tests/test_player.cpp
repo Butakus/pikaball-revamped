@@ -73,8 +73,8 @@ TEST_CASE("Player: jump") {
   CHECK(player.sound() == PlayerSound::Chu);
   CHECK(player.y() == player_ground_y - 16);
 
-  // Peak at y = 108 (136 px above the ground), then back to the ground on frame 33.
-  // TODO: Review original game, should be frame 34 (the JS version stays in the air one more frame).
+  // Peak at y = 108 (136 px above the ground).
+  // Reaches the ground on frame 33, but stays Jumping on that frame and lands on frame 34.
   int min_y = player.y();
   int frame = 1;
   while (player.state() != PlayerState::Normal && frame < 100) {
@@ -83,7 +83,7 @@ TEST_CASE("Player: jump") {
     min_y = std::min(min_y, player.y());
   }
   CHECK(min_y == 108);
-  CHECK(frame == 33);
+  CHECK(frame == 34);
   CHECK(player.y() == player_ground_y);
 }
 
@@ -103,13 +103,27 @@ TEST_CASE("Player: can't jump again while in the air") {
 TEST_CASE("Player: holding up jumps again right after landing") {
   Player player(FieldSide::Left);
   step(player, input::jump(), 33);
-  // Landed on frame 33 (see the jump test)
-  CHECK(player.state() == PlayerState::Normal);
+  // On the ground on frame 33, but still Jumping
+  CHECK(player.state() == PlayerState::Jumping);
   CHECK(player.y() == player_ground_y);
 
+  // Frame 34: jumps again without landing first
   player.update(input::jump());
   CHECK(player.state() == PlayerState::Jumping);
   CHECK(player.y() == player_ground_y - 16);
+}
+
+TEST_CASE("Player: power hit on the frame the jump reaches the ground") {
+  Player player(FieldSide::Left);
+  step(player, input::jump(), 1);
+  step(player, input::idle(), 31);
+  // Frame 33: on the ground but still Jumping, so a power hit is not a dive
+  player.update(input::dive(DirX::Right));
+  CHECK(player.state() == PlayerState::PowerHit);
+  CHECK(player.y() == player_ground_y);
+  // Frame 34: lands
+  player.update(input::idle());
+  CHECK(player.state() == PlayerState::Normal);
 }
 
 TEST_CASE("Player: power hit in the air") {
@@ -151,8 +165,8 @@ TEST_CASE("Player: dive") {
   CHECK(player.diving_direction() == DirX::Right);
   CHECK(player.x() == 42);
 
-  // Then it slides 8 px per frame in the dive direction, ignoring the input, until it lands on frame 12.
-  // TODO: Review original game, should be frame 13 (x = 138) (the JS version stays in the air one more frame).
+  // Then it slides 8 px per frame in the dive direction, ignoring the input.
+  // It reaches the ground on frame 12 but stays Diving on that frame, and lands on frame 13.
   player.update(input::move(DirX::Left));
   CHECK(player.x() == 50);
   int frame = 2;
@@ -160,15 +174,15 @@ TEST_CASE("Player: dive") {
     player.update(input::idle());
     ++frame;
   }
-  CHECK(frame == 12);
-  CHECK(player.x() == 130);
+  CHECK(frame == 13);
+  CHECK(player.x() == 138);
   CHECK(player.y() == player_ground_y);
   CHECK(player.state() == PlayerState::AfterDiving);
 
   // Lying on the ground for 5 frames, without moving, then back to Normal
   step(player, input::move(DirX::Left), 4);
   CHECK(player.state() == PlayerState::AfterDiving);
-  CHECK(player.x() == 130);
+  CHECK(player.x() == 138);
   player.update(input::idle());
   CHECK(player.state() == PlayerState::Normal);
 }
@@ -210,10 +224,10 @@ TEST_CASE("Player: end of game animations") {
     Player player(FieldSide::Left);
     player.update(input::jump());
     player.end_game(true);
-    // Still in the air on frame 32
-    step(player, input::idle(), 31);
+    // Still Jumping on frame 33
+    step(player, input::idle(), 32);
     CHECK(player.state() == PlayerState::Jumping);
-    // Lands on frame 33 and goes straight to Winner
+    // Lands on frame 34 and goes straight to Winner
     player.update(input::idle());
     CHECK(player.y() == player_ground_y);
     CHECK(player.state() == PlayerState::Winner);

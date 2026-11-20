@@ -454,6 +454,9 @@ void Game::volley_state() {
   case VolleyGameState::NewGame:
       // TODO: Maybe check transitions after rendering and updating
       if (frame_counter_ >= view::VolleyView::new_game_frames) {
+        // The first round of the game also starts here
+        controller_left_->on_round_start(PhysicsView(*physics_));
+        controller_right_->on_round_start(PhysicsView(*physics_));
         volley_state_ = VolleyGameState::PlayRound;
         volley_view_->set_state(volley_state_);
       }

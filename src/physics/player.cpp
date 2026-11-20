@@ -70,7 +70,9 @@ void Player::update(const PlayerInput& input) {
 
 
   // Jump!
-  if (state_ == PlayerState::Normal &&
+  // Also allowed while Jumping or PowerHit: after a jump the player is still in that state on the frame it reaches
+  // the ground (see the landing check below), and holding up jumps again right away.
+  if ((state_ == PlayerState::Normal || state_ == PlayerState::Jumping || state_ == PlayerState::PowerHit) &&
       input.direction_y == DirY::Up &&
       y_ == player_ground_y) {
     velocity_y_ = -16;
@@ -91,7 +93,7 @@ void Player::update(const PlayerInput& input) {
   if (next_y < player_ground_y) {
     velocity_y_ += 1;
   }
-  else if (velocity_y_ > 0) {
+  else if (next_y > player_ground_y) {
     // if player is landing...
     velocity_y_ = 0;
     y_ = player_ground_y;
