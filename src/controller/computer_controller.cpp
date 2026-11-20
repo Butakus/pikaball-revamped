@@ -43,7 +43,7 @@ int estimate_ball_hit_landing(const PlayerInput& input, const Ball& ball) {
   return ball_clone.expected_landing_x();
 }
 
-bool ComputerController::decide_input_power_hit(const PhysicsView& physics_view, PlayerInput& input) const {
+bool ComputerController::decide_input_power_hit(PlayerInput& input) const {
   /* Two random strategies possible:
    * 1. Check the Y direction Down -> Middle -> Up
    * 2. Check the Y direction Up -> Middle -> Down (flip_dir_y)
@@ -59,7 +59,7 @@ bool ComputerController::decide_input_power_hit(const PhysicsView& physics_view,
         .direction_y = static_cast<DirY>(flip_dir_y ? - dir_y : dir_y),
       };
       // With the test input, check where would the ball land
-      const int land_x = estimate_ball_hit_landing(check_input, physics_view.ball);
+      const int land_x = estimate_ball_hit_landing(check_input, ball_);
       // Distance between the other player and the ball's landing point
       const int player_dist = land_x - other_player_.x();
       /* The player will power hit if these conditions are met:
@@ -82,6 +82,9 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
 
   // Initialize some values for later
   ball_ = physics_view.ball;
+  // Predict the ball position one frame ahead. The original game uses this position.
+  ball_.update();
+  ball_.calculate_landing_point();
   if (is_player_right_) {
     player_ = physics_view.player_right;
     other_player_ = physics_view.player_left;
@@ -179,9 +182,9 @@ PlayerInput ComputerController::on_update(const PhysicsView &physics_view) {
         input.direction_x = DirX::Left;
       }
     }
-    if (ball_distance_x < 48 && ball_distance_y < 64) {
+    if (ball_distance_x < 48 && ball_distance_y < 48) {
       // If the ball is close, we can power hit. Check it and update input direction.
-      if (decide_input_power_hit(physics_view, input)) {
+      if (decide_input_power_hit(input)) {
         input.power_hit = true;
         const int player_dist = std::abs(other_player_.x() - player_.x());
         if (player_dist < 80 && input.direction_y != DirY::Up) {

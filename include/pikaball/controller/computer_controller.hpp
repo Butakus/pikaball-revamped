@@ -61,12 +61,11 @@ private:
    * Check if the player should power hit and set the hit direction.
    * The input parameter will be modified with the direction.
    * FUN_00402630, decideWhetherInputPowerHit
-   * @param physics_view The current state of the game physics (Ball and players).
    * @param input Input for the player controlled by the computer.
                   The input directions will be modified.
    * @return True is the computer decides to power hit
    */
-  bool decide_input_power_hit(const PhysicsView& physics_view, PlayerInput& input) const;
+  bool decide_input_power_hit(PlayerInput& input) const;
 };
 
 } // namespace pika
