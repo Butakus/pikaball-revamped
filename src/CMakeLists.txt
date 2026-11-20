@@ -60,6 +60,27 @@ if (PIKA_EMBED_ASSETS)
     )
 endif()
 
+if (NOT PIKA_EMBED_ASSETS)
+    # Non-embedded builds load assets/ from the executable's directory.
+    set(_ASSETS_SRC "${PROJECT_SOURCE_DIR}/assets")
+    set(_ASSETS_DST "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets")
+    if (WIN32)
+        # Windows: copy (creating symlinks often needs admin rights). Refreshed every time the game is relinked.
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${_ASSETS_SRC}" "${_ASSETS_DST}"
+            COMMENT "Copying assets to the build directory"
+            VERBATIM
+        )
+    else()
+        # Unix: symlink, so asset edits are picked up without rebuilding
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E create_symlink "${_ASSETS_SRC}" "${_ASSETS_DST}"
+            COMMENT "Linking assets into the build directory"
+            VERBATIM
+        )
+    endif()
+endif()
+
 if (NOT PIKA_ASSETS_RUNTIME_DIR STREQUAL "")
     target_compile_definitions(${PROJECT_NAME} PRIVATE PIKA_ASSETS_RUNTIME_DIR="${PIKA_ASSETS_RUNTIME_DIR}")
 endif()

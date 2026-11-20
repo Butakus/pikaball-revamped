@@ -54,6 +54,8 @@ The project uses CMake presets for the most common workflows:
    ```
 
 The resulting binaries are placed under the build directories created by the presets.
+Non-embedded builds also get an `assets` symlink next to the binary (a copy on Windows), so the game can be run
+straight from the build directory, e.g. `./build/debug/pikaball_revamped`.
 
 ### Compiler warnings
 
