@@ -33,12 +33,6 @@ public:
   void step();
 
   /**
-   * Run the game continuously at the selected frame rate.
-   * This method does not return until the window is closed.
-   */
-  void run();
-
-  /**
    * Handle a single event from the callback queue.
    * Control-related events are not instantly processed,
    * but stored in a queue and handled during the step update.
@@ -72,7 +66,6 @@ private:
   float current_fps_ {0.0};
 
   // Game state
-  bool running_ {false};
   bool pause_ {false};
   bool enable_fps_ {false};  // Flag to display FPS
   unsigned int frame_counter_ {0};
@@ -104,9 +97,6 @@ private:
   // Player controllers
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
-
-  /** Handle keyboard input */
-  void handle_input();
 
   /**
    * Process and compiles all events previously handled by handle_event

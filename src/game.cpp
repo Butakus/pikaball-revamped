@@ -99,43 +99,9 @@ void Game::step() {
   SDL_RenderPresent(sdl_sys_.get_renderer());
 }
 
-void Game::run() {
-  SDL_Log("Running stuff!");
-  running_ = true;
-
-  // Initialize state and window
-  state_ = GameState::Intro;
-  intro_view_->start();
-
-  while (running_) {
-    const std::uint64_t start_time = SDL_GetTicksNS();
-    // Get current input state from keyboard
-    handle_input();
-    // Execute game update step and draw
-    step();
-    const std::uint64_t elapsed = SDL_GetTicksNS() - start_time;
-
-    // Compare before subtracting to avoid unsigned underflow on slow frames
-    if (elapsed < target_frame_duration_) {
-      SDL_DelayPrecise(target_frame_duration_ - elapsed);
-    }
-  }
-}
-
-void Game::handle_input() {
-  // Event data
-  SDL_Event event {};
-
-  // Check and process all new events. Not thread safe.
-  while (SDL_PollEvent(&event)) {
-    handle_event(&event);
-  }
-}
-
 void Game::handle_event(const SDL_Event * event) {
-  if (event->type == SDL_EVENT_QUIT) {
-    running_ = false;
-  } else if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat) {
+  // SDL_EVENT_QUIT is handled by SDL callbacks in SDL_AppEvent
+  if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat) {
     // Possibly meaningful event. Store it and process it later
     std::lock_guard lock(events_mutex_);
     events_queue_.push_back(*event);
@@ -313,16 +279,15 @@ void Game::menu_state() {
         controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
         controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
       } else if (player_selection_ == MenuPlayerSelection::SinglePlayer) {
+        // The human plays on the side whose Enter key was pressed
+        // (enter = enter_left | enter_right)
+        SDL_assert(menu_input_.enter_left || menu_input_.enter_right);
         if (menu_input_.enter_left) {
           controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
           controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
-        } else if (menu_input_.enter_right) {
+        } else {
           controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
           controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
-        } else {
-          // This should never happen!!!!
-          controller_left_ = std::make_unique<ComputerController>(FieldSide::Left);
-          controller_right_ = std::make_unique<ComputerController>(FieldSide::Right);
         }
       }
       menu_state_ = MenuState::FadeOut;

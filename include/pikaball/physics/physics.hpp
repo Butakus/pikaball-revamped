@@ -33,9 +33,7 @@ public:
   void restart();
 
   /**
-   * Update the world state based on the user input.
-   * If any of the players is controlled by the computer, its input is ignored
-   * and its commands are computed by function TODO: XXXX.
+   * Update the world state based on the players' input.
    * FUN_00403dd0 / physicsEngine
    * @param input_left Input for the left player.
    * @param input_right Input for the right player.

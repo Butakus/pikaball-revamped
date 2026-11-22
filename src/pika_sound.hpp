@@ -14,26 +14,12 @@
 namespace pika {
 
 /**
- * Different audio channels that can play sounds at the same time.
- * If the same channel is used to play a new sound, the previous one is stopped.
- */
-// enum class SoundChannel {
-//   General = 0,    // Used for menu sounds and start/end sounds
-//   PikaLeft = 1,   // Used for left player sounds
-//   PikaRight = 2,  // Used for right player sounds
-//   Ball = 3        // Used for ball hit/ground sounds
-// };
-
-/**
- * A class to handle SDL resources (Window, Renderer, Audio, etc.)
- * Owns and manages the SDL objects.
- * It is responsible for calling SDL_Init and SDL_Quit.
+ * Game audio: owns the SDL_mixer mixer (on the default playback device),
+ * the loaded sounds and music, and the tracks that play them.
+ * It is responsible for calling MIX_Init and MIX_Quit.
  */
 class PikaSound {
 public:
-  // Number of sound channels (number of elements in SoundChannel enum)
-  static constexpr unsigned int num_channels = 4;
-
   PikaSound(PikaSound const&) = delete;
   PikaSound(PikaSound &&) = delete;
   PikaSound &operator=(PikaSound const&) = delete;
