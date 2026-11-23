@@ -1,6 +1,9 @@
 #include "game.hpp"
 #include "SDL3/SDL.h"
 
+#include <algorithm>
+#include <utility>
+
 #include <pikaball/controller/computer_controller.hpp>
 #include <pikaball/controller/keyboard_controller.hpp>
 
@@ -32,6 +35,29 @@ constexpr int menu_toggle = SDL_SCANCODE_ESCAPE;
 constexpr int fps_toggle = SDL_SCANCODE_F3;
 
 } // namespace pika::keys
+
+namespace {
+
+/*
+ * Helpers for the options menu enums (game_state.hpp).
+ */
+
+/** Move an option value by delta, stopping at the first and last values */
+template <typename E>
+constexpr E step_option(const E value, const int delta) {
+  static_assert(option_count<E> > 0, "Not an options menu enum");
+  return static_cast<E>(std::clamp(std::to_underlying(value) + delta, 0, option_count<E> - 1));
+}
+
+/** Move an option by delta, wrapping around after the last one */
+template <typename E>
+constexpr E cycle_option(const E value, const int delta) {
+  static_assert(option_count<E> > 0, "Not an options menu enum");
+  constexpr int count = option_count<E>;
+  return static_cast<E>(((std::to_underlying(value) + delta) % count + count) % count);
+}
+
+} // namespace
 
 
 Game::Game() {
@@ -319,77 +345,26 @@ void Game::menu_options_state() {
     return;
   }
 
-  switch (option_menu_select_) {
-  case OptionMenuSelection::Speed:
-    if (menu_input_.down) {
-      option_menu_select_ = OptionMenuSelection::Points;
-    } else if (menu_input_.up) {
-      option_menu_select_ = OptionMenuSelection::Music;
-    }
-    // Change option values if left/right
-    switch (speed_opt_select_) {
-    case SpeedOptionSelection::Slow:
-      if (menu_input_.right) {
-        change_game_speed(SpeedOptionSelection::Medium);
-      }
+  // Opposite keys on the same frame cancel each other
+  const int row_delta = static_cast<int>(menu_input_.down) - static_cast<int>(menu_input_.up);
+  const int value_delta = static_cast<int>(menu_input_.right) - static_cast<int>(menu_input_.left);
+
+  // Left/right changes the value of the selected option (without cycling)
+  if (value_delta != 0) {
+    switch (option_menu_select_) {
+    case OptionMenuSelection::Speed:
+      change_game_speed(step_option(speed_opt_select_, value_delta));
       break;
-    case SpeedOptionSelection::Medium:
-      if (menu_input_.right) {
-        change_game_speed(SpeedOptionSelection::Fast);
-      } else if (menu_input_.left) {
-        change_game_speed(SpeedOptionSelection::Slow);
-      }
+    case OptionMenuSelection::Points:
+      change_win_score(step_option(points_opt_select_, value_delta));
       break;
-    case SpeedOptionSelection::Fast:
-      if (menu_input_.left) {
-        change_game_speed(SpeedOptionSelection::Medium);
-      }
+    case OptionMenuSelection::Music:
+      change_music(step_option(music_opt_select_, value_delta));
       break;
     }
-    break;
-  case OptionMenuSelection::Points:
-    if (menu_input_.down) {
-      option_menu_select_ = OptionMenuSelection::Music;
-    } else if (menu_input_.up) {
-      option_menu_select_ = OptionMenuSelection::Speed;
-    }
-    // Change option values if left/right
-    switch (points_opt_select_) {
-    case PointsOptionSelection::Five:
-      if (menu_input_.right) {
-        change_win_score(PointsOptionSelection::Ten);
-      }
-      break;
-    case PointsOptionSelection::Ten:
-      if (menu_input_.right) {
-        change_win_score(PointsOptionSelection::Fifteen);
-      } else if (menu_input_.left) {
-        change_win_score(PointsOptionSelection::Five);
-      }
-      break;
-    case PointsOptionSelection::Fifteen:
-      if (menu_input_.left) {
-        change_win_score(PointsOptionSelection::Ten);
-      }
-      break;
-    }
-    break;
-  case OptionMenuSelection::Music:
-    if (menu_input_.down) {
-      option_menu_select_ = OptionMenuSelection::Speed;
-    } else if (menu_input_.up) {
-      option_menu_select_ = OptionMenuSelection::Points;
-    }
-    // Change option values if left/right
-    if (music_opt_select_ == OnOffSelection::On && menu_input_.right) {
-      toggle_music();
-      music_opt_select_ = OnOffSelection::Off;
-    } else if (music_opt_select_ == OnOffSelection::Off && menu_input_.left) {
-      toggle_music();
-      music_opt_select_ = OnOffSelection::On;
-    }
-    break;
   }
+  // Up/down moves to another option (cycling around)
+  option_menu_select_ = cycle_option(option_menu_select_, row_delta);
 
   options_view_->select_option(option_menu_select_);
   options_view_->select_speed(speed_opt_select_);
@@ -547,16 +522,21 @@ void Game::change_win_score(const PointsOptionSelection win_points) {
   }
 }
 
-void Game::toggle_music() {
-  if (music_opt_select_ == OnOffSelection::Off) {
+void Game::change_music(const OnOffSelection music) {
+  if (music == music_opt_select_) {
+    return;
+  }
+  music_opt_select_ = music;
+  switch (music) {
+  case OnOffSelection::On:
     // Only start the music if inside a game
     if (state_ == GameState::VolleyGame) {
       sdl_sys_.get_sound()->start_music();
     }
-    music_opt_select_ = OnOffSelection::On;
-  } else {
+    break;
+  case OnOffSelection::Off:
     sdl_sys_.get_sound()->stop_music();
-    music_opt_select_ = OnOffSelection::Off;
+    break;
   }
 }
 

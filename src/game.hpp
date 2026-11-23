@@ -135,7 +135,7 @@ private:
 
   void change_game_speed(SpeedOptionSelection speed);
   void change_win_score(PointsOptionSelection win_points);
-  void toggle_music();
+  void change_music(OnOffSelection music);
 };
 
 } // namespace pika
