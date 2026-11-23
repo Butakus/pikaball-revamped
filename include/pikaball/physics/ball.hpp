@@ -17,15 +17,6 @@ enum class BallSound {
 
 class Ball {
 public:
-  Ball() = default;
-  ~Ball() = default;
-  Ball(const Ball&) = default;
-  Ball& operator=(const Ball&) = default;
-
-  // Delete move operations
-  Ball(Ball&&) = delete;
-  Ball& operator=(Ball&&) = delete;
-
   /** Two balls are equal if all their state is equal */
   bool operator==(const Ball&) const = default;
 

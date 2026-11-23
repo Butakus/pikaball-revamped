@@ -38,13 +38,6 @@ enum class PlayerSound {
 class Player {
 public:
   explicit Player(const FieldSide& field_side);
-  ~Player() = default;
-  Player(const Player&) = default;
-  Player& operator=(const Player&) = default;
-
-  // Delete move operations
-  Player(Player&&) = delete;
-  Player& operator=(Player&&) = delete;
 
   /** Two players are equal if all their state is equal */
   bool operator==(const Player&) const = default;

@@ -9,8 +9,8 @@
 #include "SDL3/SDL_assert.h"
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
-#include "pikaball/game_state.hpp"
-#include "pikaball/sprites.hpp"
+#include "game_state.hpp"
+#include "sprites.hpp"
 #include "text_texture.hpp"
 #include "view.hpp"
 

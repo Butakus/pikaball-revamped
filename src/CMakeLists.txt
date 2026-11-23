@@ -28,6 +28,10 @@ target_sources(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
+# Game-only headers (SDL-dependent) live in src/
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     vendor  # Link to vendored SDL (and other libs if any)
     ${PHYSICS_LIB_NAME}

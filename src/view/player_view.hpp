@@ -8,7 +8,7 @@
 #include <SDL3/SDL_assert.h>
 #include <SDL3/SDL_render.h>
 #include <pikaball/physics/player.hpp>
-#include <pikaball/sprites.hpp>
+#include "sprites.hpp"
 
 namespace pika::view {
 

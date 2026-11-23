@@ -3,7 +3,7 @@
 
 #include "pikaball/common.hpp"
 #include "pikaball/input.hpp"
-#include "pikaball/sprites.hpp"
+#include "sprites.hpp"
 #include "view.hpp"
 
 namespace pika::view {

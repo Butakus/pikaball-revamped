@@ -438,7 +438,7 @@ void Game::volley_state() {
         // End of the round
         next_serve_side_ = update_score();
         volley_view_->set_score(score_left_, score_right_);
-        if (score_left_ >= win_score || score_right_ >= win_score) {
+        if (score_left_ >= win_score_ || score_right_ >= win_score_) {
           // Game ended
           physics_->end_game(next_serve_side_);
           frame_counter_ = 0;
@@ -536,13 +536,13 @@ void Game::change_win_score(const PointsOptionSelection win_points) {
   points_opt_select_ = win_points;
   switch (win_points) {
   case PointsOptionSelection::Five:
-    win_score = 5;
+    win_score_ = 5;
     break;
   case PointsOptionSelection::Ten:
-    win_score = 10;
+    win_score_ = 10;
     break;
   case PointsOptionSelection::Fifteen:
-    win_score = 15;
+    win_score_ = 15;
     break;
   }
 }

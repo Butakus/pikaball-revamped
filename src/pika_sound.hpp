@@ -7,8 +7,8 @@
 #include <memory>
 #include <string>
 
-#include <pikaball/resources.hpp>
-#include <pikaball/sdl_error.hpp>
+#include "resources.hpp"
+#include "sdl_error.hpp"
 #include <pikaball/physics/physics_common.hpp>  // For FieldSide
 
 namespace pika {

@@ -1,9 +1,10 @@
 #ifndef PIKA_GAME_HPP
 #define PIKA_GAME_HPP
 
+#include <cstdint>
 #include <mutex>
 
-#include "pikaball/game_state.hpp"
+#include "game_state.hpp"
 #include "pikaball/input.hpp"
 #include "view/intro_view.hpp"
 #include "view/menu_view.hpp"
@@ -82,7 +83,7 @@ private:
   VolleyGameState volley_state_ {VolleyGameState::NewGame};
   int score_left_ {0};
   int score_right_ {0};
-  int win_score = 15;
+  int win_score_ = 15;
 
   FieldSide next_serve_side_ {FieldSide::Left};
   // Slow Motion state. The Game object must manually check this to adjust the FPS

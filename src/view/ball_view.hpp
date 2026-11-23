@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL_render.h>
 #include <pikaball/physics/ball.hpp>
-#include <pikaball/sprites.hpp>
+#include "sprites.hpp"
 
 namespace pika::view {
 

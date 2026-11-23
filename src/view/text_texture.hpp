@@ -5,7 +5,7 @@
 
 #include "SDL3/SDL_render.h"
 #include "SDL3_ttf/SDL_ttf.h"
-#include "pikaball/sdl_error.hpp"
+#include "sdl_error.hpp"
 #include "view.hpp"
 
 namespace pika::view {

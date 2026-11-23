@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <string>
 #include "SDL3/SDL.h"
-#include "pikaball/sdl_error.hpp"
+#include "sdl_error.hpp"
 
 #ifdef PIKA_EMBED_ASSETS
 #include <array>

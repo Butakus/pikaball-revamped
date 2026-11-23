@@ -2,6 +2,7 @@
 #define PIKA_TESTS_HELPERS_HPP
 
 #include <pikaball/input.hpp>
+#include <pikaball/physics/player.hpp>
 
 namespace pika::test {
 
@@ -34,6 +35,13 @@ constexpr PlayerInput dive(const DirX direction) {
 }
 
 } // namespace input
+
+/** Update the player n times with the same input */
+inline void step(Player& player, const PlayerInput& input, const int n) {
+  for (int i = 0; i < n; ++i) {
+    player.update(input);
+  }
+}
 
 } // namespace pika::test
 

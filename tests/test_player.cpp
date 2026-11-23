@@ -9,17 +9,6 @@
 using namespace pika;
 using namespace pika::test;
 
-namespace {
-
-/** Update the player n times with the same input */
-void step(Player& player, const PlayerInput& input, const int n) {
-  for (int i = 0; i < n; ++i) {
-    player.update(input);
-  }
-}
-
-} // namespace
-
 TEST_CASE("Player: start position depends on the field side") {
   const Player left(FieldSide::Left);
   CHECK(left.x() == 36);
