@@ -6,7 +6,7 @@
 
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
-#include "pikaball/sdl_error.hpp"
+#include "text_texture.hpp"
 #include "view.hpp"
 
 namespace pika::view {
@@ -93,7 +93,7 @@ private:
       return;
     }
     fps_str_ = fps_str;
-    fps_texture_ = FPSView::render_text_texture(renderer_, text_font_, fps_str_);
+    fps_texture_ = render_text_texture(renderer_, text_font_, fps_str_);
     if (!fps_texture_ && !fps_text_error_logged_) {
       SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Failed to render FPS value: %s", SDL_GetError());
       fps_text_error_logged_ = true;
@@ -106,52 +106,8 @@ private:
     }
 
     // Load text textures
-    fps_txt_texture_ = FPSView::load_text_texture(renderer_, text_font_, "FPS");
-    // title_texture_ = load_text_texture(renderer_, text_font_, txt::str_options);
+    fps_txt_texture_ = load_text_texture(renderer_, text_font_, "FPS");
   }
-
-
-  /**
-   * Render a text into a new texture. Does not throw: safe to call every frame.
-   * @return The texture, or an empty pointer on failure (details in SDL_GetError())
-   */
-  [[nodiscard]] static SDL_Texture_ptr render_text_texture(
-    SDL_Renderer* renderer,
-    TTF_Font* text_font,
-    const std::string & text,
-    const SDL_Color & text_color = {255, 255, 255, 255})
-  {
-    View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};
-    // Load the text into a temporary surface
-    SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
-    if (text_surface == nullptr) {
-      return text_texture;
-    }
-    // Generate the texture
-    text_texture.reset(SDL_CreateTextureFromSurface(renderer, text_surface));
-    // Release the temporary surface object
-    SDL_DestroySurface(text_surface);
-
-    return text_texture;
-  }
-
-  /**
-   * Render a text into a new texture, for textures created at startup.
-   * @throw std::runtime_error if the text cannot be rendered
-   */
-  [[nodiscard]] static SDL_Texture_ptr load_text_texture(
-    SDL_Renderer* renderer,
-    TTF_Font* text_font,
-    const std::string & text,
-    const SDL_Color & text_color = {255, 255, 255, 255})
-  {
-    auto text_texture = render_text_texture(renderer, text_font, text, text_color);
-    if (!text_texture) {
-      throw sdl_error("Failed to render text '" + text + "'");
-    }
-    return text_texture;
-  }
-
 };
 
 } // namespace pika::view

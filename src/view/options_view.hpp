@@ -10,31 +10,11 @@
 #include "SDL3_ttf/SDL_ttf.h"
 #include "pikaball/common.hpp"
 #include "pikaball/game_state.hpp"
-#include "pikaball/sdl_error.hpp"
 #include "pikaball/sprites.hpp"
+#include "text_texture.hpp"
 #include "view.hpp"
 
 namespace pika::view {
-
-[[nodiscard]] inline View::SDL_Texture_ptr load_text_texture(
-  SDL_Renderer* renderer,
-  TTF_Font* text_font,
-  const std::string & text,
-  const SDL_Color & text_color = {255, 255, 255, 255})
-{
-  // Load the text into a temporary surface
-  SDL_Surface* text_surface = TTF_RenderText_Solid(text_font, text.c_str(), 0, text_color);
-  if (text_surface == nullptr) {
-    throw sdl_error("Failed to render text '" + text + "'");
-  }
-  // Generate the texture and save it
-  View::SDL_Texture_ptr text_texture {nullptr, SDL_DestroyTexture};
-  text_texture.reset(SDL_CreateTextureFromSurface(renderer, text_surface));
-  // Release the temporary surface object
-  SDL_DestroySurface(text_surface);
-
-  return text_texture;
-}
 
 /**
  * An abstract class to represent an option item with multiple values.
@@ -155,7 +135,7 @@ public:
     for (const auto& opt_value : opt_values_) {
       opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, opt_value));
       opt_select_textures_.emplace_back(
-        load_text_texture(renderer_, text_font_, opt_value, {255, 0, 0, 255})
+        load_text_texture(renderer_, text_font_, opt_value, text_color_selected)
       );
     }
   }
@@ -168,7 +148,7 @@ public:
     opt_values_.emplace_back(option_value);
     opt_textures_.emplace_back(load_text_texture(renderer_, text_font_, option_value));
     opt_select_textures_.emplace_back(
-      load_text_texture(renderer_, text_font_, option_value, {255, 0, 0, 255}))
+      load_text_texture(renderer_, text_font_, option_value, text_color_selected))
     ;
   }
 
