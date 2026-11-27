@@ -9,6 +9,10 @@ set(KEYBOARD_CONTROLLER_LIB_NAME "${PROJECT_NAME}_kb_controller")
 set(COMPUTER_CONTROLLER_LIB_NAME "${PROJECT_NAME}_computer_controller")
 add_subdirectory(controller)
 
+# Build the network library
+set(NET_LIB_NAME "${PROJECT_NAME}_net")
+add_subdirectory(net)
+
 add_executable(${PROJECT_NAME} WIN32)
 
 # Static runtime on Windows (MinGW), so the .exe runs without extra DLLs. MSVC is not supported.
@@ -38,6 +42,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${CONTROLLER_BASE_LIB_NAME}
     ${KEYBOARD_CONTROLLER_LIB_NAME}
     ${COMPUTER_CONTROLLER_LIB_NAME}
+    ${NET_LIB_NAME}
 )
 target_link_libraries(${PROJECT_NAME} PRIVATE pika_warnings)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)

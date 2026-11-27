@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <mutex>
+#include <optional>
 
 #include "game_state.hpp"
 #include "pikaball/input.hpp"
@@ -14,14 +15,18 @@
 #include "sdl_system.hpp"
 
 #include <pikaball/controller/player_controller.hpp>
+#include <pikaball/net/connection.hpp>
 #include <pikaball/physics/physics.hpp>
 
 namespace pika {
 
 class Game {
 public:
-  Game();
-  ~Game() = default;
+  /**
+   * @param net_config Settings to host or join a network game. Empty for a local game.
+   */
+  explicit Game(const std::optional<net::NetConfig>& net_config = std::nullopt);
+  ~Game();
 
   Game(Game const&) = delete;
   Game(Game &&) = delete;
@@ -102,6 +107,9 @@ private:
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
 
+  // Connection to the other machine in a network game. Empty in a local game.
+  std::optional<net::Connection> connection_;
+
   /**
    * Process and compiles all events previously handled by handle_event
    * Afterwards, resets the event queue.
@@ -115,6 +123,9 @@ private:
    * @param tick The input for this frame
    */
   void apply_tick_input(const TickInput& tick);
+
+  /** Send and receive network messages, and log the connection changes */
+  void update_network();
 
   /** Handle player and ball sounds */
   void handle_sound() const;

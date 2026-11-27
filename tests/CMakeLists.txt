@@ -19,10 +19,12 @@ add_executable(pikaball_tests
     test_physics.cpp
     test_player.cpp
     test_ball.cpp
+    test_net.cpp
 )
 target_include_directories(pikaball_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pikaball_tests PRIVATE
     ${PROJECT_NAME}_physics
+    ${PROJECT_NAME}_net
     doctest::doctest
     pika_warnings
 )

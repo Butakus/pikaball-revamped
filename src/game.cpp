@@ -2,6 +2,7 @@
 #include "SDL3/SDL.h"
 
 #include <algorithm>
+#include <random>
 #include <utility>
 
 #include <pikaball/controller/computer_controller.hpp>
@@ -60,7 +61,7 @@ constexpr E cycle_option(const E value, const int delta) {
 } // namespace
 
 
-Game::Game() {
+Game::Game(const std::optional<net::NetConfig>& net_config) {
   physics_ = std::make_unique<Physics>(),
   intro_view_ = std::make_unique<view::IntroView>(
     sdl_sys_.get_renderer(), sdl_sys_.get_sprite_sheet());
@@ -90,10 +91,35 @@ Game::Game() {
 
   // Initialize frame time and FPS
   last_frame_timestamp_ = SDL_GetTicksNS();
+
+  if (net_config) {
+    if (net_config->role == net::NetConfig::Role::Host) {
+      const net::MatchSetup setup {
+        .seed = std::random_device{}(),
+        .input_delay = net_config->input_delay,
+        .speed = static_cast<std::uint8_t>(std::to_underlying(speed_opt_select_)),
+        .points = static_cast<std::uint8_t>(std::to_underlying(points_opt_select_)),
+      };
+      connection_ = net::Connection::host(net_config->port, setup);
+      SDL_Log("Hosting a network game on UDP port %u", connection_->local_port());
+    } else {
+      connection_ = net::Connection::join(net_config->address, net_config->port);
+      SDL_Log("Joining the network game at %s:%u", net_config->address.c_str(), net_config->port);
+    }
+  }
+}
+
+Game::~Game() {
+  if (connection_) {
+    connection_->send_bye();
+  }
 }
 
 void Game::step() {
-  // First, compile and process events
+  // Update network connection state
+  update_network();
+
+  // Compile and process events
   // Then apply the simulation input of this frame
   apply_tick_input(compile_events());
 
@@ -216,6 +242,35 @@ void Game::apply_tick_input(const TickInput& tick) {
   // Pass the player inputs to the controllers
   controller_left_->on_local_input(tick.left);
   controller_right_->on_local_input(tick.right);
+}
+
+void Game::update_network() {
+  if (!connection_) {
+    return;
+  }
+  const net::ConnectionState previous_state = connection_->state();
+  connection_->update(SDL_GetTicks());
+  const net::ConnectionState state = connection_->state();
+  if (state == previous_state) {
+    return;
+  }
+
+  switch (state) {
+  case net::ConnectionState::Connected: {
+    const net::MatchSetup& setup = connection_->setup();
+    SDL_Log("Connected to %s. Match setup: seed %u, input delay %u, speed %u, points %u",
+      connection_->peer_name().c_str(), setup.seed, setup.input_delay, setup.speed, setup.points);
+    break;
+  }
+  case net::ConnectionState::Waiting:
+    SDL_Log("The guest left. Waiting for a new guest on UDP port %u", connection_->local_port());
+    break;
+  case net::ConnectionState::Disconnected:
+    SDL_Log("The host left or stopped answering");
+    break;
+  case net::ConnectionState::Connecting:
+    break;
+  }
 }
 
 void Game::handle_player_sound(const FieldSide side) const {

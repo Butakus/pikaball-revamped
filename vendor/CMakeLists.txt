@@ -41,3 +41,22 @@ target_link_libraries(vendor INTERFACE
     SDL3_mixer::SDL3_mixer-static
     SDL3_ttf::SDL3_ttf-static
 )
+
+# Standalone Asio (header-only networking, no Boost). The repository has no CMake project,
+# so FetchContent only downloads it and the target is defined here.
+FetchContent_Declare(asio
+    GIT_REPOSITORY  https://github.com/chriskohlhoff/asio.git
+    GIT_TAG         asio-1-38-2
+    GIT_SHALLOW     TRUE
+)
+FetchContent_MakeAvailable(asio)
+
+add_library(asio INTERFACE)
+# SYSTEM: project warning flags (and -Werror) don't apply to the Asio headers
+target_include_directories(asio SYSTEM INTERFACE ${asio_SOURCE_DIR}/asio/include)
+target_compile_definitions(asio INTERFACE ASIO_STANDALONE ASIO_NO_DEPRECATED)
+if (WIN32)
+    # Target Windows 10 and link the Winsock libraries
+    target_compile_definitions(asio INTERFACE _WIN32_WINNT=0x0A00)
+    target_link_libraries(asio INTERFACE ws2_32 mswsock)
+endif()

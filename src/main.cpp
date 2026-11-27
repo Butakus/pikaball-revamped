@@ -2,9 +2,13 @@
 #include <SDL3/SDL_main.h>
 #include <SDL3/SDL_init.h>
 
+#include <charconv>
 #include <cstdint>
 #include <exception>
+#include <optional>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 
 #include "game.hpp"
 
@@ -42,12 +46,79 @@ SDL_AppResult run_guarded(const char* context, Callback&& callback) {
     return SDL_APP_FAILURE;
 }
 
+/**
+ * Parse an unsigned number in [min, max] from a command line argument.
+ * @throws std::invalid_argument if the text is not a number in range
+ */
+template <typename T>
+T parse_number(const std::string_view text, const T min, const T max, const char* what) {
+    unsigned long value {0};
+    const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+    if (error != std::errc{} || end != text.data() + text.size() || value < min || value > max) {
+        throw std::invalid_argument("Invalid " + std::string(what) + ": '" + std::string(text) + "'");
+    }
+    return static_cast<T>(value);
+}
+
+/**
+ * Parse the network game options. Temporary for development, until the game has menus for it:
+ *   --host <port>            Host a network game on the given UDP port
+ *   --join <address:port>    Join the network game hosted at address:port
+ *   --delay <frames>         Input delay in frames (host only, default 2)
+ * @return The network settings, or nothing for a local game
+ * @throws std::invalid_argument if the options are not valid
+ */
+std::optional<pika::net::NetConfig> parse_net_options(const int argc, char** argv) {
+    std::optional<pika::net::NetConfig> config;
+    std::optional<std::uint8_t> delay;
+    for (int i = 1; i < argc; ++i) {
+        const std::string_view option = argv[i];
+        if (option != "--host" && option != "--join" && option != "--delay") {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Ignoring unknown option '%s'", argv[i]);
+            continue;
+        }
+        if (i + 1 >= argc) {
+            throw std::invalid_argument("Missing value after " + std::string(option));
+        }
+        const std::string_view value = argv[++i];
+
+        if (option == "--delay") {
+            delay = parse_number<std::uint8_t>(value, 1, 15, "input delay");
+            continue;
+        }
+        if (config) {
+            throw std::invalid_argument("Use only one of --host and --join");
+        }
+        config.emplace();
+        if (option == "--host") {
+            config->role = pika::net::NetConfig::Role::Host;
+            config->port = parse_number<std::uint16_t>(value, 1, 65535, "port");
+        } else {
+            // The port is after the last ':'
+            const auto colon = value.rfind(':');
+            if (colon == std::string_view::npos) {
+                throw std::invalid_argument("Use --join <address:port>");
+            }
+            config->role = pika::net::NetConfig::Role::Guest;
+            config->address = value.substr(0, colon);
+            config->port = parse_number<std::uint16_t>(value.substr(colon + 1), 1, 65535, "port");
+        }
+    }
+    if (delay) {
+        if (!config || config->role != pika::net::NetConfig::Role::Host) {
+            throw std::invalid_argument("--delay can only be used with --host");
+        }
+        config->input_delay = *delay;
+    }
+    return config;
+}
+
 } // namespace
 
 
 SDL_AppResult SDL_AppInit(void **appstate,
-                          [[maybe_unused]] int argc,
-                          [[maybe_unused]] char **argv) {
+                          int argc,
+                          char **argv) {
     // Setup logger verbosity
     #ifdef PIKA_DEBUG
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_DEBUG);
@@ -55,8 +126,8 @@ SDL_AppResult SDL_AppInit(void **appstate,
     SDL_SetLogPriorities(SDL_LOG_PRIORITY_WARN);
     #endif
     // Create a Game object that will be passed back to each callback.
-    return run_guarded("The game could not start", [appstate] {
-        *appstate = new pika::Game;
+    return run_guarded("The game could not start", [appstate, argc, argv] {
+        *appstate = new pika::Game(parse_net_options(argc, argv));
         return SDL_APP_CONTINUE;
     });
 }
