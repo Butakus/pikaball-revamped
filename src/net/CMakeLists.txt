@@ -3,6 +3,7 @@ add_library(${NET_LIB_NAME}
     protocol.cpp
     udp_transport.cpp
     connection.cpp
+    network_session.cpp
 )
 target_include_directories(${NET_LIB_NAME} PUBLIC
     ${PROJECT_SOURCE_DIR}/include

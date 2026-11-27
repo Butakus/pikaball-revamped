@@ -20,6 +20,7 @@ add_executable(pikaball_tests
     test_player.cpp
     test_ball.cpp
     test_net.cpp
+    test_network_session.cpp
 )
 target_include_directories(pikaball_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pikaball_tests PRIVATE

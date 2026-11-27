@@ -46,6 +46,13 @@ void Connection::send_bye() {
   }
 }
 
+FieldSide Connection::local_side() const {
+  if (is_host_) {
+    return setup_.host_side;
+  }
+  return setup_.host_side == FieldSide::Left ? FieldSide::Right : FieldSide::Left;
+}
+
 std::string Connection::peer_name() const {
   return transport_.peer() ? transport_.peer()->to_string() : std::string {};
 }
@@ -87,6 +94,10 @@ void Connection::handle_datagram(const Datagram& datagram, const std::uint64_t n
     if (state_ == ConnectionState::Connected) {
       disconnect();
     }
+    break;
+  case MessageType::Input:
+    // TODO: Pass the inputs to the NetworkSession once the game loop uses it.
+    // Receiving them already keeps the connection alive (last_received_ms_).
     break;
   }
 }

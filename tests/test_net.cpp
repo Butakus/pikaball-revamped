@@ -11,12 +11,13 @@
 #include <vector>
 
 using namespace pika::net;
+using pika::FieldSide;
 
 TEST_CASE("Protocol: messages round-trip") {
   CHECK(decode_type(encode_message(MessageType::Hello)) == MessageType::Hello);
   CHECK(decode_type(encode_message(MessageType::Bye)) == MessageType::Bye);
 
-  const MatchSetup setup {.seed = 0xDEADBEEF, .input_delay = 3, .speed = 2, .points = 1};
+  const MatchSetup setup {.seed = 0xDEADBEEF, .input_delay = 3, .speed = 2, .points = 1, .host_side = FieldSide::Right};
   const auto welcome = encode_welcome(setup);
   CHECK(decode_type(welcome) == MessageType::Welcome);
   CHECK(decode_welcome(welcome) == setup);
@@ -45,6 +46,10 @@ TEST_CASE("Protocol: invalid datagrams are rejected") {
   SUBCASE("too short for a header") {
     datagram.resize(1);
     CHECK_FALSE(decode_type(datagram));
+  }
+  SUBCASE("invalid host side") {
+    datagram.back() = 2;
+    CHECK_FALSE(decode_welcome(datagram));
   }
   SUBCASE("a Hello is not a Welcome") {
     CHECK_FALSE(decode_welcome(encode_message(MessageType::Hello)));
@@ -79,7 +84,7 @@ bool connected(const Connection& connection) {
 } // namespace
 
 TEST_CASE("Connection: handshake over loopback UDP") {
-  const MatchSetup setup {.seed = 12345, .input_delay = 2, .speed = 1, .points = 2};
+  const MatchSetup setup {.seed = 12345, .input_delay = 2, .speed = 1, .points = 2, .host_side = FieldSide::Right};
   Connection host = Connection::host(0, setup);  // Any free port
   Connection guest = Connection::join("127.0.0.1", host.local_port());
   CHECK(host.is_host());
@@ -94,6 +99,9 @@ TEST_CASE("Connection: handshake over loopback UDP") {
   CHECK(guest.setup().input_delay == setup.input_delay);
   CHECK(guest.setup().speed == setup.speed);
   CHECK(guest.setup().points == setup.points);
+  // The host plays where it chose, the guest on the other side
+  CHECK(host.local_side() == FieldSide::Right);
+  CHECK(guest.local_side() == FieldSide::Left);
 
   SUBCASE("the keep-alive holds the connection") {
     // 10 s of rounds, longer than the timeout

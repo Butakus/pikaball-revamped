@@ -65,15 +65,17 @@ T parse_number(const std::string_view text, const T min, const T max, const char
  *   --host <port>            Host a network game on the given UDP port
  *   --join <address:port>    Join the network game hosted at address:port
  *   --delay <frames>         Input delay in frames (host only, default 2)
+ *   --side <left|right>      Side where the host plays (host only, default left)
  * @return The network settings, or nothing for a local game
  * @throws std::invalid_argument if the options are not valid
  */
 std::optional<pika::net::NetConfig> parse_net_options(const int argc, char** argv) {
     std::optional<pika::net::NetConfig> config;
     std::optional<std::uint8_t> delay;
+    std::optional<pika::FieldSide> side;
     for (int i = 1; i < argc; ++i) {
         const std::string_view option = argv[i];
-        if (option != "--host" && option != "--join" && option != "--delay") {
+        if (option != "--host" && option != "--join" && option != "--delay" && option != "--side") {
             SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Ignoring unknown option '%s'", argv[i]);
             continue;
         }
@@ -84,6 +86,13 @@ std::optional<pika::net::NetConfig> parse_net_options(const int argc, char** arg
 
         if (option == "--delay") {
             delay = parse_number<std::uint8_t>(value, 1, 15, "input delay");
+            continue;
+        }
+        if (option == "--side") {
+            if (value != "left" && value != "right") {
+                throw std::invalid_argument("Use --side left or --side right");
+            }
+            side = (value == "left") ? pika::FieldSide::Left : pika::FieldSide::Right;
             continue;
         }
         if (config) {
@@ -104,11 +113,18 @@ std::optional<pika::net::NetConfig> parse_net_options(const int argc, char** arg
             config->port = parse_number<std::uint16_t>(value.substr(colon + 1), 1, 65535, "port");
         }
     }
+    const bool hosting = config && config->role == pika::net::NetConfig::Role::Host;
     if (delay) {
-        if (!config || config->role != pika::net::NetConfig::Role::Host) {
+        if (!hosting) {
             throw std::invalid_argument("--delay can only be used with --host");
         }
         config->input_delay = *delay;
+    }
+    if (side) {
+        if (!hosting) {
+            throw std::invalid_argument("--side can only be used with --host");
+        }
+        config->host_side = *side;
     }
     return config;
 }

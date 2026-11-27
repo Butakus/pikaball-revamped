@@ -17,6 +17,7 @@ struct NetConfig {
   std::string address;       // Host's address (guest only)
   std::uint16_t port {0};    // Port to listen on (host) or to send to (guest)
   std::uint8_t input_delay {2};
+  FieldSide host_side {FieldSide::Left};  // Where the host plays (host only)
 };
 
 enum class ConnectionState {
@@ -66,6 +67,8 @@ public:
   /** The match setup. Only valid once connected (the guest receives it from the host). */
   [[nodiscard]] const MatchSetup& setup() const { return setup_; }
   [[nodiscard]] bool is_host() const { return is_host_; }
+  /** @return The side where this machine's player plays. Only valid once connected. */
+  [[nodiscard]] FieldSide local_side() const;
   /** @return The peer as "address:port" (empty if no peer) */
   [[nodiscard]] std::string peer_name() const;
   [[nodiscard]] std::uint16_t local_port() const { return transport_.local_port(); }

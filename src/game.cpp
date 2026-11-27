@@ -99,6 +99,7 @@ Game::Game(const std::optional<net::NetConfig>& net_config) {
         .input_delay = net_config->input_delay,
         .speed = static_cast<std::uint8_t>(std::to_underlying(speed_opt_select_)),
         .points = static_cast<std::uint8_t>(std::to_underlying(points_opt_select_)),
+        .host_side = net_config->host_side,
       };
       connection_ = net::Connection::host(net_config->port, setup);
       SDL_Log("Hosting a network game on UDP port %u", connection_->local_port());
@@ -258,8 +259,9 @@ void Game::update_network() {
   switch (state) {
   case net::ConnectionState::Connected: {
     const net::MatchSetup& setup = connection_->setup();
-    SDL_Log("Connected to %s. Match setup: seed %u, input delay %u, speed %u, points %u",
-      connection_->peer_name().c_str(), setup.seed, setup.input_delay, setup.speed, setup.points);
+    SDL_Log("Connected to %s. Match setup: seed %u, input delay %u, speed %u, points %u. Playing on the %s",
+      connection_->peer_name().c_str(), setup.seed, setup.input_delay, setup.speed, setup.points,
+      connection_->local_side() == FieldSide::Left ? "left" : "right");
     break;
   }
   case net::ConnectionState::Waiting:

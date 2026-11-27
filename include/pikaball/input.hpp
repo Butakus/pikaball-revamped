@@ -29,6 +29,8 @@ struct PlayerInput {
   DirX direction_x;
   DirY direction_y;
   bool power_hit;
+
+  bool operator==(const PlayerInput&) const = default;
 };
 
 /**
@@ -39,6 +41,17 @@ struct TickInput {
   PlayerInput left {};
   PlayerInput right {};
   bool pause_toggle {false};
+};
+
+/**
+ * One player's part of a TickInput: their PlayerInput and their pause key.
+ * In a network game, each machine sends its own player's SideInput to the other one.
+ */
+struct SideInput {
+  PlayerInput player {};
+  bool pause_toggle {false};
+
+  bool operator==(const SideInput&) const = default;
 };
 
 /**
