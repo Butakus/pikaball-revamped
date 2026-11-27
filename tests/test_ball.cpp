@@ -11,6 +11,9 @@ using namespace pika::test;
 
 namespace {
 
+/** Random numbers for the hits (only used when the ball lands almost on the player's center) */
+Rng hit_rng {0};
+
 /** A ball placed for the start of a round on the given side */
 Ball serve(const FieldSide side) {
   Ball ball;
@@ -177,7 +180,7 @@ TEST_CASE("Ball: hit by a player on the ground") {
   SUBCASE("ball to the right of the player goes right") {
     const Player player(FieldSide::Left);  // x = 36
     Ball ball = serve(FieldSide::Left);  // x = 56
-    ball.process_player_hit(player, input::idle());
+    ball.process_player_hit(player, input::idle(), hit_rng);
     CHECK(ball.velocity_x() == 6);    // distance 20 / 3
     CHECK(ball.velocity_y() == -15);  // at least 15 up
     CHECK_FALSE(ball.power_hit());
@@ -185,14 +188,14 @@ TEST_CASE("Ball: hit by a player on the ground") {
   SUBCASE("ball to the left of the player goes left") {
     const Player player(FieldSide::Right);  // x = 396
     Ball ball = serve(FieldSide::Right);  // x = 376
-    ball.process_player_hit(player, input::idle());
+    ball.process_player_hit(player, input::idle(), hit_rng);
     CHECK(ball.velocity_x() == -6);
   }
   SUBCASE("a fast ball keeps its speed, upwards") {
     const Player player(FieldSide::Left);
     Ball ball = serve(FieldSide::Left);
     ball.set_velocity_y(22);
-    ball.process_player_hit(player, input::idle());
+    ball.process_player_hit(player, input::idle(), hit_rng);
     CHECK(ball.velocity_y() == -22);
   }
   SUBCASE("ball almost on the player center gets a random x velocity") {
@@ -200,9 +203,9 @@ TEST_CASE("Ball: hit by a player on the ground") {
     step(player, input::move(DirX::Right), 3);
     REQUIRE(player.x() == 54);  // 2 px from the ball: 2 / 3 = 0
     for (std::uint32_t seed = 0; seed < 20; ++seed) {
-      seed_rng(seed);
+      Rng seeded_rng {seed};
       Ball ball = serve(FieldSide::Left);
-      ball.process_player_hit(player, input::idle());
+      ball.process_player_hit(player, input::idle(), seeded_rng);
       CHECK(ball.velocity_x() >= -1);
       CHECK(ball.velocity_x() <= 1);
     }
@@ -210,7 +213,7 @@ TEST_CASE("Ball: hit by a player on the ground") {
   SUBCASE("the expected landing point is updated") {
     const Player player(FieldSide::Left);
     Ball ball = serve(FieldSide::Left);
-    ball.process_player_hit(player, input::idle());
+    ball.process_player_hit(player, input::idle(), hit_rng);
     Ball copy = ball;
     copy.calculate_landing_point();
     CHECK(ball.expected_landing_x() == copy.expected_landing_x());
@@ -228,7 +231,7 @@ TEST_CASE("Ball: power hit") {
   SUBCASE("forward and down from the left side") {
     Ball ball = serve(FieldSide::Left);
     ball.set_velocity_y(10);
-    ball.process_player_hit(player, input::power_hit(DirX::Right, DirY::Down));
+    ball.process_player_hit(player, input::power_hit(DirX::Right, DirY::Down), hit_rng);
     CHECK(ball.velocity_x() == 20);
     CHECK(ball.velocity_y() == 30);  // 2 * |-15|: the y speed is raised to 15 before the power hit
     CHECK(ball.power_hit());
@@ -239,19 +242,19 @@ TEST_CASE("Ball: power hit") {
   }
   SUBCASE("no direction: half the x speed, flat") {
     Ball ball = serve(FieldSide::Left);
-    ball.process_player_hit(player, input::power_hit());
+    ball.process_player_hit(player, input::power_hit(), hit_rng);
     CHECK(ball.velocity_x() == 10);
     CHECK(ball.velocity_y() == 0);
   }
   SUBCASE("up") {
     Ball ball = serve(FieldSide::Left);
     ball.set_velocity_y(20);
-    ball.process_player_hit(player, input::power_hit(DirX::None, DirY::Up));
+    ball.process_player_hit(player, input::power_hit(DirX::None, DirY::Up), hit_rng);
     CHECK(ball.velocity_y() == -40);
   }
   SUBCASE("from the right side the ball goes left, whatever the direction") {
     Ball ball = serve(FieldSide::Right);
-    ball.process_player_hit(player, input::power_hit(DirX::Right));
+    ball.process_player_hit(player, input::power_hit(DirX::Right), hit_rng);
     CHECK(ball.velocity_x() == -20);
   }
   SUBCASE("a ball exactly over the net goes left") {
@@ -259,7 +262,7 @@ TEST_CASE("Ball: power hit") {
     ball.set_velocity_x(20);
     step(ball, 8);
     REQUIRE(ball.x() == ground_h_width);
-    ball.process_player_hit(player, input::power_hit(DirX::Right));
+    ball.process_player_hit(player, input::power_hit(DirX::Right), hit_rng);
     CHECK(ball.velocity_x() == -20);
   }
 }

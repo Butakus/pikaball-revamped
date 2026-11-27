@@ -4,6 +4,7 @@
 #include <array>
 
 #include <pikaball/input.hpp>
+#include <pikaball/random.hpp>
 #include "physics_common.hpp"
 #include "player.hpp"
 
@@ -55,8 +56,9 @@ public:
    * FUN_004030a0 / processCollisionBetweenBallAndPlayer
    * @param player The player that is in contact with the ball.
    * @param input The input for the given player.
+   * @param rng The simulation's random number generator
    */
-  void process_player_hit(const Player& player, const PlayerInput& input);
+  void process_player_hit(const Player& player, const PlayerInput& input, Rng& rng);
 
   // Getters
   [[nodiscard]] auto x() const { return x_; }

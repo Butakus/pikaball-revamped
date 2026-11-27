@@ -138,7 +138,7 @@ bool Ball::collision_with_player(const Player& player) const {
   return std::abs(diff_x) <= player_h_size && std::abs(diff_y) <= player_h_size;
 }
 
-void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
+void Ball::process_player_hit(const Player &player, const PlayerInput &input, Rng& rng) {
 
   // Base y velocity is always updated when the ball hits the player
   const int abs_velocity_y = std::abs(velocity_y_);
@@ -187,7 +187,7 @@ void Ball::process_player_hit(const Player &player, const PlayerInput &input) {
 
     if (velocity_x_ == 0) {
       // If ball velocity x is 0, randomly choose one of -1, 0, 1.
-      velocity_x_ = rand_int() % 3 - 1;
+      velocity_x_ = rng.rand_int() % 3 - 1;
     }
 
     power_hit_ = false;

@@ -3,9 +3,12 @@
 
 #include "ball.hpp"
 #include "pikaball/input.hpp"
+#include "pikaball/random.hpp"
 #include "player.hpp"
 
+#include <cstdint>
 #include <memory>
+#include <random>
 
 namespace pika {
 
@@ -14,7 +17,11 @@ public:
   // Utility typedef
   using Ptr = std::unique_ptr<Physics>;
 
-  Physics();
+  /**
+   * @param seed Seed for the simulation's random numbers.
+   *             Networked games must use the same seed on both machines.
+   */
+  explicit Physics(std::uint32_t seed = std::random_device{}());
   ~Physics() = default;
 
   // Delete copy and move operations
@@ -50,12 +57,17 @@ public:
   /** Reset sounds of players and ball after an iteration */
   void reset_sound();
 
+  /** Restart the sequence of the random numbers with a new seed */
+  void seed(const std::uint32_t seed) { rng_.seed(seed); }
+
   [[nodiscard]] const Ball& ball() const { return ball_; }
   [[nodiscard]] const Player& player(const FieldSide& side) const;
 private:
   Player player_left_;
   Player player_right_;
   Ball ball_ {};
+  // Random numbers of the simulation
+  Rng rng_;
 
   /**
    * Check and process collisions between the ball and a player

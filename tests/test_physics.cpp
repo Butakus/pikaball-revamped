@@ -12,24 +12,24 @@ using namespace pika::test;
 
 namespace {
 
-/** Random but valid input, drawn from the game's RNG (use seed_rng() for repeatable runs) */
-PlayerInput random_input() {
+/** Random but valid input, drawn from the given generator */
+PlayerInput random_input(Rng& rng) {
   return {
-    .direction_x = static_cast<DirX>(rand_int() % 3 - 1),
-    .direction_y = static_cast<DirY>(rand_int() % 3 - 1),
-    .power_hit = rand_int() % 4 == 0,
+    .direction_x = static_cast<DirX>(rng.rand_int() % 3 - 1),
+    .direction_y = static_cast<DirY>(rng.rand_int() % 3 - 1),
+    .power_hit = rng.rand_int() % 4 == 0,
   };
 }
 
 /** Run a seeded game with random inputs, starting a new round after each point. Returns the state of every frame. */
 std::vector<PhysicsView> simulate(const std::uint32_t seed, const int frames) {
-  seed_rng(seed);
-  Physics physics;
+  Rng input_rng {seed};
+  Physics physics {seed};
   physics.init_round(FieldSide::Left);
   std::vector<PhysicsView> states;
   states.reserve(frames);
   for (int frame = 0; frame < frames; ++frame) {
-    if (physics.update(random_input(), random_input())) {
+    if (physics.update(random_input(input_rng), random_input(input_rng))) {
       physics.init_round(physics.ball().x() < ground_h_width ? FieldSide::Right : FieldSide::Left);
     }
     states.emplace_back(physics);
@@ -155,14 +155,53 @@ TEST_CASE("Physics: the same seed and inputs give the same game") {
   CHECK_FALSE(first == other);
 }
 
+TEST_CASE("Physics: two games with the same seed stay in sync when the shared RNG is used elsewhere") {
+  // Like two networked machines: same seed and inputs, but the views draw from the
+  // shared RNG a different number of times on each one
+  constexpr std::uint32_t seed = 7;
+  Physics first {seed};
+  Physics second {seed};
+  first.init_round(FieldSide::Left);
+  second.init_round(FieldSide::Left);
+
+  // The inputs come from their own generator, so both games get the same ones
+  Rng input_rng {99};
+
+  int points = 0;
+  for (int frame = 0; frame < 10000; ++frame) {
+    CAPTURE(frame);
+    const PlayerInput left = random_input(input_rng);
+    const PlayerInput right = random_input(input_rng);
+
+    // Only one of the games "renders clouds"
+    for (int i = 0; i < frame % 5; ++i) {
+      static_cast<void>(rand_int());
+    }
+
+    const bool first_point = first.update(left, right);
+    const bool second_point = second.update(left, right);
+    REQUIRE(first_point == second_point);
+    REQUIRE(PhysicsView(first) == PhysicsView(second));
+
+    if (first_point) {
+      ++points;
+      const FieldSide serve = first.ball().x() < ground_h_width ? FieldSide::Right : FieldSide::Left;
+      first.init_round(serve);
+      second.init_round(serve);
+    }
+  }
+  // Enough points to exercise the random serve paths
+  CHECK(points > 100);
+}
+
 TEST_CASE("Physics: positions stay inside the field during a long random game") {
-  seed_rng(1234);
-  Physics physics;
+  Rng input_rng {1234};
+  Physics physics {1234};
   physics.init_round(FieldSide::Left);
 
   int points = 0;
   for (int frame = 0; frame < 10000; ++frame) {
-    if (physics.update(random_input(), random_input())) {
+    if (physics.update(random_input(input_rng), random_input(input_rng))) {
       ++points;
       physics.init_round(physics.ball().x() < ground_h_width ? FieldSide::Right : FieldSide::Left);
       continue;

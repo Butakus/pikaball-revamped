@@ -2,9 +2,10 @@
 
 namespace pika {
 
-Physics::Physics() :
+Physics::Physics(const std::uint32_t seed) :
   player_left_(FieldSide::Left),
-  player_right_(FieldSide::Right)
+  player_right_(FieldSide::Right),
+  rng_(seed)
 {}
 
 void Physics::init_round(const FieldSide &field_side) {
@@ -44,7 +45,7 @@ void Physics::end_game(const FieldSide& field_side) {
 void Physics::collision_ball_player(Player& player, const PlayerInput& input) {
   if (ball_.collision_with_player(player)) {
     if (!player.collision_with_ball) {
-      ball_.process_player_hit(player, input);
+      ball_.process_player_hit(player, input, rng_);
       player.collision_with_ball = true;
     }
   }
