@@ -94,7 +94,8 @@ Game::Game() {
 
 void Game::step() {
   // First, compile and process events
-  compile_events();
+  // Then apply the simulation input of this frame
+  apply_tick_input(compile_events());
 
   switch (state_) {
   case GameState::Intro:
@@ -134,10 +135,9 @@ void Game::handle_event(const SDL_Event * event) {
   }
 }
 
-void Game::compile_events() {
-  // Enter / power-hit keys are handled by events to avoid repetitions
-  PlayerInput player_input_left {};
-  PlayerInput player_input_right {};
+TickInput Game::compile_events() {
+  // Enter / power-hit and pause keys are handled by events to avoid repetitions
+  TickInput tick {};
   // Same applies to menu input
   menu_input_ = {};
 
@@ -150,21 +150,19 @@ void Game::compile_events() {
         switch (event.key.scancode) {
           case keys::menu_toggle:
             // When ESC is pressed, the game is paused / unpaused
-            if (state_ != GameState::Intro) {
-              pause_ = !pause_;
-            }
+            tick.pause_toggle = true;
             break;
           case keys::fps_toggle:
             enable_fps_ = !enable_fps_;
             break;
           case keys::p1_hit:
           case keys::p1_hit_alt:
-            player_input_left.power_hit = true;
+            tick.left.power_hit = true;
             menu_input_.enter_left = true;
             break;
           case keys::p2_hit:
           case keys::p2_hit_alt:
-          player_input_right.power_hit = true;
+            tick.right.power_hit = true;
             menu_input_.enter_right = true;
             break;
           case keys::p1_up:
@@ -196,20 +194,28 @@ void Game::compile_events() {
   const bool* key_state = SDL_GetKeyboardState(nullptr);
 
   // Convert keys from bool to a DirX/DirY object and set the player input directions
-  player_input_left.direction_x =
+  tick.left.direction_x =
     get_input_direction_x(key_state[keys::p1_left], key_state[keys::p1_right]);
-  player_input_left.direction_y =
+  tick.left.direction_y =
     get_input_direction_y(key_state[keys::p1_up], key_state[keys::p1_down]);
-  player_input_right.direction_x =
+  tick.right.direction_x =
     get_input_direction_x(key_state[keys::p2_left], key_state[keys::p2_right]);
-  player_input_right.direction_y =
+  tick.right.direction_y =
     get_input_direction_y(key_state[keys::p2_up], key_state[keys::p2_down]);
 
-  // Pass keyboard inputs to the keyboard controllers
-  controller_left_->on_local_input(player_input_left);
-  controller_right_->on_local_input(player_input_right);
-
   menu_input_.enter = menu_input_.enter_left | menu_input_.enter_right;
+  return tick;
+}
+
+void Game::apply_tick_input(const TickInput& tick) {
+  tick_input_ = tick;
+  // The game can't be paused during the intro
+  if (tick.pause_toggle && state_ != GameState::Intro) {
+    pause_ = !pause_;
+  }
+  // Pass the player inputs to the controllers
+  controller_left_->on_local_input(tick.left);
+  controller_right_->on_local_input(tick.right);
 }
 
 void Game::handle_player_sound(const FieldSide side) const {
@@ -446,9 +452,9 @@ void Game::volley_state() {
       }
     break;
     case VolleyGameState::GameEnd:
-      // Check if the user wants to skip the end frames
-      const bool skip =
-        frame_counter_ > view::VolleyView::game_end_skip_frames && menu_input_.enter;
+      // Check if a player wants to skip the end frames
+      const bool hit_pressed = tick_input_.left.power_hit || tick_input_.right.power_hit;
+      const bool skip = frame_counter_ > view::VolleyView::game_end_skip_frames && hit_pressed;
       // Or, end the game after the total animation frames
       if (skip || frame_counter_ > view::VolleyView::game_end_frames) {
         reset_volley_game_state();

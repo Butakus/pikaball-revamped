@@ -94,7 +94,10 @@ private:
   std::vector<SDL_Event> events_queue_;
 
   // Inputs
+  // Local menu navigation (not synchronized in network games)
   MenuInput menu_input_ {};
+  // Input for the game simulation in the current frame
+  TickInput tick_input_ {};
   // Player controllers
   std::unique_ptr<PlayerController> controller_left_ {nullptr};
   std::unique_ptr<PlayerController> controller_right_ {nullptr};
@@ -102,8 +105,16 @@ private:
   /**
    * Process and compiles all events previously handled by handle_event
    * Afterwards, resets the event queue.
+   * Local-only input (menu navigation, FPS toggle) is applied directly.
+   * @return The simulation input from this machine's keyboard
    */
-  void compile_events();
+  TickInput compile_events();
+
+  /**
+   * Apply the simulation input of this frame: pause toggle and player inputs.
+   * @param tick The input for this frame
+   */
+  void apply_tick_input(const TickInput& tick);
 
   /** Handle player and ball sounds */
   void handle_sound() const;

@@ -32,6 +32,16 @@ struct PlayerInput {
 };
 
 /**
+ * All the input that drives the game simulation in one frame.
+ * In a network game, both machines must apply the same TickInput on the same frame.
+ */
+struct TickInput {
+  PlayerInput left {};
+  PlayerInput right {};
+  bool pause_toggle {false};
+};
+
+/**
  * Utility function to extract the x direction from a PlayerInput struct.
  * @param input_left The value of the input left key
  * @param input_right The value of the input right key
