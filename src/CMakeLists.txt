@@ -110,10 +110,8 @@ else()
         install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}.metainfo.xml
                 DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
         # AppStream (software centres, Flatpak) needs an icon of at least 64x64
-        foreach(_SIZE 48 128)
-            install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}-${_SIZE}.png
-                    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${_SIZE}x${_SIZE}/apps
-                    RENAME ${_APP_ID}.png)
-        endforeach()
+        install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}-128.png
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/128x128/apps
+                RENAME ${_APP_ID}.png)
     endif()
 endif()
