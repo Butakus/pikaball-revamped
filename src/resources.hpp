@@ -49,25 +49,38 @@ static const std::array<pika::b::EmbedInternal::EmbeddedFile, 10> resource_list 
 } // namespace pika::embed
 #endif
 
-inline std::string build_resource_path(const char* filename) {
-#ifdef PIKA_ASSETS_RUNTIME_DIR
-  std::string runtime_dir = PIKA_ASSETS_RUNTIME_DIR;
-  std::string relative_path = filename;
-  static constexpr const char* prefix = "assets/";
-  static constexpr std::size_t prefix_size = 7;
-  if (relative_path.compare(0, prefix_size, prefix) == 0) {
-    relative_path.erase(0, prefix_size);
-  }
-  std::filesystem::path full_path = std::filesystem::path(runtime_dir) / relative_path;
-  return full_path.lexically_normal().string();
-#else
-  const char* base_path = SDL_GetBasePath();
-  if (base_path != nullptr) {
-    const std::filesystem::path full_path = std::filesystem::path(base_path) / filename;
-    return full_path.lexically_normal().string();
-  }
-  return filename;
+/**
+ * Directory that contains the assets/ directory, found on first use:
+ * 1. The executable's directory (build directory, or the portable install).
+ * 2. The installed data directory relative to the executable, if built for the Unix install layout
+ *    (PIKA_ASSETS_INSTALL_REL_DIR, e.g. "../share/pikaball_revamped").
+ * If no candidate has an assets/ directory, the first one is used, so load errors show the expected path.
+ */
+inline const std::filesystem::path& assets_base_dir() {
+  static const std::filesystem::path base_dir = [] {
+    const char* exe_dir = SDL_GetBasePath();
+    const std::filesystem::path exe_path = (exe_dir != nullptr) ? exe_dir : "";
+    std::error_code error;  // Treat errors (e.g. no permission) as "not found"
+    if (std::filesystem::exists(exe_path / "assets", error)) {
+      return exe_path;
+    }
+#ifdef PIKA_ASSETS_INSTALL_REL_DIR
+    const std::filesystem::path installed_path = (exe_path / PIKA_ASSETS_INSTALL_REL_DIR).lexically_normal();
+    if (std::filesystem::exists(installed_path / "assets", error)) {
+      return installed_path;
+    }
 #endif
+    return exe_path;
+  }();
+  return base_dir;
+}
+
+/**
+ * Full path of a resource file on disk
+ * @param filename The resource filename (relative to the project root, e.g. "assets/font.ttf")
+ */
+inline std::string build_resource_path(const char* filename) {
+  return (assets_base_dir() / filename).lexically_normal().string();
 }
 
 /**

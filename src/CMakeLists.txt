@@ -17,7 +17,7 @@ if (WIN32 AND NOT MSVC)
 endif()
 
 # Windows resources (icon + version info). The version comes from project(VERSION).
-configure_file(${PROJECT_SOURCE_DIR}/cmake/pikaball-revamped.rc.in ${PROJECT_BINARY_DIR}/pikaball-revamped.rc @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/dist/windows/pikaball-revamped.rc.in ${PROJECT_BINARY_DIR}/pikaball-revamped.rc @ONLY)
 
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
@@ -85,17 +85,35 @@ if (NOT PIKA_EMBED_ASSETS)
     endif()
 endif()
 
-if (NOT PIKA_ASSETS_RUNTIME_DIR STREQUAL "")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PIKA_ASSETS_RUNTIME_DIR="${PIKA_ASSETS_RUNTIME_DIR}")
-endif()
-
-# Install targets
-install(TARGETS ${PROJECT_NAME}
-    DESTINATION .
-)
-
-if (NOT PIKA_EMBED_ASSETS)
-    install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets/
-            DESTINATION ${PIKA_ASSETS_INSTALL_DIR}
-    )
+# Install
+if (NOT PIKA_SYSTEM_INSTALL)
+    # Portable layout (default): the executable and assets/ side by side, as in the build directory
+    install(TARGETS ${PROJECT_NAME} DESTINATION .)
+    if (NOT PIKA_EMBED_ASSETS)
+        install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets DESTINATION .)
+    endif()
+else()
+    # Unix layout: bin/pikaball_revamped and share/pikaball_revamped/assets (plus the desktop files on Linux)
+    set(_DATA_DIR "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}")
+    install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    if (NOT PIKA_EMBED_ASSETS)
+        install(DIRECTORY ${PROJECT_SOURCE_DIR}/assets DESTINATION ${_DATA_DIR})
+        # The game finds the installed assets relative to its own directory, so the install prefix can be moved
+        file(RELATIVE_PATH _ASSETS_REL_DIR
+            "${CMAKE_INSTALL_FULL_BINDIR}" "${CMAKE_INSTALL_FULL_DATADIR}/${PROJECT_NAME}")
+        target_compile_definitions(${PROJECT_NAME} PRIVATE PIKA_ASSETS_INSTALL_REL_DIR="${_ASSETS_REL_DIR}")
+    endif()
+    if (UNIX AND NOT APPLE)
+        set(_APP_ID "io.github.butakus.pikaball")
+        install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}.desktop
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+        install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}.metainfo.xml
+                DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+        # AppStream (software centres, Flatpak) needs an icon of at least 64x64
+        foreach(_SIZE 48 128)
+            install(FILES ${PROJECT_SOURCE_DIR}/dist/linux/${_APP_ID}-${_SIZE}.png
+                    DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${_SIZE}x${_SIZE}/apps
+                    RENAME ${_APP_ID}.png)
+        endforeach()
+    endif()
 endif()

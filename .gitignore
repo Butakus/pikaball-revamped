@@ -9,3 +9,9 @@ build
 # Doxygen docs
 docs/html
 docs/latex
+
+# Flatpak build output (dist/flatpak/build_flatpak.sh)
+.flatpak-builder
+dist/flatpak/builddir
+dist/flatpak/repo
+dist/flatpak/*.flatpak

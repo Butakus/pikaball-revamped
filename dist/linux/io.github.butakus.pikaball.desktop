@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Pikaball
+Comment=Pikachu Volleyball - Revamped Murcia LAN Party Edition
+Exec=pikaball_revamped
+Icon=io.github.butakus.pikaball
+Terminal=false
+Categories=Game;ArcadeGame;

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.butakus.pikaball</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>Pikaball</name>
+  <summary>Pikachu Volleyball - Revamped Murcia LAN Party Edition</summary>
+  <description>
+    <p>
+      A modern C++ reimplementation of the classic Pikachu Volleyball game (1997) using SDL3,
+      with the custom sprites of the Murcia LAN Party 2009 special edition.
+    </p>
+    <ul>
+      <li>Classic Pikachu Volleyball gameplay</li>
+      <li>Single-player mode against the computer, or two players on the same keyboard</li>
+      <li>Original sound effects and music</li>
+      <li>Options menu to change the game speed, winning score and music</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.butakus.pikaball.desktop</launchable>
+  <provides>
+    <binary>pikaball_revamped</binary>
+  </provides>
+  <url type="homepage">https://github.com/butakus/pikaball-revamped</url>
+  <url type="bugtracker">https://github.com/butakus/pikaball-revamped/issues</url>
+  <developer id="io.github.butakus">
+    <name>butakus</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="1.0.0" date="2025-10-24">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Game</category>
+    <category>ArcadeGame</category>
+  </categories>
+</component>

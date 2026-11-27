@@ -23,7 +23,7 @@ This "Revamped" version features:
 - **Special sprites** modified by the Murcia LAN Party team in 2009.
 
 ## Download
-You can download the executable for Windows and Linux from the [Releases](https://github.com/butakus/pikaball-revamped/releases) page.
+You can download the game for Windows and Linux from the [Releases](https://github.com/butakus/pikaball-revamped/releases) page.
 
 ### Windows:
 Download the `pikaball_revamped.exe` file and run it!
@@ -31,7 +31,7 @@ Download the `pikaball_revamped.exe` file and run it!
 ### Linux:
 There is a Flatpak file available for Linux. After downloading it, you can install it with this command:
 
-```flatpak --user install pikaball_revamped.flatpak```
+```flatpak --user install pikaball.flatpak```
 
 The flatpak will create a `.desktop` entry for you.
 You can launch the game by clicking on the icon, or by running this in the terminal:

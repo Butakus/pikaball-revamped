@@ -137,7 +137,7 @@ jobs:
       uses: actions/upload-artifact@v7
       if: ${{ success() && runner.os == 'Windows' && matrix.build_type == 'Release' && matrix.c_compiler == 'gcc' && matrix.pika_embed_assets == 'ON' }}
       with:
-        name: pikaball-revamped.exe
+        name: pikaball-revamped
         path: '${{ steps.strings.outputs.build-output-dir }}/pikaball_revamped.exe'
 
     - name: .zip for non-embedded release

@@ -1,0 +1,32 @@
+# Build the Flatpak bundle (dist/flatpak) and upload it as an artifact (pikaball.flatpak), to be attached to releases.
+name: Flatpak build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  flatpak:
+    runs-on: ubuntu-latest
+    container:
+      # The image provides flatpak-builder and the freedesktop runtime/SDK of the manifest
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-26.08
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Build the Flatpak bundle
+      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: pikaball.flatpak
+        manifest-path: dist/flatpak/io.github.butakus.pikaball.yml
+        cache-key: flatpak-builder-${{ github.sha }}

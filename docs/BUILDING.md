@@ -104,29 +104,6 @@ You can toggle the mode with:
 - `PIKA_EMBED_ASSETS=OFF` for non-embedded builds
 - `PIKA_EMBED_ASSETS=ON` for embedded builds
 
-### Install layout for non-embedded builds
-
-For non-embedded builds, assets are installed under the install prefix using:
-
-- `PIKA_ASSETS_INSTALL_DIR` (default: `assets`)
-
-For example:
-
-```bash
-cmake -S . -B build/release -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DPIKA_EMBED_ASSETS=OFF \
-  -DPIKA_ASSETS_INSTALL_DIR=assets
-```
-
-### Runtime asset path for package managers
-
-Packaging systems such as Flatpak may need an explicit runtime root for assets. Use:
-
-- `PIKA_ASSETS_RUNTIME_DIR`
-
-This can point to the location where the assets will be available at runtime, for example inside a sandboxed application install.
-
 ## Installing the build
 
 A typical install step is:
@@ -135,10 +112,31 @@ A typical install step is:
 cmake --install build/release
 ```
 
-You can override the install prefix if needed:
+By default, the game is installed inside the build directory, in `pikaball-release/` (with the presets, `build/<preset>/pikaball-release/`).
+You can choose another location with `--prefix`:
 
 ```bash
 cmake --install build/release --prefix /path/to/stage
 ```
 
-For package-specific setups, combine the install prefix with the asset-related CMake options above.
+### Install layouts
+
+- **Portable (default)**: the executable and the `assets/` directory side by side, like in the build directory and in the Windows release zip.
+  The whole directory can be moved around.
+- **Unix layout** (`-DPIKA_SYSTEM_INSTALL=ON`): `bin/pikaball_revamped` and `share/pikaball_revamped/assets/`.
+  On Linux, it also installs the desktop entry, the AppStream metainfo and the icon (from `dist/linux/`) into `share/`.
+  This is the layout used by the Flatpak.
+
+The game first looks for `assets/` next to the executable, and then (Unix layout only) in `../share/pikaball_revamped/` relative to it.
+
+## Flatpak
+
+The Flatpak manifest and a build script are in `dist/flatpak/`.
+To build the `pikaball.flatpak` bundle locally (it needs `flatpak-builder` and the Flathub repository):
+
+```bash
+dist/flatpak/build_flatpak.sh            # Build dist/flatpak/pikaball.flatpak
+dist/flatpak/build_flatpak.sh --install  # Also install it for the current user
+```
+
+The CI also builds the bundle on every push to `main` (workflow `Flatpak build`), and uploads it as an artifact.

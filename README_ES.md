@@ -22,7 +22,7 @@ Esta versión "Revamped" incluye:
 
 ## Descarga
 
-Puedes descargar el ejecutable para Windows y Linux desde la página de [Releases](https://github.com/butakus/pikaball-revamped/releases).
+Puedes descargar el juego para Windows y Linux desde la página de [Releases](https://github.com/butakus/pikaball-revamped/releases).
 
 ### Windows:
 
@@ -33,7 +33,7 @@ Puedes descargar el ejecutable para Windows y Linux desde la página de [Release
 Hay un archivo Flatpak disponible para Linux. Después de descargarlo, puedes instalarlo con este comando:
 
 ```bash
-flatpak --user install pikaball_revamped.flatpak
+flatpak --user install pikaball.flatpak
 ```
 
 El flatpak creará una entrada `.desktop`.

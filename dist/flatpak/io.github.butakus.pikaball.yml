@@ -1,0 +1,40 @@
+# Flatpak manifest. Builds the game from this repository.
+id: io.github.butakus.pikaball
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+command: pikaball_revamped
+build-options:
+  build-args:
+    - --share=network
+finish-args:
+  # Wayland, with X11 as fallback
+  - --socket=wayland
+  - --socket=fallback-x11
+  # Share IPC namespace with the host (necessary for X11)
+  - --share=ipc
+  # OpenGL rendering
+  - --device=dri
+  # Audio
+  - --socket=pulseaudio
+modules:
+  - name: pikaball
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DPIKA_EMBED_ASSETS=OFF
+      # bin/, share/pikaball_revamped/assets, desktop entry, metainfo and icon
+      - -DPIKA_SYSTEM_INSTALL=ON
+      - -DPIKA_BUILD_TESTS=OFF
+    sources:
+      - type: dir
+        path: ../..
+        skip:
+          - .git
+          - build
+          - .flatpak-builder
+          - dist/flatpak/.flatpak-builder
+          - dist/flatpak/builddir
+          - dist/flatpak/repo
+          - dist/flatpak/pikaball.flatpak
