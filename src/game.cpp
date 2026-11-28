@@ -375,90 +375,107 @@ void Game::menu_options_state() {
 }
 
 void Game::volley_state() {
-  // Render the view
-  volley_view_->render(frame_counter_, PhysicsView(*physics_));
-
-  // If the game is paused (options are on the screen) just render and exit without an update
-  if (pause_) {
-    return;
+  // The physics are updated before rendering, so the screen shows the ball and players of this frame
+  // (the same frame as the input and the sounds). The rest of the update happens after rendering,
+  // so the messages and fades see the same state and frame counter as the physics they're shown with.
+  // While paused (options on the screen), just render.
+  if (!pause_) {
+    update_volley_physics();
   }
+  volley_view_->render(frame_counter_, PhysicsView(*physics_));
+  if (!pause_) {
+    update_volley_frame();
+  }
+}
 
+void Game::update_volley_physics() {
+  switch (volley_state_) {
+  case VolleyGameState::NewGame:
+  case VolleyGameState::StartRound:
+    // The players and the ball wait for the round to start
+    break;
+  case VolleyGameState::PlayRound:
+    // Update physics and check if the ball is touching the ground
+    if (step_physics()) {
+      // End of the round
+      next_serve_side_ = update_score();
+      volley_view_->set_score(score_left_, score_right_);
+      if (score_left_ >= win_score_ || score_right_ >= win_score_) {
+        // Game ended
+        physics_->end_game(next_serve_side_);
+        frame_counter_ = 0;
+        volley_state_ = VolleyGameState::GameEnd;
+        volley_view_->set_state(volley_state_);
+        // Stop music
+        sdl_sys_.get_sound()->stop_music();
+      }
+      else {
+        // Apply end-of-round effects and start next round
+        frame_counter_ = 0;
+        volley_state_ = VolleyGameState::EndRound;
+        volley_view_->set_state(volley_state_);
+      }
+    }
+    break;
+  case VolleyGameState::EndRound:
+  case VolleyGameState::GameEnd:
+    // Keep updating the physics, without checking the ball touching the ground
+    step_physics();
+    break;
+  }
+}
+
+void Game::update_volley_frame() {
   // Update frame counter
   frame_counter_++;
 
   switch (volley_state_) {
   case VolleyGameState::NewGame:
-      // TODO: Maybe check transitions after rendering and updating
-      if (frame_counter_ >= view::VolleyView::new_game_frames) {
-        // The first round of the game also starts here
-        controller_left_->on_round_start(PhysicsView(*physics_));
-        controller_right_->on_round_start(PhysicsView(*physics_));
-        volley_state_ = VolleyGameState::PlayRound;
-        volley_view_->set_state(volley_state_);
-      }
+    if (frame_counter_ >= view::VolleyView::new_game_frames) {
+      // The first round of the game also starts here
+      controller_left_->on_round_start(PhysicsView(*physics_));
+      controller_right_->on_round_start(PhysicsView(*physics_));
+      volley_state_ = VolleyGameState::PlayRound;
+      volley_view_->set_state(volley_state_);
+    }
     break;
-    case VolleyGameState::StartRound:
-      if (frame_counter_ >= view::VolleyView::start_round_frames) {
-        // Start the next round
-        // When a new round stars, update the controllers
-        controller_left_->on_round_start(PhysicsView(*physics_));
-        controller_right_->on_round_start(PhysicsView(*physics_));
-        volley_state_ = VolleyGameState::PlayRound;
-        volley_view_->set_state(volley_state_);
-      }
+  case VolleyGameState::StartRound:
+    if (frame_counter_ >= view::VolleyView::start_round_frames) {
+      // Start the next round
+      // When a new round stars, update the controllers
+      controller_left_->on_round_start(PhysicsView(*physics_));
+      controller_right_->on_round_start(PhysicsView(*physics_));
+      volley_state_ = VolleyGameState::PlayRound;
+      volley_view_->set_state(volley_state_);
+    }
     break;
-    case VolleyGameState::PlayRound:
-      // Update physics and check if the ball is touching the ground
-      if (step_physics()) {
-        // End of the round
-        next_serve_side_ = update_score();
-        volley_view_->set_score(score_left_, score_right_);
-        if (score_left_ >= win_score_ || score_right_ >= win_score_) {
-          // Game ended
-          physics_->end_game(next_serve_side_);
-          frame_counter_ = 0;
-          volley_state_ = VolleyGameState::GameEnd;
-          volley_view_->set_state(volley_state_);
-          // Stop music
-          sdl_sys_.get_sound()->stop_music();
-        }
-        else {
-          // Apply end-of-round effects and start next round
-          frame_counter_ = 0;
-          volley_state_ = VolleyGameState::EndRound;
-          volley_view_->set_state(volley_state_);
-        }
-      }
+  case VolleyGameState::PlayRound:
+    // The round ends when the ball touches the ground (see update_volley_physics)
     break;
-    case VolleyGameState::EndRound:
-      // Apply and manage slow motion and fading effects
-      // Slow motion will be active for the first 6 frames after the point
-      slow_motion_ = frame_counter_ <= 6;
-      // We keep updating the physics, but without checking the ball
-      step_physics();
-      if (frame_counter_ >= view::VolleyView::end_round_frames) {
-        // Start the next round
-        frame_counter_ = 0;
-        volley_view_->fade_out(1.0);
-        physics_->init_round(next_serve_side_);
-        volley_state_ = VolleyGameState::StartRound;
-        volley_view_->set_state(volley_state_);
-      }
+  case VolleyGameState::EndRound:
+    // Slow motion for the frame that was just rendered: the point and the next 5 frames
+    slow_motion_ = frame_counter_ <= 6;
+    if (frame_counter_ >= view::VolleyView::end_round_frames) {
+      // Start the next round.
+      // The fade out also covers the frame that was just rendered with black.
+      frame_counter_ = 0;
+      volley_view_->fade_out(1.0);
+      physics_->init_round(next_serve_side_);
+      volley_state_ = VolleyGameState::StartRound;
+      volley_view_->set_state(volley_state_);
+    }
     break;
-    case VolleyGameState::GameEnd:
-      // Check if the user wants to skip the end frames
-      const bool skip =
-        frame_counter_ > view::VolleyView::game_end_skip_frames && menu_input_.enter;
-      // Or, end the game after the total animation frames
-      if (skip || frame_counter_ > view::VolleyView::game_end_frames) {
-        reset_volley_game_state();
-        frame_counter_ = 0;
-        state_ = GameState::Intro;
-        intro_view_->start();
-        return;
-      }
-      // Keep updating physics in the end state, without checking the ball touching ground.
-      step_physics();
+  case VolleyGameState::GameEnd:
+    // Check if the user wants to skip the end frames
+    const bool skip =
+      frame_counter_ > view::VolleyView::game_end_skip_frames && menu_input_.enter;
+    // Or, end the game after the total animation frames
+    if (skip || frame_counter_ > view::VolleyView::game_end_frames) {
+      reset_volley_game_state();
+      frame_counter_ = 0;
+      state_ = GameState::Intro;
+      intro_view_->start();
+    }
     break;
   }
 }

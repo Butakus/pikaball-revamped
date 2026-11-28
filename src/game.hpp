@@ -120,6 +120,16 @@ private:
   /** Control the game's logic for the VolleyGame state */
   void volley_state();
   /**
+   * First part of a VolleyGame update, before rendering: advance the physics,
+   * and handle the ball touching the ground (score, end of the round or the game).
+   */
+  void update_volley_physics();
+  /**
+   * Second part of a VolleyGame update, after rendering: advance the frame counter,
+   * and handle the transitions that depend on it (start of the game and the rounds, fades, end of the game).
+   */
+  void update_volley_frame();
+  /**
    * Query both controllers and advance the physics one step.
    * @return true if the ball touched the ground (same as Physics::update)
    */
