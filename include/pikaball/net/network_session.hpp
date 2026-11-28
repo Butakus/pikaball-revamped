@@ -36,7 +36,8 @@ class NetworkSession {
 public:
   /**
    * @param local_side Side of the player of this machine
-   * @param input_delay Ticks between reading a local input and applying it (at least 1)
+   * @param input_delay Ticks between reading a local input and applying it.
+   *        With 0, each tick waits for the other machine's input of that same tick: only fine on a LAN.
    */
   NetworkSession(FieldSide local_side, std::uint8_t input_delay);
 
@@ -44,8 +45,9 @@ public:
    * Schedule the local input for tick current_tick() + input_delay.
    * Call it at least once per tick. Only the first call for a tick is scheduled: the power hit and pause
    * presses of later calls (e.g. while waiting for the other machine) are kept for the next tick, so they're not lost.
+   * @return True if the input was scheduled (a new input to send), false if it was only kept for the next tick
    */
-  void add_local_input(const SideInput& input);
+  bool add_local_input(const SideInput& input);
 
   /** @return True if both inputs for the current tick are known, so it can be simulated */
   [[nodiscard]] bool ready() const;

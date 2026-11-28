@@ -3,7 +3,9 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 #include <string>
+#include <vector>
 
 #include "protocol.hpp"
 #include "udp_transport.hpp"
@@ -63,6 +65,15 @@ public:
   /** Tell the peer that we are leaving (best effort, it may be lost). */
   void send_bye();
 
+  /** Send a game message (e.g. Input) to the peer. Only if connected. */
+  void send(std::span<const std::uint8_t> datagram);
+
+  /**
+   * @return The Input messages received from the peer since the last call, in arrival order.
+   *         Messages are not decoded.
+   */
+  [[nodiscard]] std::vector<std::vector<std::uint8_t>> take_input_messages();
+
   [[nodiscard]] ConnectionState state() const { return state_; }
   /** The match setup. Only valid once connected (the guest receives it from the host). */
   [[nodiscard]] const MatchSetup& setup() const { return setup_; }
@@ -88,6 +99,8 @@ private:
   std::optional<std::uint64_t> last_hello_ms_;
   // Time of the last valid message from the peer
   std::uint64_t last_received_ms_ {0};
+  // Input messages waiting for take_input_messages()
+  std::vector<std::vector<std::uint8_t>> input_messages_;
 
   Connection(UdpTransport transport, bool is_host, const MatchSetup& setup);
 

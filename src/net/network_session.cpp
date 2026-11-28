@@ -6,25 +6,26 @@ namespace pika::net {
 
 NetworkSession::NetworkSession(const FieldSide local_side, const std::uint8_t input_delay) :
   local_side_(local_side),
-  input_delay_(std::max<std::uint8_t>(input_delay, 1)),
+  input_delay_(input_delay),
   // The first input_delay ticks are idle for both players, and both machines know it
   local_inputs_(input_delay_),
   remote_inputs_(input_delay_),
   remote_received_(input_delay_)
 {}
 
-void NetworkSession::add_local_input(const SideInput& input) {
+bool NetworkSession::add_local_input(const SideInput& input) {
   if (local_inputs_.size() > current_tick_ + input_delay_) {
     // The input for this tick is already scheduled: keep the presses for the next one
     carried_presses_.player.power_hit |= input.player.power_hit;
     carried_presses_.pause_toggle |= input.pause_toggle;
-    return;
+    return false;
   }
   SideInput scheduled = input;
   scheduled.player.power_hit |= carried_presses_.player.power_hit;
   scheduled.pause_toggle |= carried_presses_.pause_toggle;
   carried_presses_ = {};
   local_inputs_.push_back(scheduled);
+  return true;
 }
 
 bool NetworkSession::ready() const {

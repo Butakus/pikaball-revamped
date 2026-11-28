@@ -107,6 +107,8 @@ Game::Game(const std::optional<net::NetConfig>& net_config) {
       connection_ = net::Connection::join(net_config->address, net_config->port);
       SDL_Log("Joining the network game at %s:%u", net_config->address.c_str(), net_config->port);
     }
+    // Skip the intro and menu, and wait for the other machine
+    state_ = GameState::NetworkWaiting;
   }
 }
 
@@ -121,8 +123,25 @@ void Game::step() {
   update_network();
 
   // Compile and process events
+  TickInput tick = compile_events();
+  // In a network match, the simulation input comes from both machines
+  waiting_for_peer_ = false;
+  if (session_) {
+    const auto network_tick = exchange_network_input(tick);
+    const std::uint64_t now = SDL_GetTicksNS();
+    if (!network_tick) {
+      // The other machine's input for this tick hasn't arrived: don't simulate or draw, retry soon
+      if (!wait_start_) {
+        wait_start_ = now;
+      }
+      waiting_for_peer_ = true;
+      return;
+    }
+    record_network_tick(now);
+    tick = *network_tick;
+  }
   // Then apply the simulation input of this frame
-  apply_tick_input(compile_events());
+  apply_tick_input(tick);
 
   switch (state_) {
   case GameState::Intro:
@@ -131,7 +150,7 @@ void Game::step() {
   case GameState::Menu:
     menu_state();
     break;
-  case GameState::VolleyGame:
+  case GameState::VolleyGame: {
     volley_state();
 
     // Check physics state and play sounds accordingly
@@ -141,6 +160,10 @@ void Game::step() {
     // Slow motion is ignored while paused, so the options menu runs at normal speed.
     const unsigned int fps = (slow_motion_ && !pause_) ? slow_motion_fps_ : target_fps_;
     target_frame_duration_ = ns_per_second / fps;
+    break;
+  }
+  case GameState::NetworkWaiting:
+    network_waiting_state();
     break;
   }
 
@@ -236,8 +259,8 @@ TickInput Game::compile_events() {
 
 void Game::apply_tick_input(const TickInput& tick) {
   tick_input_ = tick;
-  // The game can't be paused during the intro
-  if (tick.pause_toggle && state_ != GameState::Intro) {
+  // The game can't be paused during the intro, or while waiting for the other machine
+  if (tick.pause_toggle && state_ != GameState::Intro && state_ != GameState::NetworkWaiting) {
     pause_ = !pause_;
   }
   // Pass the player inputs to the controllers
@@ -252,26 +275,157 @@ void Game::update_network() {
   const net::ConnectionState previous_state = connection_->state();
   connection_->update(SDL_GetTicks());
   const net::ConnectionState state = connection_->state();
-  if (state == previous_state) {
-    return;
+
+  if (state != previous_state) {
+    switch (state) {
+    case net::ConnectionState::Connected: {
+      const net::MatchSetup& setup = connection_->setup();
+      SDL_Log("Connected to %s. Match setup: seed %u, input delay %u, speed %u, points %u. Playing on the %s",
+        connection_->peer_name().c_str(), setup.seed, setup.input_delay, setup.speed, setup.points,
+        connection_->local_side() == FieldSide::Left ? "left" : "right");
+      if (state_ == GameState::NetworkWaiting) {
+        start_network_match();
+      }
+      break;
+    }
+    case net::ConnectionState::Waiting:
+      SDL_Log("The guest left. Waiting for a new guest on UDP port %u", connection_->local_port());
+      if (session_) {
+        end_network_match();
+      }
+      break;
+    case net::ConnectionState::Disconnected:
+      SDL_Log("The host left or stopped answering");
+      if (session_) {
+        end_network_match();
+      }
+      break;
+    case net::ConnectionState::Connecting:
+      break;
+    }
   }
 
-  switch (state) {
-  case net::ConnectionState::Connected: {
-    const net::MatchSetup& setup = connection_->setup();
-    SDL_Log("Connected to %s. Match setup: seed %u, input delay %u, speed %u, points %u. Playing on the %s",
-      connection_->peer_name().c_str(), setup.seed, setup.input_delay, setup.speed, setup.points,
-      connection_->local_side() == FieldSide::Left ? "left" : "right");
-    break;
+  // Pass the other machine's inputs to the match (outside a match, they're not needed)
+  // The connection may have been closed above (the guest leaves when the match ends)
+  if (connection_) {
+    for (const auto& message : connection_->take_input_messages()) {
+      if (session_) {
+        session_->receive_message(message);
+      }
+    }
   }
-  case net::ConnectionState::Waiting:
-    SDL_Log("The guest left. Waiting for a new guest on UDP port %u", connection_->local_port());
-    break;
-  case net::ConnectionState::Disconnected:
-    SDL_Log("The host left or stopped answering");
-    break;
-  case net::ConnectionState::Connecting:
-    break;
+}
+
+std::optional<TickInput> Game::exchange_network_input(const TickInput& keyboard) {
+  // Either key set controls this machine's player
+  const SideInput local {
+    .player = {
+      .direction_x = keyboard.left.direction_x != DirX::None ? keyboard.left.direction_x : keyboard.right.direction_x,
+      .direction_y = keyboard.left.direction_y != DirY::None ? keyboard.left.direction_y : keyboard.right.direction_y,
+      .power_hit = keyboard.left.power_hit || keyboard.right.power_hit,
+    },
+    .pause_toggle = keyboard.pause_toggle,
+  };
+
+  // Send a message for each new local input, and re-send now and then while waiting (in case it was lost)
+  const bool new_input = session_->add_local_input(local);
+  const std::uint64_t now = SDL_GetTicksNS();
+  if (new_input || now - last_input_sent_ >= network_resend_interval_) {
+    connection_->send(session_->make_message());
+    last_input_sent_ = now;
+  }
+
+  if (!session_->ready()) {
+    return std::nullopt;
+  }
+  const TickInput tick = session_->current_input();
+  session_->advance();
+  return tick;
+}
+
+void Game::record_network_tick(const std::uint64_t now) {
+  NetworkWaitStats& stats = wait_stats_;
+  if (wait_start_) {
+    const std::uint64_t wait = now - *wait_start_;
+    ++stats.waits;
+    stats.total_wait += wait;
+    stats.max_wait = std::max(stats.max_wait, wait);
+    wait_start_.reset();
+  }
+  ++stats.ticks;
+
+  const std::uint64_t elapsed = now - stats.period_start;
+  if (elapsed >= ns_per_second) {
+    constexpr double ns_per_ms = 1e6;
+    SDL_Log("Network: %.1f ticks/s, %u of %u ticks waited (total %.1f ms, max %.1f ms)",
+      stats.ticks * static_cast<double>(ns_per_second) / static_cast<double>(elapsed),
+      stats.waits, stats.ticks,
+      static_cast<double>(stats.total_wait) / ns_per_ms, static_cast<double>(stats.max_wait) / ns_per_ms);
+    stats = {.period_start = now};
+  }
+}
+
+void Game::start_network_match() {
+  const net::MatchSetup& setup = connection_->setup();
+  session_.emplace(connection_->local_side(), setup.input_delay);
+  wait_stats_ = {.period_start = SDL_GetTicksNS()};
+  wait_start_.reset();
+
+  // Both machines must start from exactly the same state: a new simulation with the shared seed
+  reset_volley_game_state();
+  physics_ = std::make_unique<Physics>(setup.seed);
+  pause_ = false;
+  slow_motion_ = false;
+  // Both players use the keyboard: the inputs come from the session
+  controller_left_ = std::make_unique<KeyboardController>(FieldSide::Left);
+  controller_right_ = std::make_unique<KeyboardController>(FieldSide::Right);
+  // The host's game settings
+  if (setup.speed < option_count<SpeedOptionSelection>) {
+    change_game_speed(static_cast<SpeedOptionSelection>(setup.speed));
+  }
+  if (setup.points < option_count<PointsOptionSelection>) {
+    change_win_score(static_cast<PointsOptionSelection>(setup.points));
+  }
+  start_volley_game();
+}
+
+void Game::end_network_match() {
+  session_.reset();
+  reset_volley_game_state();
+  sdl_sys_.get_sound()->stop_music();
+  pause_ = false;
+  slow_motion_ = false;
+  frame_counter_ = 0;
+  target_frame_duration_ = ns_per_second / target_fps_;
+
+  if (connection_->is_host()) {
+    // Wait for the next guest (the current one leaves, or is already gone)
+    state_ = GameState::NetworkWaiting;
+  } else {
+    // The guest leaves and goes back to the local game
+    connection_->send_bye();
+    connection_.reset();
+    state_ = GameState::Intro;
+    intro_view_->start();
+  }
+}
+
+void Game::network_waiting_state() {
+  // TODO: Show a waiting screen. For now, the window stays black.
+  SDL_SetRenderDrawColor(sdl_sys_.get_renderer(), 0x00, 0x00, 0x00, 0xFF);
+  SDL_RenderClear(sdl_sys_.get_renderer());
+}
+
+void Game::start_volley_game() {
+  state_ = GameState::VolleyGame;
+  frame_counter_ = 0;
+  // Initialize controllers
+  controller_left_->on_game_start(PhysicsView(*physics_));
+  controller_right_->on_game_start(PhysicsView(*physics_));
+  volley_view_->start();
+  // Start the music (if enabled)
+  if (music_opt_select_ == OnOffSelection::On) {
+    sdl_sys_.get_sound()->start_music();
   }
 }
 
@@ -388,23 +542,14 @@ void Game::menu_state() {
     // After fading out completely, change game state to start the game
     if (menu_view_->get_fade_alpha() >= 1.0) {
       // Trigger transition to VolleyGame state
-      state_ = GameState::VolleyGame;
-      frame_counter_ = 0;
-      // Initialize controllers
-      controller_left_->on_game_start(PhysicsView(*physics_));
-      controller_right_->on_game_start(PhysicsView(*physics_));
-      volley_view_->start();
-      // Start the music (if enabled)
-      if (music_opt_select_ == OnOffSelection::On) {
-        sdl_sys_.get_sound()->start_music();
-      }
+      start_volley_game();
     }
     break;
   }
 }
 
 void Game::menu_options_state() {
-  if (!pause_ || state_ == GameState::Intro) {
+  if (!pause_ || state_ == GameState::Intro || state_ == GameState::NetworkWaiting) {
     return;
   }
 
@@ -413,13 +558,19 @@ void Game::menu_options_state() {
   const int value_delta = static_cast<int>(menu_input_.right) - static_cast<int>(menu_input_.left);
 
   // Left/right changes the value of the selected option (without cycling)
+  // In a network match, speed and points come from the host's match setup and can't change yet
+  // TODO: Let the host change them, sent in its inputs so both machines apply them on the same tick
   if (value_delta != 0) {
     switch (option_menu_select_) {
     case OptionMenuSelection::Speed:
-      change_game_speed(step_option(speed_opt_select_, value_delta));
+      if (!session_) {
+        change_game_speed(step_option(speed_opt_select_, value_delta));
+      }
       break;
     case OptionMenuSelection::Points:
-      change_win_score(step_option(points_opt_select_, value_delta));
+      if (!session_) {
+        change_win_score(step_option(points_opt_select_, value_delta));
+      }
       break;
     case OptionMenuSelection::Music:
       change_music(step_option(music_opt_select_, value_delta));
@@ -514,6 +665,11 @@ void Game::volley_state() {
       const bool skip = frame_counter_ > view::VolleyView::game_end_skip_frames && hit_pressed;
       // Or, end the game after the total animation frames
       if (skip || frame_counter_ > view::VolleyView::game_end_frames) {
+        if (session_) {
+          // Both machines reach this tick together
+          end_network_match();
+          return;
+        }
         reset_volley_game_state();
         frame_counter_ = 0;
         state_ = GameState::Intro;

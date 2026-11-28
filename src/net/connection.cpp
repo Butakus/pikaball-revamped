@@ -46,6 +46,16 @@ void Connection::send_bye() {
   }
 }
 
+void Connection::send(const std::span<const std::uint8_t> datagram) {
+  if (state_ == ConnectionState::Connected) {
+    transport_.send(datagram);
+  }
+}
+
+std::vector<std::vector<std::uint8_t>> Connection::take_input_messages() {
+  return std::exchange(input_messages_, {});
+}
+
 FieldSide Connection::local_side() const {
   if (is_host_) {
     return setup_.host_side;
@@ -96,13 +106,15 @@ void Connection::handle_datagram(const Datagram& datagram, const std::uint64_t n
     }
     break;
   case MessageType::Input:
-    // TODO: Pass the inputs to the NetworkSession once the game loop uses it.
-    // Receiving them already keeps the connection alive (last_received_ms_).
+    // Kept for the NetworkSession.
+    // They may arrive before the guest gets the Welcome (reordered), so they're also kept while connecting.
+    input_messages_.push_back(datagram.data);
     break;
   }
 }
 
 void Connection::disconnect() {
+  input_messages_.clear();
   if (is_host_) {
     transport_.clear_peer();
     state_ = ConnectionState::Waiting;

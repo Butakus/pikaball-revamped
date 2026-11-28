@@ -8,6 +8,7 @@ enum class GameState {
   Intro,
   Menu,
   VolleyGame,
+  NetworkWaiting,  // Network game: waiting for the other machine before the match starts
 };
 
 /** Menu sub-states */

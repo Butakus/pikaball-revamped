@@ -64,7 +64,7 @@ T parse_number(const std::string_view text, const T min, const T max, const char
  * Parse the network game options. Temporary for development, until the game has menus for it:
  *   --host <port>            Host a network game on the given UDP port
  *   --join <address:port>    Join the network game hosted at address:port
- *   --delay <frames>         Input delay in frames (host only, default 2)
+ *   --delay <frames>         Input delay in frames, 0 to 15 (host only, default 2)
  *   --side <left|right>      Side where the host plays (host only, default left)
  * @return The network settings, or nothing for a local game
  * @throws std::invalid_argument if the options are not valid
@@ -85,7 +85,7 @@ std::optional<pika::net::NetConfig> parse_net_options(const int argc, char** arg
         const std::string_view value = argv[++i];
 
         if (option == "--delay") {
-            delay = parse_number<std::uint8_t>(value, 1, 15, "input delay");
+            delay = parse_number<std::uint8_t>(value, 0, 15, "input delay");
             continue;
         }
         if (option == "--side") {

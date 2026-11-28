@@ -16,6 +16,7 @@
 
 #include <pikaball/controller/player_controller.hpp>
 #include <pikaball/net/connection.hpp>
+#include <pikaball/net/network_session.hpp>
 #include <pikaball/physics/physics.hpp>
 
 namespace pika {
@@ -46,7 +47,13 @@ public:
    */
   void handle_event(const SDL_Event * event);
 
-  [[nodiscard]] std::uint64_t get_frame_duration() const {return target_frame_duration_;}
+  /**
+   * @return The time until the next step, in nanoseconds.
+   *         Very short while waiting for the other machine's input
+   */
+  [[nodiscard]] std::uint64_t get_frame_duration() const {
+    return waiting_for_peer_ ? network_retry_duration_ : target_frame_duration_;
+  }
 private:
   SDLSystem sdl_sys_;
 
@@ -109,6 +116,28 @@ private:
 
   // Connection to the other machine in a network game. Empty in a local game.
   std::optional<net::Connection> connection_;
+  // Input exchange of the current network match. Empty outside network matches.
+  std::optional<net::NetworkSession> session_;
+  // True if the last step couldn't run because the other machine's input hadn't arrived
+  bool waiting_for_peer_ {false};
+  // Time between retries while waiting for the other machine's input (0.5 ms)
+  constexpr static std::uint64_t network_retry_duration_ {ns_per_second / 2000};
+  // While waiting, the Input message is re-sent at this pace (in case the last ones were lost)
+  constexpr static std::uint64_t network_resend_interval_ {ns_per_second / 400};
+  // Time of the last Input message sent, in nanoseconds
+  std::uint64_t last_input_sent_ {0};
+
+  // Statistics of the waits for the other machine's input, logged every second
+  struct NetworkWaitStats {
+    std::uint64_t period_start {0};  // Start of the logging period (ns)
+    unsigned int ticks {0};          // Ticks simulated in the period
+    unsigned int waits {0};          // Ticks that had to wait for the other machine
+    std::uint64_t total_wait {0};    // Sum of the waits (ns)
+    std::uint64_t max_wait {0};      // Longest wait (ns)
+  };
+  NetworkWaitStats wait_stats_ {};
+  // When the wait for the current tick started (ns). Empty if it's not waiting.
+  std::optional<std::uint64_t> wait_start_;
 
   /**
    * Process and compiles all events previously handled by handle_event
@@ -124,8 +153,34 @@ private:
    */
   void apply_tick_input(const TickInput& tick);
 
-  /** Send and receive network messages, and log the connection changes */
+  /**
+   * Send and receive network messages, log the connection changes,
+   * and start or end the network match when the other machine connects or leaves.
+   */
   void update_network();
+
+  /**
+   * In a network match, send the local input and get the input of the tick to simulate.
+   * @param keyboard This machine's keyboard input (either key set controls the local player)
+   * @return The input of the next tick, or nothing if the other machine's input hasn't arrived yet
+   */
+  std::optional<TickInput> exchange_network_input(const TickInput& keyboard);
+
+  /**
+   * Record that a network tick is simulated now (and how long it waited), and log the statistics every second
+   * @param now Current time (ns)
+   */
+  void record_network_tick(std::uint64_t now);
+
+  /** Start a network match with the match setup of the connection */
+  void start_network_match();
+  /** Leave the network match (when it ends, or the other machine leaves) */
+  void end_network_match();
+  /** Render the screen shown while waiting for the other machine */
+  void network_waiting_state();
+
+  /** Switch to the VolleyGame state and start the game (from the menu, or a network match) */
+  void start_volley_game();
 
   /** Handle player and ball sounds */
   void handle_sound() const;

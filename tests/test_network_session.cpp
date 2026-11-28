@@ -138,6 +138,18 @@ TEST_CASE("NetworkSession: inputs are applied input_delay ticks later, on the ri
   CHECK(guest.current_input().pause_toggle);
 }
 
+TEST_CASE("NetworkSession: without input delay, every tick needs the remote input") {
+  NetworkSession host(FieldSide::Left, 0);
+  NetworkSession guest(FieldSide::Right, 0);
+  host.add_local_input(hit());
+  CHECK_FALSE(host.ready());
+  guest.add_local_input({});
+  REQUIRE(host.receive_message(guest.make_message()));
+  REQUIRE(host.ready());
+  CHECK(host.current_input().left == input::power_hit());
+  CHECK(host.current_input().right == input::idle());
+}
+
 TEST_CASE("NetworkSession: presses while waiting are carried to the next tick") {
   NetworkSession session(FieldSide::Left, 1);
   session.add_local_input({});        // Scheduled for tick 1
@@ -230,8 +242,8 @@ struct Machine {
   std::vector<TickInput> applied;
   std::vector<PhysicsView> states;
 
-  Machine(const FieldSide side, const std::uint32_t seed, const std::uint32_t input_seed) :
-    session(side, 2), physics(seed), input_rng(input_seed), speed_rng(input_seed + 1)
+  Machine(const FieldSide side, const std::uint8_t delay, const std::uint32_t seed, const std::uint32_t input_seed) :
+    session(side, delay), physics(seed), input_rng(input_seed), speed_rng(input_seed + 1)
   {
     physics.init_round(FieldSide::Left);
   }
@@ -267,8 +279,12 @@ struct Machine {
 TEST_CASE("NetworkSession: two machines stay in sync over a bad network") {
   constexpr std::uint32_t seed = 2024;
   constexpr std::size_t ticks = 3000;
-  Machine host(FieldSide::Left, seed, 1);
-  Machine guest(FieldSide::Right, seed, 2);
+  std::uint8_t delay {0};
+  SUBCASE("no input delay") { delay = 0; }
+  SUBCASE("input delay 2") { delay = 2; }
+  CAPTURE(delay);
+  Machine host(FieldSide::Left, delay, seed, 1);
+  Machine guest(FieldSide::Right, delay, seed, 2);
   FakeLink to_guest(10);
   FakeLink to_host(11);
 
